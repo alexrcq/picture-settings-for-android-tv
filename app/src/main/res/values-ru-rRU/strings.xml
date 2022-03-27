@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Настройки изображения</string>
+    <string name="not_supported_tv">Модель телевизора не поддерживается</string>
+    <string name="write_settings_permission_required">Необходимо разрешение\nandroid.permission.WRITE_SECURE_SETTINGS\nдля изменения системных настроек</string>
+    <string name="adaptive_luma_control">Адаптивная подстветка</string>
+    <string name="local_contrast_control">Локальный контраст</string>
+    <string name="noise_reduction">Шумоподавление</string>
+    <string name="advanced_video">Расширенные настройки видео</string>
+    <string name="backlight">Подсветка</string>
+    <string name="picture_mode">Режим изображения</string>
+    <string name="picture">Изображение</string>
+    <string name="advanced">Дополнительно</string>
+    <string name="reset_to_default_message">Сбросить настройки изображения до значений по умолчанию?</string>
+    <string name="color_temperature">Цветовая температура</string>
+    <string name="reset_to_default">Восстановить по умолчанию</string>
+    <string name="auto_backlight">Автоматическая подсветка</string>
+    <string name="sunrise">Рассвет</string>
+    <string name="sunset">Закат</string>
+    <string name="backlight_at_night">Подсветка ночью</string>
+    <string name="brightness">Яркость</string>
+    <string name="contrast">Контраст</string>
+    <string name="saturation">Насыщенность</string>
+    <string name="hue">Оттенок</string>
+    <string name="sharpness">Резкость</string>
+    <string name="auto_backlight_summary">Автоматически снижать и повышать подсветку после заката и восхода соответственно</string>
+    <string name="extra_dimming">Дополнительное затемнение</string>
+    <string name="make_it_even_darker_summary">Помимо снижения подсветки, накладывать неинтерактивный прозрачный тёмный прямоугольник поверх изображения телевизора в тёмное время суток</string>
+    <string name="should_enable_dark_filter_message">Для работы данной настройки необходимо включить \"Тёмный фильтр\" в настройках вашего ТВ в разделе\n<b>Настройки устройства → Cпециальные возможности</b></string>
+    <string name="open_settings">Открыть настройки</string>
+</resources>

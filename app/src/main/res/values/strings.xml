@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Picture settings</string>
+    <string name="not_supported_tv">The current TV model is not supported</string>
+    <string name="write_settings_permission_required">You need a WRITE_SECURE_SETTINGS permission to change system settings</string>
+    <string name="adaptive_luma_control">Adaptive luma control</string>
+    <string name="local_contrast_control">Local contrast control</string>
+    <string name="noise_reduction">Noise reduction</string>
+    <string name="advanced_video">Advanced video</string>
+    <string name="backlight">Backlight</string>
+    <string name="picture_mode">Picture mode</string>
+    <string name="picture">Picture</string>
+    <string name="advanced">Advanced</string>
+    <string name="reset_to_default_message">Reset picture settings to default values?</string>
+    <string name="color_temperature">Color Temperature</string>
+    <string name="reset_to_default">Reset to Default</string>
+    <string name="auto_backlight">Auto-backlight</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+    <string name="backlight_at_night">Backlight at night</string>
+    <string name="brightness">Brightness</string>
+    <string name="contrast">Contrast</string>
+    <string name="saturation">Saturation</string>
+    <string name="hue">HUE</string>
+    <string name="sharpness">Sharpness</string>
+    <string name="auto_backlight_summary">Automatically decrease and increase the backlight after sunset and sunrise, respectively</string>
+    <string name="extra_dimming">Extra dimming</string>
+    <string name="make_it_even_darker_summary">In addition to decreasing the backlight, the enabled preference overlays a non-interactive transparent dark rectangle on top of the TV picture</string>
+    <string name="should_enable_dark_filter_message">In order for this setting to work, you should enable the \"Dark filter\" in your TV settings in the \"Device settings → Accessibility\" section.</string>
+    <string name="open_settings">Open settings</string>
+</resources>

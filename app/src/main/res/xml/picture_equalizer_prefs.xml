@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    app:title="Эквалайзер">
+    <SeekBarPreference
+        app:key="brightness"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:persistent="false"
+        app:title="@string/brightness" />
+    <SeekBarPreference
+        app:key="contrast"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:persistent="false"
+        app:title="@string/contrast" />
+    <SeekBarPreference
+        app:key="saturation"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:persistent="false"
+        app:title="@string/saturation" />
+    <SeekBarPreference
+        app:key="hue"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:persistent="false"
+        app:title="@string/hue"
+        app:min="-50"
+        android:max="50"/>
+    <SeekBarPreference
+        app:key="sharpness"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:persistent="false"
+        app:title="@string/sharpness"
+        android:max="20" />
+</PreferenceScreen>

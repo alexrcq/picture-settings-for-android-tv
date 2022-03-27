@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Main picture settings -->
+    <integer name="default_backlight">80</integer>
+    <integer name="default_temperature">3</integer>
+    <integer name="default_picture_mode">7</integer>
+    <!-- Picture equalizer -->
+    <integer name="default_brightness">50</integer>
+    <integer name="default_contrast">50</integer>
+    <integer name="default_saturation">50</integer>
+    <integer name="default_hue">0</integer>
+    <integer name="default_sharpness">10</integer>
+    <!-- Advanced video -->
+    <integer name="default_noise_reduction">2</integer>
+    <integer name="default_local_contrast_control">2</integer>
+    <integer name="default_adaptive_luma_control">2</integer>
+</resources>

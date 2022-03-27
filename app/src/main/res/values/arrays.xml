@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="picture_mode">
+        <item>Default</item>
+        <item>Bright</item>
+        <item>Sport</item>
+        <item>Movie</item>
+        <item>Custom</item>
+    </string-array>
+    <string-array name="picture_temperature">
+        <item>Warm</item>
+        <item>Cold</item>
+        <item>Default</item>
+    </string-array>
+    <string-array name="picture_mode_values">
+        <item>7</item>
+        <item>3</item>
+        <item>2</item>
+        <item>9</item>
+        <item>0</item>
+    </string-array>
+    <string-array name="picture_temperature_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <array name="picture_advanced_video_noise_reduction_entries">
+        <item>Off</item>
+        <item>Minimum</item>
+        <item>Medium</item>
+        <item>Strong</item>
+    </array>
+    <string-array name="picture_advanced_video_noise_reduction_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+</resources>
