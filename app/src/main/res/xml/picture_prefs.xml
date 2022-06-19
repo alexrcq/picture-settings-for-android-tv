@@ -7,6 +7,9 @@
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/backlight" />
+    <Preference
+        app:key="power_picture_off"
+        app:title="@string/power_picture_off" />
     <ListPreference
         app:entries="@array/picture_mode"
         app:entryValues="@array/picture_mode_values"

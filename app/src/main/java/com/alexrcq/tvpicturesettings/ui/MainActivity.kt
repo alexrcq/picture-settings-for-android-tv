@@ -1,54 +1,38 @@
 package com.alexrcq.tvpicturesettings.ui
 
+import android.Manifest
 import android.app.AlertDialog
-import android.content.*
+import android.content.DialogInterface
 import android.os.Bundle
-import android.os.IBinder
 import android.view.Gravity
 import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.service.AutoBacklightService
-import com.alexrcq.tvpicturesettings.util.DialogButton.NEGATIVE_BUTTON
 import com.alexrcq.tvpicturesettings.util.DialogButton.POSITIVE_BUTTON
 import com.alexrcq.tvpicturesettings.util.Utils
 import com.alexrcq.tvpicturesettings.util.makeButtonFocused
 
-class MainActivity : FragmentActivity(R.layout.activity_main) {
+class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!Utils.isCurrentTVSupported(this)) {
             showNotSupportedTVDialog()
-        } else if (!Utils.canWriteSecureSettings(this)) {
-            showPermissionRequiredDialog()
         }
-    }
-
-    private var isAutoBacklightServiceBound = false
-
-    private val autoBacklightServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {}
-        override fun onServiceDisconnected(arg0: ComponentName) {}
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (!isAutoBacklightServiceBound) {
-            bindService(
-                Intent(this, AutoBacklightService::class.java),
-                autoBacklightServiceConnection,
-                Context.BIND_AUTO_CREATE
-            )
-            isAutoBacklightServiceBound = true
+        if (!Utils.isDebuggingEnabled(this)) {
+            showUsbDebuggingRequiredDialog()
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        if (isAutoBacklightServiceBound) {
-            unbindService(autoBacklightServiceConnection)
-            isAutoBacklightServiceBound = false
+        if (Utils.hasPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            setContentView(R.layout.activity_main)
+        } else {
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                if (isGranted) {
+                    setContentView(R.layout.activity_main)
+                } else {
+                    showStoragePermissionRequiredDialog()
+                }
+            }.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
     }
 
@@ -73,17 +57,27 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             .setPositiveButton(android.R.string.ok, onOkClickListener)
             .create()
         alertDialog.show()
-        alertDialog.makeButtonFocused(NEGATIVE_BUTTON)
+        alertDialog.makeButtonFocused(POSITIVE_BUTTON)
     }
 
-    private fun showPermissionRequiredDialog() {
+    private fun showStoragePermissionRequiredDialog() {
         val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
-            if (!Utils.canWriteSecureSettings(this)) {
-                finish()
-            }
+            finish()
         }
         val alertDialog = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-            .setMessage(R.string.write_settings_permission_required)
+            .setMessage(R.string.storage_permission_required)
+            .setPositiveButton(android.R.string.ok, onOkClickListener)
+            .create()
+        alertDialog.show()
+        alertDialog.makeButtonFocused(POSITIVE_BUTTON)
+    }
+
+    private fun showUsbDebuggingRequiredDialog() {
+        val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
+            finish()
+        }
+        val alertDialog = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            .setMessage("Для работы приложения требуется включить отладку по USB в настройках для разработчиков")
             .setPositiveButton(android.R.string.ok, onOkClickListener)
             .create()
         alertDialog.show()

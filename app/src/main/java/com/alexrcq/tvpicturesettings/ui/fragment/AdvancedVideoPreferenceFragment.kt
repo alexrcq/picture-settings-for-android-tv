@@ -7,6 +7,7 @@ import androidx.preference.Preference
 import androidx.preference.SwitchPreference
 import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 
 class AdvancedVideoPreferenceFragment : LeanbackPreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
@@ -19,10 +20,10 @@ class AdvancedVideoPreferenceFragment : LeanbackPreferenceFragmentCompat(), Pref
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.advanced_video_prefs, rootKey)
-        pictureSettings = PictureSettings(requireContext())
-        noiseReductionPref = findPreference(Keys.NOISE_REDUCTION)
-        adaptiveLumaPref = findPreference(Keys.ADAPTIVE_LUMA_CONTROL)
-        localContrastPref = findPreference(Keys.LOCAL_CONTRAST_CONTROL)
+        pictureSettings = PictureSettings.getInstance(requireContext())
+        noiseReductionPref = findPreference(AppPreferences.Keys.NOISE_REDUCTION)
+        adaptiveLumaPref = findPreference(AppPreferences.Keys.ADAPTIVE_LUMA_CONTROL)
+        localContrastPref = findPreference(AppPreferences.Keys.LOCAL_CONTRAST_CONTROL)
         preferenceScreen.forEach { preference ->
             preference.onPreferenceChangeListener = this
         }
@@ -41,22 +42,16 @@ class AdvancedVideoPreferenceFragment : LeanbackPreferenceFragmentCompat(), Pref
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         when (preference.key) {
-            Keys.ADAPTIVE_LUMA_CONTROL -> {
+            AppPreferences.Keys.ADAPTIVE_LUMA_CONTROL -> {
                 pictureSettings.isAdaptiveLumaEnabled = newValue as Boolean
             }
-            Keys.LOCAL_CONTRAST_CONTROL -> {
+            AppPreferences.Keys.LOCAL_CONTRAST_CONTROL -> {
                 pictureSettings.isLocalContrastEnabled = newValue as Boolean
             }
-            Keys.NOISE_REDUCTION -> {
+            AppPreferences.Keys.NOISE_REDUCTION -> {
                 pictureSettings.noiseReduction = (newValue as String).toInt()
             }
         }
         return true
-    }
-
-    private object Keys {
-        const val NOISE_REDUCTION = "noise_reduction"
-        const val ADAPTIVE_LUMA_CONTROL = "adaptive_luma_control"
-        const val LOCAL_CONTRAST_CONTROL = "local_contrast_control"
     }
 }

@@ -3,46 +3,56 @@ package com.alexrcq.tvpicturesettings.ui.fragment
 import android.app.AlertDialog
 import android.content.*
 import android.os.Bundle
-import android.os.IBinder
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
-import android.view.View
 import androidx.fragment.app.commitNow
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.preference.*
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.service.AutoBacklightService
+import com.alexrcq.tvpicturesettings.helper.AutoBacklightManager
+import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import com.alexrcq.tvpicturesettings.storage.GlobalSettings
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 import com.alexrcq.tvpicturesettings.util.DialogButton.NEGATIVE_BUTTON
 import com.alexrcq.tvpicturesettings.util.DialogButton.POSITIVE_BUTTON
-import com.alexrcq.tvpicturesettings.util.GlobalSettingsObserver
-import com.alexrcq.tvpicturesettings.util.OnGlobalSettingChangedCallback
 import com.alexrcq.tvpicturesettings.util.Utils
 import com.alexrcq.tvpicturesettings.util.makeButtonFocused
 
 
 class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
-    OnGlobalSettingChangedCallback, SharedPreferences.OnSharedPreferenceChangeListener,
+    SharedPreferences.OnSharedPreferenceChangeListener,
     Preference.OnPreferenceChangeListener {
 
     private var backlightPref: SeekBarPreference? = null
     private var pictureModePref: ListPreference? = null
     private var temperaturePref: ListPreference? = null
     private var isDarkFilterEnabledPref: SwitchPreference? = null
-    private var globalSettingsObserver = GlobalSettingsObserver()
 
-    private var autoBacklightService: AutoBacklightService? = null
-
+    private lateinit var autoBacklightManager: AutoBacklightManager
+    private lateinit var appPreferences: AppPreferences
     private lateinit var pictureSettings: PictureSettings
+
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            updateBacklightBarWithDelay()
+        }
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.picture_prefs, rootKey)
-        pictureSettings = PictureSettings(requireContext())
-        backlightPref = findPreference(Keys.BACKLIGHT)
-        pictureModePref = findPreference(Keys.PICTURE_MODE)
-        temperaturePref = findPreference(Keys.TEMPERATURE)
-        isDarkFilterEnabledPref = findPreference(Keys.IS_DARK_FILTER_ENABLED)
-        findPreference<Preference>(Keys.RESET_TO_DEFAULT)?.setOnPreferenceClickListener {
+        appPreferences = AppPreferences(requireContext())
+        autoBacklightManager = AutoBacklightManager(requireContext())
+        pictureSettings = PictureSettings.getInstance(requireContext())
+        backlightPref = findPreference(AppPreferences.Keys.BACKLIGHT)
+        pictureModePref = findPreference(AppPreferences.Keys.PICTURE_MODE)
+        temperaturePref = findPreference(AppPreferences.Keys.TEMPERATURE)
+        isDarkFilterEnabledPref = findPreference(AppPreferences.Keys.IS_DARK_FILTER_ENABLED)
+        findPreference<Preference>(AppPreferences.Keys.POWER_PICTURE_OFF)?.setOnPreferenceClickListener {
+            pictureSettings.turnOffScreen()
+            true
+        }
+        findPreference<Preference>(AppPreferences.Keys.RESET_TO_DEFAULT)?.setOnPreferenceClickListener {
             showResetToDefaultDialog()
             true
         }
@@ -53,20 +63,26 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         when (preference.key) {
-            Keys.BACKLIGHT -> {
-                pictureSettings.backlight = newValue as Int
+            AppPreferences.Keys.BACKLIGHT -> {
+                val backlight = newValue as Int
+                pictureSettings.backlight = backlight
+                with(appPreferences) {
+                    if (isAutoBacklightEnabled && !isNightNow) {
+                        dayBacklight = backlight
+                    }
+                }
             }
-            Keys.PICTURE_MODE -> {
+            AppPreferences.Keys.PICTURE_MODE -> {
                 val pictureMode = (newValue as String).toInt()
                 pictureSettings.pictureMode = pictureMode
                 if (pictureMode == GlobalSettings.PICTURE_MODE_USER) {
                     showPictureEqualizer()
                 }
             }
-            Keys.TEMPERATURE -> {
+            AppPreferences.Keys.TEMPERATURE -> {
                 pictureSettings.temperature = (newValue as String).toInt()
             }
-            Keys.IS_DARK_FILTER_ENABLED -> {
+            AppPreferences.Keys.IS_DARK_FILTER_ENABLED -> {
                 val isDarkFilterEnabled = newValue as Boolean
                 if (isDarkFilterEnabled && !Utils.isDarkFilterServiceEnabled(requireContext())) {
                     showEnableDarkFilterDialog()
@@ -74,11 +90,13 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
                     return false
                 }
             }
-            Keys.DAY_TIME -> {
-                autoBacklightService?.setDaytimeLaunchTime(newValue as String)
+            AppPreferences.Keys.DAY_TIME -> {
+                autoBacklightManager.setDaytimeManagerLaunchTime(newValue as String)
+                updateBacklightBarWithDelay()
             }
-            Keys.NIGHT_TIME -> {
-                autoBacklightService?.setNighttimeLaunchTime(newValue as String)
+            AppPreferences.Keys.NIGHT_TIME -> {
+                autoBacklightManager.setNighttimeLaunchTime(newValue as String)
+                updateBacklightBarWithDelay()
             }
         }
         return true
@@ -86,74 +104,28 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
         when (key) {
-            Keys.IS_AUTO_BACKLIGHT_ENABLED -> {
-                val isAutoBacklightEnabled =
-                    sharedPreferences.getBoolean(Keys.IS_AUTO_BACKLIGHT_ENABLED, false)
-                if (isAutoBacklightEnabled) {
-                    autoBacklightService?.enable()
-                } else {
-                    autoBacklightService?.disable()
+            AppPreferences.Keys.IS_AUTO_BACKLIGHT_ENABLED -> {
+                autoBacklightManager.switchAutoBacklight(enabled = appPreferences.isAutoBacklightEnabled)
+                updateBacklightBarWithDelay()
+            }
+            AppPreferences.Keys.IS_DARK_FILTER_ENABLED -> {
+                autoBacklightManager.switchDarkFilter(enabled = (appPreferences.isDarkFilterEnabled && appPreferences.isNightNow))
+            }
+            AppPreferences.Keys.NIGHT_BACKLIGHT -> {
+                with(appPreferences) {
+                    if (isNightNow) {
+                        pictureSettings.backlight = nightBacklight
+                    }
                 }
             }
-            Keys.IS_DARK_FILTER_ENABLED -> {
-                val isDarkFilterEnabled =
-                    sharedPreferences.getBoolean(Keys.IS_DARK_FILTER_ENABLED, false)
-                if (isDarkFilterEnabled) {
-                    autoBacklightService?.enableDarkFilter()
-                } else {
-                    autoBacklightService?.disableDarkFilter()
-                }
-            }
-            Keys.NIGHT_BACKLIGHT -> {
-                autoBacklightService?.setNightBacklight(
-                    sharedPreferences.getInt(Keys.NIGHT_BACKLIGHT, 0)
-                )
-            }
         }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        globalSettingsObserver.observe(requireContext().contentResolver, this)
-    }
-
-    override fun onGlobalSettingChanged(key: String) {
-        when (key) {
-            GlobalSettings.KEY_PICTURE_BACKLIGHT -> {
-                backlightPref?.value = pictureSettings.backlight
-            }
-            GlobalSettings.KEY_PICTURE_MODE -> {
-                pictureModePref?.value = pictureSettings.pictureMode.toString()
-            }
-            GlobalSettings.KEY_PICTURE_TEMPERATURE -> {
-                temperaturePref?.value = pictureSettings.temperature.toString()
-            }
-        }
-    }
-
-    private var isAutoBacklightServiceBound = false
-
-    private val autoBacklightServiceConnection = object : ServiceConnection {
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            val serviceBinder = service as AutoBacklightService.ServiceBinder
-            autoBacklightService = serviceBinder.getService()
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {}
     }
 
     override fun onStart() {
         super.onStart()
         PreferenceManager.getDefaultSharedPreferences(requireContext().applicationContext)
             .registerOnSharedPreferenceChangeListener(this)
-        if (!isAutoBacklightServiceBound) {
-            requireContext().bindService(
-                Intent(requireContext(), AutoBacklightService::class.java),
-                autoBacklightServiceConnection,
-                Context.BIND_AUTO_CREATE
-            )
-            isAutoBacklightServiceBound = true
-        }
+        requireActivity().registerReceiver(receiver, IntentFilter(ACTION_UPDATE_BACKLIGHT_BAR))
         updateUi()
     }
 
@@ -161,15 +133,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         super.onStop()
         PreferenceManager.getDefaultSharedPreferences(requireContext().applicationContext)
             .unregisterOnSharedPreferenceChangeListener(this)
-        if (isAutoBacklightServiceBound) {
-            requireContext().unbindService(autoBacklightServiceConnection)
-            isAutoBacklightServiceBound = false
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        globalSettingsObserver.stopObserving()
+        requireActivity().unregisterReceiver(receiver)
     }
 
     private fun updateUi() {
@@ -220,15 +184,14 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         alertDialog.makeButtonFocused(NEGATIVE_BUTTON)
     }
 
-    private object Keys {
-        const val IS_AUTO_BACKLIGHT_ENABLED = "auto_backlight"
-        const val BACKLIGHT = "backlight"
-        const val DAY_TIME = "ab_day_time"
-        const val NIGHT_TIME = "ab_night_time"
-        const val IS_DARK_FILTER_ENABLED = "is_dark_filter_enabled"
-        const val NIGHT_BACKLIGHT = "ab_night_backlight"
-        const val PICTURE_MODE = "picture_mode"
-        const val TEMPERATURE = "temperature"
-        const val RESET_TO_DEFAULT = "reset_to_default"
+    private fun updateBacklightBarWithDelay() {
+        //wait for the shell
+        Handler(Looper.getMainLooper()).postDelayed({
+            backlightPref?.value = pictureSettings.backlight
+        }, 200)
+    }
+
+    companion object {
+        const val ACTION_UPDATE_BACKLIGHT_BAR = "com.alexrcq.tvpicturesettings.ui.fragment.ACTION_UPDATE_BACKLIGHT_BAR"
     }
 }

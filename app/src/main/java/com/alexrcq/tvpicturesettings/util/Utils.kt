@@ -1,6 +1,5 @@
 package com.alexrcq.tvpicturesettings.util
 
-import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.provider.Settings
@@ -20,8 +19,11 @@ object Utils {
         }
     }
 
-    fun canWriteSecureSettings(context: Context): Boolean =
-        context.checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED
+    fun isDebuggingEnabled(context: Context): Boolean =
+        Settings.Global.getInt(context.contentResolver, Settings.Global.ADB_ENABLED, 0) == 1
+
+    fun hasPermission(context: Context, permission: String): Boolean =
+        context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 
     fun isDarkFilterServiceEnabled(context: Context): Boolean {
         val prefString = Settings.Secure.getString(

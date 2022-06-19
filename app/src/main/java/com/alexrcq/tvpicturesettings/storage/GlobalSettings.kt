@@ -2,13 +2,44 @@ package com.alexrcq.tvpicturesettings.storage
 
 import android.content.Context
 import android.provider.Settings
+import android.util.Log
+import com.alexrcq.tvpicturesettings.util.AdbUtils
+import com.tananaev.adblib.AdbConnection
+import com.tananaev.adblib.AdbCrypto
+import java.io.IOException
+import java.net.Socket
+import java.util.concurrent.Executors
 
 open class GlobalSettings(context: Context) {
 
     private var contentResolver = context.contentResolver
+    private var connection: AdbConnection? = null
+    private val executor = Executors.newSingleThreadExecutor()
+
+    init {
+        var crypto: AdbCrypto? = AdbUtils.readCryptoConfig(context.filesDir)
+        executor.execute {
+            if (crypto == null) {
+                crypto = AdbUtils.writeNewCryptoConfig(context.filesDir)
+                if (crypto == null) {
+                    Log.d("GlobalSettings", "Key Pair Generation Failed")
+                    return@execute
+                }
+                Log.d("GlobalSettings", "New Key Pair Generated")
+            }
+            connection = AdbConnection.create(Socket("127.0.0.1", 5555), crypto)
+            connection?.connect()
+        }
+    }
 
     fun putInt(key: String, value: Int) {
-        Settings.Global.putInt(contentResolver, key, value)
+        executor.execute {
+            try {
+                connection?.open("shell:settings put global $key $value")
+            } catch (e: IOException) {
+                // do nothing, wait for the user
+            }
+        }
     }
 
     fun getInt(key: String?): Int {
@@ -27,6 +58,7 @@ open class GlobalSettings(context: Context) {
         const val KEY_PICTURE_SATURATION = "picture_saturation"
         const val KEY_PICTURE_HUE = "picture_hue"
         const val KEY_PICTURE_SHARPNESS = "picture_sharpness"
+        const val KEY_POWER_PICTURE_OFF = "power_picture_off"
         const val PICTURE_MODE_DEFAULT = 7
         const val PICTURE_MODE_BRIGHT = 3
         const val PICTURE_MODE_SPORT = 2

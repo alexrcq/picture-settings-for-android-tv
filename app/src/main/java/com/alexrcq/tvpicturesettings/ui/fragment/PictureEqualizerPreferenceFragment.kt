@@ -9,6 +9,7 @@ import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
 import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 
 class PictureEqualizerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
@@ -24,12 +25,12 @@ class PictureEqualizerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.picture_equalizer_prefs, rootKey)
-        pictureSettings = PictureSettings(requireContext())
-        brightnessPref = findPreference(Keys.BRIGHTNESS)
-        contrastPref = findPreference(Keys.CONTRAST)
-        saturationPref = findPreference(Keys.SATURATION)
-        huePref = findPreference(Keys.HUE)
-        sharpnessPref = findPreference(Keys.SHARPNESS)
+        pictureSettings = PictureSettings.getInstance(requireContext())
+        brightnessPref = findPreference(AppPreferences.Keys.BRIGHTNESS)
+        contrastPref = findPreference(AppPreferences.Keys.CONTRAST)
+        saturationPref = findPreference(AppPreferences.Keys.SATURATION)
+        huePref = findPreference(AppPreferences.Keys.HUE)
+        sharpnessPref = findPreference(AppPreferences.Keys.SHARPNESS)
         preferenceScreen.forEach { preference ->
             preference.onPreferenceChangeListener = this
         }
@@ -50,19 +51,19 @@ class PictureEqualizerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         when (preference.key) {
-            Keys.BRIGHTNESS -> {
+            AppPreferences.Keys.BRIGHTNESS -> {
                 pictureSettings.brightness = newValue as Int
             }
-            Keys.CONTRAST -> {
+            AppPreferences.Keys.CONTRAST -> {
                 pictureSettings.contrast = newValue as Int
             }
-            Keys.SATURATION -> {
+            AppPreferences.Keys.SATURATION -> {
                 pictureSettings.saturation = newValue as Int
             }
-            Keys.HUE -> {
+            AppPreferences.Keys.HUE -> {
                 pictureSettings.hue = newValue as Int
             }
-            Keys.SHARPNESS -> {
+            AppPreferences.Keys.SHARPNESS -> {
                 pictureSettings.sharpness = newValue as Int
             }
         }
@@ -91,13 +92,5 @@ class PictureEqualizerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
                 PicturePreferenceFragment()
             )
         }
-    }
-
-    private object Keys {
-        const val BRIGHTNESS = "brightness"
-        const val CONTRAST = "contrast"
-        const val SATURATION = "saturation"
-        const val HUE = "hue"
-        const val SHARPNESS = "sharpness"
     }
 }

@@ -4,9 +4,11 @@
     package="com.alexrcq.tvpicturesettings">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"
-        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"
+        tools:ignore="ScopedStorage" />
 
     <uses-feature
         android:name="android.software.leanback"
@@ -24,10 +26,6 @@
         android:theme="@style/Theme.AppTheme">
 
         <service
-            android:name="com.alexrcq.tvpicturesettings.service.AutoBacklightService"
-            android:exported="false" />
-
-        <service
             android:name="com.alexrcq.tvpicturesettings.service.DarkFilterService"
             android:exported="false"
             android:label="Тёмный фильтр"
@@ -38,12 +36,12 @@
         </service>
 
         <receiver
-            android:name="com.alexrcq.tvpicturesettings.AppReceiver"
+            android:name="com.alexrcq.tvpicturesettings.helper.AppReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-                <action android:name="com.alerxrcq.tvpicturesettings.AutoBacklightService.ACTION_SERVICE_LAUNCH" />
+                <action android:name="com.alerxrcq.tvpicturesettings.AutoBacklightManager.ACTION_SCHEDULED_MANAGER_LAUNCH" />
             </intent-filter>
         </receiver>
 

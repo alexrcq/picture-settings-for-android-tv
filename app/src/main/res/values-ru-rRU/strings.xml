@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">Настройки изображения</string>
     <string name="not_supported_tv">Модель телевизора не поддерживается</string>
-    <string name="write_settings_permission_required">Необходимо разрешение\nandroid.permission.WRITE_SECURE_SETTINGS\nдля изменения системных настроек</string>
     <string name="adaptive_luma_control">Адаптивная подстветка</string>
     <string name="local_contrast_control">Локальный контраст</string>
     <string name="noise_reduction">Шумоподавление</string>
@@ -28,4 +27,6 @@
     <string name="make_it_even_darker_summary">Помимо снижения подсветки, накладывать неинтерактивный прозрачный тёмный прямоугольник поверх изображения телевизора в тёмное время суток</string>
     <string name="should_enable_dark_filter_message">Для работы данной настройки необходимо включить \"Тёмный фильтр\" в настройках вашего ТВ в разделе\n<b>Настройки устройства → Cпециальные возможности</b></string>
     <string name="open_settings">Открыть настройки</string>
+    <string name="power_picture_off">Выключить экран</string>
+    <string name="storage_permission_required">Для работы приложения требуется разрешение на запись во внешнее хранилище</string>
 </resources>

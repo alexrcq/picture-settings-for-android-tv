@@ -1,9 +1,11 @@
 package com.alexrcq.tvpicturesettings.storage
 
+import android.annotation.SuppressLint
 import android.content.Context
 import com.alexrcq.tvpicturesettings.R
 
-class PictureSettings(private val context: Context): GlobalSettings(context) {
+class PictureSettings private constructor(private val context: Context) : GlobalSettings(context) {
+
     var backlight: Int
         set(value) {
             putInt(KEY_PICTURE_BACKLIGHT, value)
@@ -92,6 +94,10 @@ class PictureSettings(private val context: Context): GlobalSettings(context) {
             }
         }
 
+    fun turnOffScreen() {
+        putInt(KEY_POWER_PICTURE_OFF, 0)
+    }
+
     fun resetToDefault() {
         val resources = context.resources
         backlight = resources.getInteger(R.integer.default_backlight)
@@ -113,5 +119,17 @@ class PictureSettings(private val context: Context): GlobalSettings(context) {
         }
         temperature = resources.getInteger(R.integer.default_temperature)
         pictureMode = resources.getInteger(R.integer.default_picture_mode)
+    }
+
+    companion object {
+        @SuppressLint("StaticFieldLeak")
+        @Volatile
+        private var INSTANCE: PictureSettings? = null
+
+        @Synchronized
+        fun getInstance(context: Context): PictureSettings =
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: PictureSettings(context).also { INSTANCE = it }
+            }
     }
 }
