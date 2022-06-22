@@ -40,7 +40,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="com.alerxrcq.tvpicturesettings.AutoBacklightManager.ACTION_SCHEDULED_MANAGER_LAUNCH" />
             </intent-filter>
         </receiver>
