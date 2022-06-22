@@ -17,6 +17,14 @@ class AppPreferences(context: Context) {
             }
         }
 
+    var isBacklightBarSwitchEnabled: Boolean
+        get() = preferences.getBoolean(Keys.IS_NIGHT_BACKLIGHT_ACTIVATED, false)
+        set(value) {
+            preferences.edit {
+                putBoolean(Keys.IS_NIGHT_BACKLIGHT_ACTIVATED, value)
+            }
+        }
+
     var dayBacklight: Int
         get() = preferences.getInt(Keys.DAY_BACKLIGHT, 80)
         set(value) {
@@ -67,6 +75,7 @@ class AppPreferences(context: Context) {
 
     object Keys {
         const val IS_AUTO_BACKLIGHT_ENABLED = "auto_backlight"
+        const val IS_NIGHT_BACKLIGHT_ACTIVATED = "is_night_backlight_activated"
         const val BACKLIGHT = "backlight"
         const val DAY_TIME = "ab_day_time"
         const val NIGHT_TIME = "ab_night_time"

@@ -43,7 +43,12 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         appPreferences = AppPreferences(requireContext())
         autoBacklightManager = AutoBacklightManager(requireContext())
         pictureSettings = PictureSettings.getInstance(requireContext())
-        backlightPref = findPreference(AppPreferences.Keys.BACKLIGHT)
+        backlightPref = findPreference<SeekBarPreference?>(AppPreferences.Keys.BACKLIGHT)?.apply {
+            onPreferenceChangeListener = this@PicturePreferenceFragment
+            setOnPreferenceClickListener {
+                toggleBacklight()
+            }
+        }
         pictureModePref = findPreference(AppPreferences.Keys.PICTURE_MODE)
         temperaturePref = findPreference(AppPreferences.Keys.TEMPERATURE)
         isDarkFilterEnabledPref = findPreference(AppPreferences.Keys.IS_DARK_FILTER_ENABLED)
@@ -60,13 +65,28 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         }
     }
 
+    private fun toggleBacklight(): Boolean {
+        with(appPreferences) {
+            val seekbarValue: Int = if (appPreferences.isBacklightBarSwitchEnabled) {
+                isBacklightBarSwitchEnabled = false
+                appPreferences.dayBacklight
+            } else {
+                isBacklightBarSwitchEnabled = true
+                appPreferences.nightBacklight
+            }
+            pictureSettings.backlight = seekbarValue
+            backlightPref?.value = seekbarValue
+        }
+        return true
+    }
+
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         when (preference.key) {
             AppPreferences.Keys.BACKLIGHT -> {
                 val backlight = newValue as Int
                 pictureSettings.backlight = backlight
                 with(appPreferences) {
-                    if (isAutoBacklightEnabled && !isNightNow) {
+                    if (!isNightNow) {
                         dayBacklight = backlight
                     }
                 }
@@ -122,7 +142,10 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     }
 
     private val onSettingsChangedCallback = { key: String, value: Int ->
-        when(key) {
+        when (key) {
+            PictureSettings.KEY_PICTURE_BACKLIGHT -> {
+
+            }
             PictureSettings.KEY_PICTURE_MODE -> pictureModePref?.value = value.toString()
             PictureSettings.KEY_PICTURE_TEMPERATURE -> temperaturePref?.value = value.toString()
         }
@@ -168,7 +191,10 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         val alertDialog =
             AlertDialog.Builder(requireContext(), android.R.style.Theme_Material_Dialog_Alert)
                 .setMessage(R.string.should_enable_dark_filter_message)
-                .setPositiveButton(getString(R.string.open_settings), onOpenSettingsClickListener)
+                .setPositiveButton(
+                    getString(R.string.open_settings),
+                    onOpenSettingsClickListener
+                )
                 .setNegativeButton(android.R.string.cancel, null)
                 .create()
         alertDialog.show()
@@ -201,6 +227,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     }
 
     companion object {
-        const val ACTION_UPDATE_BACKLIGHT_BAR = "com.alexrcq.tvpicturesettings.ui.fragment.ACTION_UPDATE_BACKLIGHT_BAR"
+        const val ACTION_UPDATE_BACKLIGHT_BAR =
+            "com.alexrcq.tvpicturesettings.ui.fragment.ACTION_UPDATE_BACKLIGHT_BAR"
     }
 }
