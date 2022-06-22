@@ -5,13 +5,13 @@ import android.content.pm.PackageManager
 import android.provider.Settings
 import android.util.Log
 import com.alexrcq.tvpicturesettings.service.DarkFilterService
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings
+import com.alexrcq.tvpicturesettings.storage.PictureSettings
 
 object Utils {
 
     fun isCurrentTVSupported(context: Context): Boolean {
         return try {
-            Settings.Global.getInt(context.contentResolver, GlobalSettings.KEY_PICTURE_BACKLIGHT)
+            Settings.Global.getInt(context.contentResolver, PictureSettings.KEY_PICTURE_BACKLIGHT)
             true
         } catch (e: Settings.SettingNotFoundException) {
             Log.e("Utils", "The current TV model is not supported", e)

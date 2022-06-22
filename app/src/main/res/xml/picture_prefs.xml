@@ -52,6 +52,15 @@
         app:key="ab_night_backlight"
         app:seekBarIncrement="1"
         app:title="@string/backlight_at_night" />
+    <ListPreference
+        app:entries="@array/backlight_adjust_time"
+        app:entryValues="@array/picture_temperature_values"
+        app:defaultValue="1"
+        app:enabled="false"
+        app:key="temperature"
+        app:persistent="false"
+        app:title="Длительность смены подсветки"
+        app:useSimpleSummaryProvider="true" />
     <SwitchPreference
         app:defaultValue="false"
         app:dependency="auto_backlight"

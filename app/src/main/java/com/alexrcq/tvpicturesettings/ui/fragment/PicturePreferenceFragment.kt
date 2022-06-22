@@ -12,7 +12,6 @@ import androidx.preference.*
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.helper.AutoBacklightManager
 import com.alexrcq.tvpicturesettings.storage.AppPreferences
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 import com.alexrcq.tvpicturesettings.util.DialogButton.NEGATIVE_BUTTON
 import com.alexrcq.tvpicturesettings.util.DialogButton.POSITIVE_BUTTON
@@ -75,7 +74,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             AppPreferences.Keys.PICTURE_MODE -> {
                 val pictureMode = (newValue as String).toInt()
                 pictureSettings.pictureMode = pictureMode
-                if (pictureMode == GlobalSettings.PICTURE_MODE_USER) {
+                if (pictureMode == PictureSettings.PICTURE_MODE_USER) {
                     showPictureEqualizer()
                 }
             }
@@ -115,9 +114,17 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
                 with(appPreferences) {
                     if (isNightNow) {
                         pictureSettings.backlight = nightBacklight
+                        updateBacklightBarWithDelay()
                     }
                 }
             }
+        }
+    }
+
+    private val onSettingsChangedCallback = { key: String, value: Int ->
+        when(key) {
+            PictureSettings.KEY_PICTURE_MODE -> pictureModePref?.value = value.toString()
+            PictureSettings.KEY_PICTURE_TEMPERATURE -> temperaturePref?.value = value.toString()
         }
     }
 
@@ -126,6 +133,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         PreferenceManager.getDefaultSharedPreferences(requireContext().applicationContext)
             .registerOnSharedPreferenceChangeListener(this)
         requireActivity().registerReceiver(receiver, IntentFilter(ACTION_UPDATE_BACKLIGHT_BAR))
+        pictureSettings.addOnSettingsChangedCallback(onSettingsChangedCallback)
         updateUi()
     }
 
@@ -133,6 +141,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         super.onStop()
         PreferenceManager.getDefaultSharedPreferences(requireContext().applicationContext)
             .unregisterOnSharedPreferenceChangeListener(this)
+        pictureSettings.removeOnSettingsChangedCallback(onSettingsChangedCallback)
         requireActivity().unregisterReceiver(receiver)
     }
 

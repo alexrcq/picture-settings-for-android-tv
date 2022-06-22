@@ -77,6 +77,7 @@ class AppPreferences(context: Context) {
         const val TEMPERATURE = "temperature"
         const val RESET_TO_DEFAULT = "reset_to_default"
         const val POWER_PICTURE_OFF = "power_picture_off"
+        const val HDR = "hdr"
 
         const val BRIGHTNESS = "brightness"
         const val CONTRAST = "contrast"

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/advanced_video">
     <ListPreference
         app:persistent="false"
@@ -16,4 +17,8 @@
         app:persistent="false"
         app:title="@string/local_contrast_control"
         app:key="local_contrast_control" />
+    <SwitchPreference
+        android:key="hdr"
+        android:persistent="false"
+        android:title="HDR" />
 </PreferenceScreen>

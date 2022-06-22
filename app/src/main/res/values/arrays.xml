@@ -36,4 +36,18 @@
         <item>2</item>
         <item>3</item>
     </string-array>
+    <string-array name="backlight_adjust_time">
+        <item>Моментально</item>
+        <item>30 минут</item>
+        <item>1 час</item>
+        <item>3 часа</item>
+        <item>6 часов</item>
+    </string-array>
+    <string-array name="backlight_adjust_time_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
 </resources>

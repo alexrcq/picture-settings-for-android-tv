@@ -77,7 +77,7 @@ class MainActivity : FragmentActivity() {
             finish()
         }
         val alertDialog = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-            .setMessage("Для работы приложения требуется включить отладку по USB в настройках для разработчиков")
+            .setMessage(R.string.adb_debugging_required)
             .setPositiveButton(android.R.string.ok, onOkClickListener)
             .create()
         alertDialog.show()

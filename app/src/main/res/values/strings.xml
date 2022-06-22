@@ -28,4 +28,5 @@
     <string name="open_settings">Open settings</string>
     <string name="power_picture_off">Turn off the screen</string>
     <string name="storage_permission_required">The application requires permission to write to external storage</string>
+    <string name="adb_debugging_required">The app requires enabled USB debugging</string>
 </resources>
