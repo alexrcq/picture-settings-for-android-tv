@@ -4,7 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.alexrcq.tvpicturesettings.R
 
-class PictureSettings private constructor(context: Context) : AdbGlobalSettings(context) {
+class PictureSettings private constructor(private val context: Context) :
+    GlobalSettingsImpl(context.contentResolver) {
 
     var backlight: Int
         set(value) {

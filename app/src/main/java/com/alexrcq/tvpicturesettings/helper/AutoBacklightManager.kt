@@ -73,26 +73,26 @@ class AutoBacklightManager(val context: Context) {
         private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
         fun setRepeatingLaunch(launchId: Int, time: String) {
-            val serviceLaunchTime = LocalTime.parse(time)
-            val serviceLaunchCalendar = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, serviceLaunchTime.hour)
-                set(Calendar.MINUTE, serviceLaunchTime.minute)
+            val managerLaunchTime = LocalTime.parse(time)
+            val managerLaunchCalendar = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, managerLaunchTime.hour)
+                set(Calendar.MINUTE, managerLaunchTime.minute)
                 set(Calendar.SECOND, 0)
             }
-            adjustServiceLaunchTime(serviceLaunchCalendar)
-            Log.d(TAG, "scheduling the service launch at ${serviceLaunchCalendar.time}")
+            adjustManagerLaunchTime(managerLaunchCalendar)
+            Log.d(TAG, "scheduling the manager at ${managerLaunchCalendar.time}")
             alarmManager.setRepeating(
                 AlarmManager.RTC_WAKEUP,
-                serviceLaunchCalendar.timeInMillis,
+                managerLaunchCalendar.timeInMillis,
                 AlarmManager.INTERVAL_DAY,
                 getPendingIntentFor(launchId)
             )
         }
 
-        private fun adjustServiceLaunchTime(serviceLaunchTime: Calendar) {
+        private fun adjustManagerLaunchTime(managerLaunchTime: Calendar) {
             val now = Calendar.getInstance()
-            if (serviceLaunchTime.before(now)) {
-                serviceLaunchTime.add(Calendar.DAY_OF_MONTH, 1)
+            if (managerLaunchTime.before(now)) {
+                managerLaunchTime.add(Calendar.DAY_OF_MONTH, 1)
             }
         }
 

@@ -2,38 +2,35 @@ package com.alexrcq.tvpicturesettings.ui
 
 import android.Manifest
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.Gravity
 import android.view.WindowManager
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.FragmentActivity
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.util.AdbUtils
 import com.alexrcq.tvpicturesettings.util.DialogButton.POSITIVE_BUTTON
 import com.alexrcq.tvpicturesettings.util.Utils
 import com.alexrcq.tvpicturesettings.util.makeButtonFocused
+import java.util.concurrent.LinkedBlockingQueue
 
 class MainActivity : FragmentActivity() {
+
+    private var dialogsToShow: LinkedBlockingQueue<Dialog> = LinkedBlockingQueue()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (!Utils.isCurrentTVSupported(this)) {
-            showNotSupportedTVDialog()
+            showDialog(createNotSupportedTVDialog())
         }
         if (!Utils.isDebuggingEnabled(this)) {
-            showUsbDebuggingRequiredDialog()
+            showDialog(createUsbDebuggingRequiredDialog())
         }
-        if (Utils.hasPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            setContentView(R.layout.activity_main)
-        } else {
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) {
-                    setContentView(R.layout.activity_main)
-                } else {
-                    showStoragePermissionRequiredDialog()
-                }
-            }.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (!Utils.hasPermission(this, Manifest.permission.WRITE_SECURE_SETTINGS)) {
+            showDialog(createWriteSecureSettingsPermissionRequiredDialog())
         }
+        setContentView(R.layout.activity_main)
     }
 
     override fun onAttachedToWindow() {
@@ -48,39 +45,61 @@ class MainActivity : FragmentActivity() {
         windowManager.updateViewLayout(view, layoutParams)
     }
 
-    private fun showNotSupportedTVDialog() {
+    private fun createNotSupportedTVDialog(): Dialog {
         val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
             finish()
         }
-        val alertDialog = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
             .setMessage(R.string.not_supported_tv)
             .setPositiveButton(android.R.string.ok, onOkClickListener)
             .create()
-        alertDialog.show()
-        alertDialog.makeButtonFocused(POSITIVE_BUTTON)
+            .apply {
+                setOnShowListener {
+                    makeButtonFocused(POSITIVE_BUTTON)
+                }
+            }
     }
 
-    private fun showStoragePermissionRequiredDialog() {
+    private fun createWriteSecureSettingsPermissionRequiredDialog(): Dialog {
         val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
-            finish()
+            AdbUtils.grantWriteSecureSettingsPermission()
         }
-        val alertDialog = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-            .setMessage(R.string.storage_permission_required)
+        return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            .setMessage(R.string.wait_for_debug_window)
             .setPositiveButton(android.R.string.ok, onOkClickListener)
             .create()
-        alertDialog.show()
-        alertDialog.makeButtonFocused(POSITIVE_BUTTON)
+            .apply {
+                setOnShowListener {
+                    makeButtonFocused(POSITIVE_BUTTON)
+                }
+            }
     }
 
-    private fun showUsbDebuggingRequiredDialog() {
+    private fun createUsbDebuggingRequiredDialog(): Dialog {
         val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
             finish()
         }
-        val alertDialog = AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
             .setMessage(R.string.adb_debugging_required)
             .setPositiveButton(android.R.string.ok, onOkClickListener)
             .create()
-        alertDialog.show()
-        alertDialog.makeButtonFocused(POSITIVE_BUTTON)
+            .apply {
+                setOnShowListener {
+                    makeButtonFocused(POSITIVE_BUTTON)
+                }
+            }
+    }
+
+    private fun showDialog(dialog: Dialog) {
+        if (dialogsToShow.isEmpty()) {
+            dialog.show()
+        }
+        dialogsToShow.offer(dialog)
+        dialog.setOnDismissListener {
+            dialogsToShow.remove(dialog)
+            if (!dialogsToShow.isEmpty()) {
+                dialogsToShow.peek()?.show()
+            }
+        }
     }
 }

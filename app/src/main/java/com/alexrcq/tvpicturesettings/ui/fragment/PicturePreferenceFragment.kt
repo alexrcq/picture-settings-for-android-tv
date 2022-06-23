@@ -1,16 +1,17 @@
 package com.alexrcq.tvpicturesettings.ui.fragment
 
 import android.app.AlertDialog
-import android.content.*
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.Settings
 import androidx.fragment.app.commitNow
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.preference.*
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.helper.AutoBacklightManager
+import com.alexrcq.tvpicturesettings.service.DarkFilterService
 import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 import com.alexrcq.tvpicturesettings.util.DialogButton.NEGATIVE_BUTTON
@@ -31,12 +32,6 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     private lateinit var autoBacklightManager: AutoBacklightManager
     private lateinit var appPreferences: AppPreferences
     private lateinit var pictureSettings: PictureSettings
-
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            updateBacklightBarWithDelay()
-        }
-    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.picture_prefs, rootKey)
@@ -67,11 +62,17 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     private fun toggleBacklight(): Boolean {
         with(appPreferences) {
-            val seekbarValue: Int = if (appPreferences.isBacklightBarSwitchEnabled) {
+            val seekbarValue: Int = if (isBacklightBarSwitchEnabled) {
                 isBacklightBarSwitchEnabled = false
+                if (isDarkFilterEnabled) {
+                    DarkFilterService.sharedInstance?.disableDarkFilter()
+                }
                 appPreferences.dayBacklight
             } else {
                 isBacklightBarSwitchEnabled = true
+                if (isDarkFilterEnabled) {
+                    DarkFilterService.sharedInstance?.enableDarkFilter()
+                }
                 appPreferences.nightBacklight
             }
             pictureSettings.backlight = seekbarValue
@@ -111,11 +112,9 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             }
             AppPreferences.Keys.DAY_TIME -> {
                 autoBacklightManager.setDaytimeManagerLaunchTime(newValue as String)
-                updateBacklightBarWithDelay()
             }
             AppPreferences.Keys.NIGHT_TIME -> {
                 autoBacklightManager.setNighttimeLaunchTime(newValue as String)
-                updateBacklightBarWithDelay()
             }
         }
         return true
@@ -125,7 +124,6 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         when (key) {
             AppPreferences.Keys.IS_AUTO_BACKLIGHT_ENABLED -> {
                 autoBacklightManager.switchAutoBacklight(enabled = appPreferences.isAutoBacklightEnabled)
-                updateBacklightBarWithDelay()
             }
             AppPreferences.Keys.IS_DARK_FILTER_ENABLED -> {
                 autoBacklightManager.switchDarkFilter(enabled = (appPreferences.isDarkFilterEnabled && appPreferences.isNightNow))
@@ -134,7 +132,6 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
                 with(appPreferences) {
                     if (isNightNow) {
                         pictureSettings.backlight = nightBacklight
-                        updateBacklightBarWithDelay()
                     }
                 }
             }
@@ -143,9 +140,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     private val onSettingsChangedCallback = { key: String, value: Int ->
         when (key) {
-            PictureSettings.KEY_PICTURE_BACKLIGHT -> {
-
-            }
+            PictureSettings.KEY_PICTURE_BACKLIGHT -> backlightPref?.value = value
             PictureSettings.KEY_PICTURE_MODE -> pictureModePref?.value = value.toString()
             PictureSettings.KEY_PICTURE_TEMPERATURE -> temperaturePref?.value = value.toString()
         }
@@ -155,7 +150,6 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         super.onStart()
         PreferenceManager.getDefaultSharedPreferences(requireContext().applicationContext)
             .registerOnSharedPreferenceChangeListener(this)
-        requireActivity().registerReceiver(receiver, IntentFilter(ACTION_UPDATE_BACKLIGHT_BAR))
         pictureSettings.addOnSettingsChangedCallback(onSettingsChangedCallback)
         updateUi()
     }
@@ -165,7 +159,6 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         PreferenceManager.getDefaultSharedPreferences(requireContext().applicationContext)
             .unregisterOnSharedPreferenceChangeListener(this)
         pictureSettings.removeOnSettingsChangedCallback(onSettingsChangedCallback)
-        requireActivity().unregisterReceiver(receiver)
     }
 
     private fun updateUi() {
@@ -217,17 +210,5 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
                 .create()
         alertDialog.show()
         alertDialog.makeButtonFocused(NEGATIVE_BUTTON)
-    }
-
-    private fun updateBacklightBarWithDelay() {
-        //wait for the shell
-        Handler(Looper.getMainLooper()).postDelayed({
-            backlightPref?.value = pictureSettings.backlight
-        }, 200)
-    }
-
-    companion object {
-        const val ACTION_UPDATE_BACKLIGHT_BAR =
-            "com.alexrcq.tvpicturesettings.ui.fragment.ACTION_UPDATE_BACKLIGHT_BAR"
     }
 }

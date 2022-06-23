@@ -30,4 +30,5 @@
     <string name="power_picture_off">Выключить экран</string>
     <string name="storage_permission_required">Для работы приложения требуется разрешение на запись во внешнее хранилище</string>
     <string name="adb_debugging_required">Для работы приложения требуется включить отладку по USB в настройках для разработчиков</string>
+    <string name="wait_for_debug_window">Дождитесь сообщения об отладке и в новом окне нажмите ОК</string>
 </resources>

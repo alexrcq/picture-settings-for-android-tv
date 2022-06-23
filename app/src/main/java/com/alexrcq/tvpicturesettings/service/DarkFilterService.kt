@@ -15,13 +15,14 @@ import android.view.accessibility.AccessibilityEvent
 class DarkFilterService : AccessibilityService() {
 
     private var darkFilterView: View? = null
+    private var isDarkFilterActivated = false
 
     override fun onServiceConnected() {
         super.onServiceConnected()
         sharedInstance = this
         darkFilterView = View(this).apply {
             setBackgroundColor(Color.BLACK)
-            alpha = 0.50f
+            alpha = 0.65f
         }
     }
 
@@ -30,25 +31,30 @@ class DarkFilterService : AccessibilityService() {
     override fun onInterrupt() {}
 
     fun enableDarkFilter() {
-        val layoutParams = WindowManager.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-            PixelFormat.TRANSLUCENT
-        )
-        val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        try {
-            windowManager.addView(darkFilterView, layoutParams)
-        } catch (e: IllegalStateException) {
-            Log.e(TAG, "the dark filter view has already added", e)
+        if (!isDarkFilterActivated) {
+            val layoutParams = WindowManager.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT
+            )
+            val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+            try {
+                windowManager.addView(darkFilterView, layoutParams)
+            } catch (e: IllegalStateException) {
+                Log.e(TAG, "the dark filter view has already added", e)
+            }
+            isDarkFilterActivated = true
         }
     }
 
     fun disableDarkFilter() {
+        if (!isDarkFilterActivated) return
         if (darkFilterView?.windowToken != null) {
             val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
             windowManager.removeView(darkFilterView)
+            isDarkFilterActivated = false
         }
     }
 

@@ -29,4 +29,5 @@
     <string name="power_picture_off">Turn off the screen</string>
     <string name="storage_permission_required">The application requires permission to write to external storage</string>
     <string name="adb_debugging_required">The app requires enabled USB debugging</string>
+    <string name="wait_for_debug_window">Wait for the debug message and click OK in the new window</string>
 </resources>

@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment
 
 class AppReceiver : BroadcastReceiver() {
 
@@ -14,7 +13,6 @@ class AppReceiver : BroadcastReceiver() {
             intent.action == AutoBacklightManager.ACTION_SCHEDULED_MANAGER_LAUNCH
         ) {
             AutoBacklightManager(context).rescheduleWork()
-            context.sendBroadcast(Intent(PicturePreferenceFragment.ACTION_UPDATE_BACKLIGHT_BAR))
         }
     }
 }
