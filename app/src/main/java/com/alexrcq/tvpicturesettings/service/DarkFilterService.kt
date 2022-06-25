@@ -15,15 +15,17 @@ import android.view.accessibility.AccessibilityEvent
 class DarkFilterService : AccessibilityService() {
 
     private var darkFilterView: View? = null
-    private var isDarkFilterActivated = false
+    var isDarkFilterActivated = false
+        private set
 
     override fun onServiceConnected() {
         super.onServiceConnected()
         sharedInstance = this
         darkFilterView = View(this).apply {
             setBackgroundColor(Color.BLACK)
-            alpha = 0.65f
+            alpha = 0.5f
         }
+        application.sendBroadcast(Intent(ACTION_DARK_FILTER_SERVICE_INSTANTIATED))
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
@@ -58,6 +60,10 @@ class DarkFilterService : AccessibilityService() {
         }
     }
 
+    fun setDarkFilterAlpha(alpha: Float) {
+        darkFilterView?.alpha = alpha
+    }
+
     override fun onUnbind(intent: Intent?): Boolean {
         sharedInstance = null
         return super.onUnbind(intent)
@@ -65,6 +71,8 @@ class DarkFilterService : AccessibilityService() {
 
     companion object {
         const val TAG = "DarkFilterService"
+        const val ACTION_DARK_FILTER_SERVICE_INSTANTIATED =
+            "com.alexrcq.tvpicturesettings.ACTION_DARK_FILTER_SERVICE_INSTANTIATED"
 
         @SuppressLint("StaticFieldLeak")
         var sharedInstance: DarkFilterService? = null

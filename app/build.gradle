@@ -10,8 +10,8 @@ android {
         applicationId "com.alexrcq.tvpicturesettings"
         minSdkVersion 26
         targetSdkVersion 31
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 5
+        versionName "1.0.30"
 
     }
 
@@ -32,6 +32,12 @@ android {
         }
     }
     buildToolsVersion '32.0.0'
+
+    applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "tvpicturesettings${defaultConfig.versionName}.apk"
+        }
+    }
 }
 
 dependencies {

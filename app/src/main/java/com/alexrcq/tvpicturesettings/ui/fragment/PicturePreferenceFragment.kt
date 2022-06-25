@@ -1,47 +1,45 @@
 package com.alexrcq.tvpicturesettings.ui.fragment
 
 import android.app.AlertDialog
-import android.content.DialogInterface
-import android.content.Intent
-import android.content.SharedPreferences
+import android.content.*
 import android.os.Bundle
-import android.provider.Settings
+import android.widget.Toast
 import androidx.fragment.app.commitNow
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.preference.*
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.helper.AutoBacklightManager
 import com.alexrcq.tvpicturesettings.service.DarkFilterService
 import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 import com.alexrcq.tvpicturesettings.util.DialogButton.NEGATIVE_BUTTON
-import com.alexrcq.tvpicturesettings.util.DialogButton.POSITIVE_BUTTON
-import com.alexrcq.tvpicturesettings.util.Utils
 import com.alexrcq.tvpicturesettings.util.makeButtonFocused
 
 
 class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
-    SharedPreferences.OnSharedPreferenceChangeListener,
     Preference.OnPreferenceChangeListener {
 
     private var backlightPref: SeekBarPreference? = null
     private var pictureModePref: ListPreference? = null
     private var temperaturePref: ListPreference? = null
     private var isDarkFilterEnabledPref: SwitchPreference? = null
-
-    private lateinit var autoBacklightManager: AutoBacklightManager
+    private var darkFilterBroadcastReceiver: BroadcastReceiver? = null
     private lateinit var appPreferences: AppPreferences
     private lateinit var pictureSettings: PictureSettings
 
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.picture_prefs, rootKey)
-        appPreferences = AppPreferences(requireContext())
-        autoBacklightManager = AutoBacklightManager(requireContext())
+        darkFilterBroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                isDarkFilterEnabledPref?.isChecked = false
+            }
+        }
+        appPreferences = AppPreferences.getInstance(requireContext())
         pictureSettings = PictureSettings.getInstance(requireContext())
         backlightPref = findPreference<SeekBarPreference?>(AppPreferences.Keys.BACKLIGHT)?.apply {
             onPreferenceChangeListener = this@PicturePreferenceFragment
             setOnPreferenceClickListener {
-                toggleBacklight()
+                toggleDarkmode()
             }
         }
         pictureModePref = findPreference(AppPreferences.Keys.PICTURE_MODE)
@@ -55,28 +53,37 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             showResetToDefaultDialog()
             true
         }
+        findPreference<SeekBarPreference>(AppPreferences.Keys.DARK_FILTER_POWER)?.max = 98
         preferenceScreen.forEach { preference ->
             preference.onPreferenceChangeListener = this
         }
     }
 
-    private fun toggleBacklight(): Boolean {
-        with(appPreferences) {
-            val seekbarValue: Int = if (isBacklightBarSwitchEnabled) {
-                isBacklightBarSwitchEnabled = false
-                if (isDarkFilterEnabled) {
-                    DarkFilterService.sharedInstance?.disableDarkFilter()
+    private val sharedPreferenceChangeListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            when (key) {
+                AppPreferences.Keys.IS_DARK_MODE_ACTIVATED -> {
+                    if (appPreferences.isDarkModeActivated) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Активирован ночной режим",
+                            Toast.LENGTH_SHORT
+                        )
+                            .show()
+                        return@OnSharedPreferenceChangeListener
+                    }
+                    Toast.makeText(
+                        requireContext(),
+                        "Активирован дневной режим",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-                appPreferences.dayBacklight
-            } else {
-                isBacklightBarSwitchEnabled = true
-                if (isDarkFilterEnabled) {
-                    DarkFilterService.sharedInstance?.enableDarkFilter()
-                }
-                appPreferences.nightBacklight
             }
-            pictureSettings.backlight = seekbarValue
-            backlightPref?.value = seekbarValue
+        }
+
+    private fun toggleDarkmode(): Boolean {
+        with(appPreferences) {
+            isDarkModeActivated = !isDarkModeActivated
         }
         return true
     }
@@ -87,7 +94,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
                 val backlight = newValue as Int
                 pictureSettings.backlight = backlight
                 with(appPreferences) {
-                    if (!isNightNow) {
+                    if (!isDarkModeActivated) {
                         dayBacklight = backlight
                     }
                 }
@@ -102,40 +109,8 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             AppPreferences.Keys.TEMPERATURE -> {
                 pictureSettings.temperature = (newValue as String).toInt()
             }
-            AppPreferences.Keys.IS_DARK_FILTER_ENABLED -> {
-                val isDarkFilterEnabled = newValue as Boolean
-                if (isDarkFilterEnabled && !Utils.isDarkFilterServiceEnabled(requireContext())) {
-                    showEnableDarkFilterDialog()
-                    isDarkFilterEnabledPref?.isChecked = false
-                    return false
-                }
-            }
-            AppPreferences.Keys.DAY_TIME -> {
-                autoBacklightManager.setDaytimeManagerLaunchTime(newValue as String)
-            }
-            AppPreferences.Keys.NIGHT_TIME -> {
-                autoBacklightManager.setNighttimeLaunchTime(newValue as String)
-            }
         }
         return true
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        when (key) {
-            AppPreferences.Keys.IS_AUTO_BACKLIGHT_ENABLED -> {
-                autoBacklightManager.switchAutoBacklight(enabled = appPreferences.isAutoBacklightEnabled)
-            }
-            AppPreferences.Keys.IS_DARK_FILTER_ENABLED -> {
-                autoBacklightManager.switchDarkFilter(enabled = (appPreferences.isDarkFilterEnabled && appPreferences.isNightNow))
-            }
-            AppPreferences.Keys.NIGHT_BACKLIGHT -> {
-                with(appPreferences) {
-                    if (isNightNow) {
-                        pictureSettings.backlight = nightBacklight
-                    }
-                }
-            }
-        }
     }
 
     private val onSettingsChangedCallback = { key: String, value: Int ->
@@ -148,17 +123,20 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     override fun onStart() {
         super.onStart()
-        PreferenceManager.getDefaultSharedPreferences(requireContext().applicationContext)
-            .registerOnSharedPreferenceChangeListener(this)
         pictureSettings.addOnSettingsChangedCallback(onSettingsChangedCallback)
+        appPreferences.registerOnSharedPreferenceChangedListener(sharedPreferenceChangeListener)
+        requireContext().registerReceiver(
+            darkFilterBroadcastReceiver,
+            IntentFilter(DarkFilterService.ACTION_DARK_FILTER_SERVICE_INSTANTIATED)
+        )
         updateUi()
     }
 
     override fun onStop() {
         super.onStop()
-        PreferenceManager.getDefaultSharedPreferences(requireContext().applicationContext)
-            .unregisterOnSharedPreferenceChangeListener(this)
         pictureSettings.removeOnSettingsChangedCallback(onSettingsChangedCallback)
+        appPreferences.unregisterOnSharedPreferenceChangedListener(sharedPreferenceChangeListener)
+        requireContext().unregisterReceiver(darkFilterBroadcastReceiver)
     }
 
     private fun updateUi() {
@@ -175,27 +153,6 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
                 PictureEqualizerPreferenceFragment()
             )
         }
-    }
-
-    private fun showEnableDarkFilterDialog() {
-        val onOpenSettingsClickListener = DialogInterface.OnClickListener { _, _ ->
-            openTvSettings()
-        }
-        val alertDialog =
-            AlertDialog.Builder(requireContext(), android.R.style.Theme_Material_Dialog_Alert)
-                .setMessage(R.string.should_enable_dark_filter_message)
-                .setPositiveButton(
-                    getString(R.string.open_settings),
-                    onOpenSettingsClickListener
-                )
-                .setNegativeButton(android.R.string.cancel, null)
-                .create()
-        alertDialog.show()
-        alertDialog.makeButtonFocused(POSITIVE_BUTTON)
-    }
-
-    private fun openTvSettings() {
-        startActivity(Intent(Settings.ACTION_SETTINGS))
     }
 
     private fun showResetToDefaultDialog() {

@@ -9,28 +9,76 @@ import android.view.Gravity
 import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.service.AutoBacklightService
 import com.alexrcq.tvpicturesettings.util.AdbUtils
 import com.alexrcq.tvpicturesettings.util.DialogButton.POSITIVE_BUTTON
 import com.alexrcq.tvpicturesettings.util.Utils
 import com.alexrcq.tvpicturesettings.util.makeButtonFocused
 import java.util.concurrent.LinkedBlockingQueue
 
-class MainActivity : FragmentActivity() {
+class MainActivity : FragmentActivity(R.layout.activity_main) {
 
-    private var dialogsToShow: LinkedBlockingQueue<Dialog> = LinkedBlockingQueue()
+    private val dialogsToShow: LinkedBlockingQueue<Dialog> by lazy(LazyThreadSafetyMode.NONE) {
+        LinkedBlockingQueue()
+    }
+    private val notSupportedTVDialog: Dialog
+        get() {
+            val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
+                finish()
+            }
+            return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+                .setMessage(R.string.not_supported_tv)
+                .setPositiveButton(android.R.string.ok, onOkClickListener)
+                .create()
+                .apply {
+                    setOnShowListener {
+                        makeButtonFocused(POSITIVE_BUTTON)
+                    }
+                }
+        }
+    private val writeSecureSettingsPermissionRequiredDialog: Dialog
+        get() {
+            val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
+                AdbUtils.grantWriteSecureSettingsPermission()
+            }
+            return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+                .setMessage(R.string.wait_for_debug_window)
+                .setPositiveButton(android.R.string.ok, onOkClickListener)
+                .create()
+                .apply {
+                    setOnShowListener {
+                        makeButtonFocused(POSITIVE_BUTTON)
+                    }
+                }
+        }
+    private val usbDebuggingRequiredDialog: Dialog
+        get() {
+            val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
+                finish()
+            }
+            return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+                .setMessage(R.string.adb_debugging_required)
+                .setPositiveButton(android.R.string.ok, onOkClickListener)
+                .create()
+                .apply {
+                    setOnShowListener {
+                        makeButtonFocused(POSITIVE_BUTTON)
+                    }
+                }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AutoBacklightService.start(this, false)
         if (!Utils.isCurrentTVSupported(this)) {
-            showDialog(createNotSupportedTVDialog())
+            showDialog(notSupportedTVDialog)
         }
         if (!Utils.isDebuggingEnabled(this)) {
-            showDialog(createUsbDebuggingRequiredDialog())
+            showDialog(usbDebuggingRequiredDialog)
         }
         if (!Utils.hasPermission(this, Manifest.permission.WRITE_SECURE_SETTINGS)) {
-            showDialog(createWriteSecureSettingsPermissionRequiredDialog())
+            showDialog(writeSecureSettingsPermissionRequiredDialog)
         }
-        setContentView(R.layout.activity_main)
     }
 
     override fun onAttachedToWindow() {
@@ -45,51 +93,6 @@ class MainActivity : FragmentActivity() {
         windowManager.updateViewLayout(view, layoutParams)
     }
 
-    private fun createNotSupportedTVDialog(): Dialog {
-        val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
-            finish()
-        }
-        return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-            .setMessage(R.string.not_supported_tv)
-            .setPositiveButton(android.R.string.ok, onOkClickListener)
-            .create()
-            .apply {
-                setOnShowListener {
-                    makeButtonFocused(POSITIVE_BUTTON)
-                }
-            }
-    }
-
-    private fun createWriteSecureSettingsPermissionRequiredDialog(): Dialog {
-        val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
-            AdbUtils.grantWriteSecureSettingsPermission()
-        }
-        return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-            .setMessage(R.string.wait_for_debug_window)
-            .setPositiveButton(android.R.string.ok, onOkClickListener)
-            .create()
-            .apply {
-                setOnShowListener {
-                    makeButtonFocused(POSITIVE_BUTTON)
-                }
-            }
-    }
-
-    private fun createUsbDebuggingRequiredDialog(): Dialog {
-        val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
-            finish()
-        }
-        return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-            .setMessage(R.string.adb_debugging_required)
-            .setPositiveButton(android.R.string.ok, onOkClickListener)
-            .create()
-            .apply {
-                setOnShowListener {
-                    makeButtonFocused(POSITIVE_BUTTON)
-                }
-            }
-    }
-
     private fun showDialog(dialog: Dialog) {
         if (dialogsToShow.isEmpty()) {
             dialog.show()
@@ -101,5 +104,10 @@ class MainActivity : FragmentActivity() {
                 dialogsToShow.peek()?.show()
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        AutoBacklightService.stop(this)
     }
 }

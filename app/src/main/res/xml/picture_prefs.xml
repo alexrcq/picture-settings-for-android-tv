@@ -5,7 +5,6 @@
         app:key="backlight"
         app:persistent="false"
         app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
         app:title="@string/backlight" />
     <Preference
         app:key="power_picture_off"
@@ -67,4 +66,10 @@
         app:key="is_dark_filter_enabled"
         app:summary="@string/make_it_even_darker_summary"
         app:title="@string/extra_dimming" />
+    <SeekBarPreference
+        app:defaultValue="50"
+        app:dependency="is_dark_filter_enabled"
+        app:key="dark_filter_power"
+        app:seekBarIncrement="1"
+        app:title="Сила затемнения" />
 </PreferenceScreen>
