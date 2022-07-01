@@ -8,10 +8,11 @@ import androidx.preference.SwitchPreference
 import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.storage.AppPreferences
+import com.alexrcq.tvpicturesettings.storage.GlobalSettingsImpl
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 
 class AdvancedVideoPreferenceFragment : LeanbackPreferenceFragmentCompat(),
-    Preference.OnPreferenceChangeListener {
+    Preference.OnPreferenceChangeListener, GlobalSettingsImpl.OnGlobalSettingChangedCallback {
 
     private var noiseReductionPref: ListPreference? = null
     private var adaptiveLumaPref: SwitchPreference? = null
@@ -32,30 +33,6 @@ class AdvancedVideoPreferenceFragment : LeanbackPreferenceFragmentCompat(),
         }
     }
 
-    private val onNoiseReductionChangedCallback = { key: String, value: Int ->
-        if (key == PictureSettings.KEY_PICTURE_NOISE_REDUCTION) {
-            noiseReductionPref?.value = value.toString()
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        pictureSettings.addOnSettingsChangedCallback(onNoiseReductionChangedCallback)
-        updateUi()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        pictureSettings.removeOnSettingsChangedCallback(onNoiseReductionChangedCallback)
-    }
-
-    private fun updateUi() {
-        noiseReductionPref?.value = pictureSettings.noiseReduction.toString()
-        localContrastPref?.isChecked = pictureSettings.isLocalContrastEnabled
-        adaptiveLumaPref?.isChecked = pictureSettings.isAdaptiveLumaEnabled
-        hdrPref?.isChecked = pictureSettings.isHdrEnabled
-    }
-
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         when (preference.key) {
             AppPreferences.Keys.ADAPTIVE_LUMA_CONTROL -> {
@@ -72,5 +49,29 @@ class AdvancedVideoPreferenceFragment : LeanbackPreferenceFragmentCompat(),
             }
         }
         return true
+    }
+
+    override fun onGlobalSettingChanged(key: String, value: Int) {
+        if (key == PictureSettings.KEY_PICTURE_NOISE_REDUCTION) {
+            noiseReductionPref?.value = value.toString()
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        pictureSettings.addOnSettingsChangedCallback(this)
+        updateUi()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        pictureSettings.removeOnSettingsChangedCallback(this)
+    }
+
+    private fun updateUi() {
+        noiseReductionPref?.value = pictureSettings.noiseReduction.toString()
+        localContrastPref?.isChecked = pictureSettings.isLocalContrastEnabled
+        adaptiveLumaPref?.isChecked = pictureSettings.isAdaptiveLumaEnabled
+        hdrPref?.isChecked = pictureSettings.isHdrEnabled
     }
 }

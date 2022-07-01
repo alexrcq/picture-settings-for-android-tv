@@ -3,8 +3,9 @@ package com.alexrcq.tvpicturesettings.ui
 import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
@@ -23,27 +24,14 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
     }
     private val notSupportedTVDialog: Dialog
         get() {
-            val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
-                finish()
-            }
             return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
                 .setMessage(R.string.not_supported_tv)
-                .setPositiveButton(android.R.string.ok, onOkClickListener)
-                .create()
-                .apply {
-                    setOnShowListener {
-                        makeButtonFocused(POSITIVE_BUTTON)
-                    }
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    finish()
                 }
-        }
-    private val writeSecureSettingsPermissionRequiredDialog: Dialog
-        get() {
-            val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
-                AdbUtils.grantWriteSecureSettingsPermission()
-            }
-            return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-                .setMessage(R.string.wait_for_debug_window)
-                .setPositiveButton(android.R.string.ok, onOkClickListener)
+                .setOnCancelListener {
+                    finish()
+                }
                 .create()
                 .apply {
                     setOnShowListener {
@@ -53,12 +41,31 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
         }
     private val usbDebuggingRequiredDialog: Dialog
         get() {
-            val onOkClickListener = DialogInterface.OnClickListener { _, _ ->
-                finish()
-            }
             return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
                 .setMessage(R.string.adb_debugging_required)
-                .setPositiveButton(android.R.string.ok, onOkClickListener)
+                .setPositiveButton(R.string.open_settings) { _, _ ->
+                    openTvSettings()
+                    finish()
+                }
+                .setOnCancelListener {
+                    finish()
+                }
+                .create()
+                .apply {
+                    setOnShowListener {
+                        makeButtonFocused(POSITIVE_BUTTON)
+                    }
+                }
+        }
+    private val acceptDebuggingDialog: Dialog
+        get() {
+            return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+                .setMessage(R.string.wait_for_debug_window)
+                .setPositiveButton(android.R.string.ok) { _, _ ->
+                    AdbUtils.grantWriteSecureSettingsPermission()
+                }.setOnCancelListener {
+                    finish()
+                }
                 .create()
                 .apply {
                     setOnShowListener {
@@ -77,7 +84,7 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             showDialog(usbDebuggingRequiredDialog)
         }
         if (!Utils.hasPermission(this, Manifest.permission.WRITE_SECURE_SETTINGS)) {
-            showDialog(writeSecureSettingsPermissionRequiredDialog)
+            showDialog(acceptDebuggingDialog)
         }
     }
 
@@ -104,6 +111,10 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
                 dialogsToShow.peek()?.show()
             }
         }
+    }
+
+    private fun openTvSettings() {
+        startActivity(Intent(Settings.ACTION_SETTINGS))
     }
 
     override fun onDestroy() {

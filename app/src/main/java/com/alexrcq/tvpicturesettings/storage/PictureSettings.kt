@@ -2,9 +2,8 @@ package com.alexrcq.tvpicturesettings.storage
 
 import android.annotation.SuppressLint
 import android.content.Context
-import com.alexrcq.tvpicturesettings.R
 
-class PictureSettings private constructor(private val context: Context) :
+class PictureSettings private constructor(context: Context) :
     GlobalSettingsImpl(context.contentResolver) {
 
     var backlight: Int
@@ -112,27 +111,9 @@ class PictureSettings private constructor(private val context: Context) :
     }
 
     fun resetToDefault() {
-        val resources = context.resources
-        backlight = resources.getInteger(R.integer.default_backlight)
-        brightness = resources.getInteger(R.integer.default_brightness)
-        contrast = resources.getInteger(R.integer.default_contrast)
-        hue = resources.getInteger(R.integer.default_hue)
-        saturation = resources.getInteger(R.integer.default_saturation)
-        sharpness = resources.getInteger(R.integer.default_sharpness)
-        noiseReduction = resources.getInteger(R.integer.default_noise_reduction)
-        val defaultAdaptiveLuma = resources.getInteger(R.integer.default_adaptive_luma_control)
-        isAdaptiveLumaEnabled = when (defaultAdaptiveLuma) {
-            2 -> true
-            else -> false
-        }
-        val defaultLocalContrast = resources.getInteger(R.integer.default_local_contrast_control)
-        isLocalContrastEnabled = when (defaultLocalContrast) {
-            2 -> true
-            else -> false
-        }
-        temperature = resources.getInteger(R.integer.default_temperature)
-        pictureMode = resources.getInteger(R.integer.default_picture_mode)
-        isHdrEnabled = false
+        // the same behavior as the system app
+        putInt(KEY_PICTURE_RESET_TO_DEFAULT, getInt(KEY_PICTURE_RESET_TO_DEFAULT) + 1)
+        putInt(KEY_PICTURE_AUTO_BACKLIGHT, 0)
     }
 
     companion object {
@@ -149,6 +130,8 @@ class PictureSettings private constructor(private val context: Context) :
         const val KEY_PICTURE_SHARPNESS = "picture_sharpness"
         const val KEY_POWER_PICTURE_OFF = "power_picture_off"
         const val KEY_PICTURE_LIST_HDR = "picture_list_hdr"
+        const val KEY_PICTURE_RESET_TO_DEFAULT = "picture_reset_to_default"
+        const val KEY_PICTURE_AUTO_BACKLIGHT = "picture_auto_backlight"
         const val PICTURE_MODE_DEFAULT = 7
         const val PICTURE_MODE_BRIGHT = 3
         const val PICTURE_MODE_SPORT = 2
@@ -159,13 +142,11 @@ class PictureSettings private constructor(private val context: Context) :
         const val PICTURE_TEMPERATURE_DEFAULT = 3
 
         @SuppressLint("StaticFieldLeak")
-        @Volatile
         private var INSTANCE: PictureSettings? = null
 
-        @Synchronized
         fun getInstance(context: Context): PictureSettings =
-            INSTANCE ?: synchronized(this) {
-                INSTANCE ?: PictureSettings(context).also { INSTANCE = it }
+            INSTANCE ?: PictureSettings(context).also {
+                INSTANCE = it
             }
     }
 }

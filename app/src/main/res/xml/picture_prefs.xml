@@ -24,7 +24,7 @@
         app:title="@string/color_temperature"
         app:useSimpleSummaryProvider="true" />
     <Preference
-        app:fragment="com.mycompany.imagesettingsfortv.fragment.AdvancedVideoPreferenceFragment"
+        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.AdvancedVideoPreferenceFragment"
         app:key="advanced_video"
         app:title="@string/advanced_video" />
     <Preference

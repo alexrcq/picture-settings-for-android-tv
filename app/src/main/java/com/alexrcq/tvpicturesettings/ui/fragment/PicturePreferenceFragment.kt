@@ -10,13 +10,15 @@ import androidx.preference.*
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.service.DarkFilterService
 import com.alexrcq.tvpicturesettings.storage.AppPreferences
+import com.alexrcq.tvpicturesettings.storage.GlobalSettingsImpl
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 import com.alexrcq.tvpicturesettings.util.DialogButton.NEGATIVE_BUTTON
 import com.alexrcq.tvpicturesettings.util.makeButtonFocused
 
 
 class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
-    Preference.OnPreferenceChangeListener {
+    Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener,
+    GlobalSettingsImpl.OnGlobalSettingChangedCallback {
 
     private var backlightPref: SeekBarPreference? = null
     private var pictureModePref: ListPreference? = null
@@ -59,28 +61,6 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         }
     }
 
-    private val sharedPreferenceChangeListener =
-        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            when (key) {
-                AppPreferences.Keys.IS_DARK_MODE_ACTIVATED -> {
-                    if (appPreferences.isDarkModeActivated) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Активирован ночной режим",
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
-                        return@OnSharedPreferenceChangeListener
-                    }
-                    Toast.makeText(
-                        requireContext(),
-                        "Активирован дневной режим",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }
-
     private fun toggleDarkmode(): Boolean {
         with(appPreferences) {
             isDarkModeActivated = !isDarkModeActivated
@@ -113,29 +93,40 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         return true
     }
 
-    private val onSettingsChangedCallback = { key: String, value: Int ->
-        when (key) {
-            PictureSettings.KEY_PICTURE_BACKLIGHT -> backlightPref?.value = value
-            PictureSettings.KEY_PICTURE_MODE -> pictureModePref?.value = value.toString()
-            PictureSettings.KEY_PICTURE_TEMPERATURE -> temperaturePref?.value = value.toString()
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == AppPreferences.Keys.IS_DARK_MODE_ACTIVATED) {
+            showModeChangedMessage()
         }
+    }
+
+    private fun showModeChangedMessage() {
+        val messageResId: Int = if (appPreferences.isDarkModeActivated) {
+            R.string.dark_mode_activated
+        } else {
+            R.string.day_mode_activated
+        }
+        Toast.makeText(
+            requireContext(),
+            messageResId,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onStart() {
         super.onStart()
-        pictureSettings.addOnSettingsChangedCallback(onSettingsChangedCallback)
-        appPreferences.registerOnSharedPreferenceChangedListener(sharedPreferenceChangeListener)
+        pictureSettings.addOnSettingsChangedCallback(this)
+        appPreferences.registerOnSharedPreferenceChangedListener(this)
         requireContext().registerReceiver(
             darkFilterBroadcastReceiver,
-            IntentFilter(DarkFilterService.ACTION_DARK_FILTER_SERVICE_INSTANTIATED)
+            IntentFilter(DarkFilterService.ACTION_DARK_FILTER_SERVICE_CONNECTED)
         )
         updateUi()
     }
 
     override fun onStop() {
         super.onStop()
-        pictureSettings.removeOnSettingsChangedCallback(onSettingsChangedCallback)
-        appPreferences.unregisterOnSharedPreferenceChangedListener(sharedPreferenceChangeListener)
+        pictureSettings.removeOnSettingsChangedCallback(this)
+        appPreferences.unregisterOnSharedPreferenceChangedListener(this)
         requireContext().unregisterReceiver(darkFilterBroadcastReceiver)
     }
 
@@ -156,16 +147,23 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     }
 
     private fun showResetToDefaultDialog() {
-        val onResetClickListener = DialogInterface.OnClickListener { _, _ ->
-            pictureSettings.resetToDefault()
+        AlertDialog.Builder(requireContext(), android.R.style.Theme_Material_Dialog_Alert)
+            .setMessage(R.string.reset_to_default_message)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                pictureSettings.resetToDefault()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .create().apply {
+                show()
+                makeButtonFocused(NEGATIVE_BUTTON)
+            }
+    }
+
+    override fun onGlobalSettingChanged(key: String, value: Int) {
+        when (key) {
+            PictureSettings.KEY_PICTURE_BACKLIGHT -> backlightPref?.value = value
+            PictureSettings.KEY_PICTURE_MODE -> pictureModePref?.value = value.toString()
+            PictureSettings.KEY_PICTURE_TEMPERATURE -> temperaturePref?.value = value.toString()
         }
-        val alertDialog =
-            AlertDialog.Builder(requireContext(), android.R.style.Theme_Material_Dialog_Alert)
-                .setMessage(R.string.reset_to_default_message)
-                .setPositiveButton(android.R.string.ok, onResetClickListener)
-                .setNegativeButton(android.R.string.cancel, null)
-                .create()
-        alertDialog.show()
-        alertDialog.makeButtonFocused(NEGATIVE_BUTTON)
     }
 }

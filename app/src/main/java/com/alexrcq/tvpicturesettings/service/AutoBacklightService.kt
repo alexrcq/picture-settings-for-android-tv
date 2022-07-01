@@ -29,10 +29,11 @@ class AutoBacklightService : Service(),
 
     override fun onCreate() {
         super.onCreate()
-        val nm = NotificationManagerCompat.from(this)
-        nm.createNotificationChannel(
-            NotificationChannelCompat.Builder("main", NotificationManagerCompat.IMPORTANCE_LOW)
-                .setName(resources.getString(R.string.app_name)).build()
+        NotificationManagerCompat.from(this).createNotificationChannel(
+            NotificationChannelCompat.Builder(
+                "main",
+                NotificationManagerCompat.IMPORTANCE_LOW
+            ).setName(resources.getString(R.string.app_name)).build()
         )
         startForeground(
             4221,
@@ -81,7 +82,6 @@ class AutoBacklightService : Service(),
                         dayLaunchTime
                     )
                 }
-
             }
             AppPreferences.Keys.NIGHT_TIME -> {
                 with(appPreferences) {
@@ -119,7 +119,7 @@ class AutoBacklightService : Service(),
         Settings.Secure.putString(
             this.contentResolver,
             "enabled_accessibility_services",
-            "$allEnabledServices:com.alexrcq.tvpicturesettings/com.alexrcq.tvpicturesettings.service.DarkFilterService"
+            "$allEnabledServices:${this.packageName}/${DarkFilterService::class.java.name}"
         )
     }
 
@@ -221,9 +221,9 @@ class AutoBacklightService : Service(),
         const val ACTION_SCHEDULED_SERVICE_LAUNCH =
             "com.alerxrcq.tvpicturesettings.AutoBacklightService.ACTION_SCHEDULED_SERVICE_LAUNCH"
 
-        fun start(context: Context, isStartedFromAlarmBroadcast: Boolean) {
+        fun start(context: Context, isStartedFromBroadcast: Boolean) {
             val intent = Intent(context, AutoBacklightService::class.java)
-            if (isStartedFromAlarmBroadcast) {
+            if (isStartedFromBroadcast) {
                 intent.action = ACTION_SCHEDULED_SERVICE_LAUNCH
             }
             context.startForegroundService(intent)
