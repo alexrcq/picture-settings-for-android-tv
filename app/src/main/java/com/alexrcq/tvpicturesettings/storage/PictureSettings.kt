@@ -106,6 +106,36 @@ class PictureSettings private constructor(context: Context) :
             }
         }
 
+    var isColorTuneEnabled: Boolean
+        set(value) {
+            val enabled = if (value) 1 else 0
+            putInt(KEY_TV_PICTURE_COLOR_TUNE_ENABLE, enabled)
+        }
+        get() {
+            return when (getInt(KEY_TV_PICTURE_COLOR_TUNE_ENABLE)) {
+                1 -> true
+                else -> false
+            }
+        }
+
+    var colorTuneRedGain: Int
+        set(value) {
+            putInt(KEY_TV_PICTURE_COLOR_TUNE_GAIN_RED, value)
+        }
+        get() = getInt(KEY_TV_PICTURE_COLOR_TUNE_GAIN_RED)
+
+    var colorTuneGreenGain: Int
+        set(value) {
+            putInt(KEY_TV_PICTURE_COLOR_TUNE_GAIN_GREEN, value)
+        }
+        get() = getInt(KEY_TV_PICTURE_COLOR_TUNE_GAIN_GREEN)
+
+    var colorTuneBlueGain: Int
+        set(value) {
+            putInt(KEY_TV_PICTURE_COLOR_TUNE_GAIN_BLUE, value)
+        }
+        get() = getInt(KEY_TV_PICTURE_COLOR_TUNE_GAIN_BLUE)
+
     fun turnOffScreen() {
         putInt(KEY_POWER_PICTURE_OFF, 0)
     }
@@ -132,6 +162,10 @@ class PictureSettings private constructor(context: Context) :
         const val KEY_PICTURE_LIST_HDR = "picture_list_hdr"
         const val KEY_PICTURE_RESET_TO_DEFAULT = "picture_reset_to_default"
         const val KEY_PICTURE_AUTO_BACKLIGHT = "picture_auto_backlight"
+        const val KEY_TV_PICTURE_COLOR_TUNE_ENABLE = "tv_picture_color_tune_enable"
+        const val KEY_TV_PICTURE_COLOR_TUNE_GAIN_RED = "tv_picture_color_tune_gain_red"
+        const val KEY_TV_PICTURE_COLOR_TUNE_GAIN_GREEN = "tv_picture_color_tune_gain_green"
+        const val KEY_TV_PICTURE_COLOR_TUNE_GAIN_BLUE = "tv_picture_color_tune_gain_blue"
         const val PICTURE_MODE_DEFAULT = 7
         const val PICTURE_MODE_BRIGHT = 3
         const val PICTURE_MODE_SPORT = 2

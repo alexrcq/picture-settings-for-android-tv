@@ -32,4 +32,10 @@
     <string name="wait_for_debug_window">Wait for the debug message and click OK in the new window</string>
     <string name="dark_mode_activated">Dark mode activated</string>
     <string name="day_mode_activated">Day mode activated</string>
+    <string name="red">Red</string>
+    <string name="green">Green</string>
+    <string name="blue">Blue</string>
+    <string name="color_tuner">Color tuner</string>
+    <string name="enable">Enable</string>
+    <string name="please_wait">Please wait…</string>
 </resources>

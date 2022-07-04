@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="Тюнер цвета">
+    <SwitchPreference
+        app:key="color_tuner_enabled"
+        app:persistent="false"
+        app:title="@string/enable" />
+    <SeekBarPreference
+        app:key="color_tuner_red_gain"
+        app:persistent="false"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:dependency="color_tuner_enabled"
+        app:title="@string/red" />
+    <SeekBarPreference
+        app:key="color_tuner_green_gain"
+        app:persistent="false"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:dependency="color_tuner_enabled"
+        app:title="@string/green" />
+    <SeekBarPreference
+        app:key="color_tuner_blue_gain"
+        app:persistent="false"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:thumbTint="@color/default_background"
+        app:dependency="color_tuner_enabled"
+        app:title="@string/blue" />
+</PreferenceScreen>

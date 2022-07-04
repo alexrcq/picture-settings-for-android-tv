@@ -121,6 +121,11 @@ class AppPreferences private constructor(context: Context) {
         const val ADAPTIVE_LUMA_CONTROL = "adaptive_luma_control"
         const val LOCAL_CONTRAST_CONTROL = "local_contrast_control"
         const val HDR = "hdr"
+
+        const val COLOR_TUNER_ENABLED = "color_tuner_enabled"
+        const val COLOR_TUNER_RED_GAIN = "color_tuner_red_gain"
+        const val COLOR_TUNER_GREEN_GAIN = "color_tuner_green_gain"
+        const val COLOR_TUNER_BLUE_GAIN = "color_tuner_blue_gain"
     }
 
     companion object {

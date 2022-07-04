@@ -151,6 +151,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             .setMessage(R.string.reset_to_default_message)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 pictureSettings.resetToDefault()
+                Toast.makeText(requireContext(), R.string.please_wait, Toast.LENGTH_LONG).show()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .create().apply {

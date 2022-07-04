@@ -20,6 +20,9 @@ class SettingsFragment : LeanbackSettingsFragmentCompat() {
             FragmentsKeys.ADVANCED_VIDEO -> startPreferenceFragment(
                 AdvancedVideoPreferenceFragment()
             )
+            FragmentsKeys.COLOR_TUNER -> startPreferenceFragment(
+                ColorTunerPreferenceFragment()
+            )
         }
         return true
     }
@@ -45,5 +48,6 @@ class SettingsFragment : LeanbackSettingsFragmentCompat() {
 
     object FragmentsKeys {
         const val ADVANCED_VIDEO = "advanced_video"
+        const val COLOR_TUNER = "color_tuner"
     }
 }

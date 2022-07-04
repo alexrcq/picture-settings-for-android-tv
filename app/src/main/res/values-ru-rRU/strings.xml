@@ -33,4 +33,10 @@
     <string name="wait_for_debug_window">Дождитесь сообщения об отладке и в новом окне нажмите ОК</string>
     <string name="dark_mode_activated">Активирован ночной режим</string>
     <string name="day_mode_activated">Активирован дневной режим</string>
+    <string name="red">Красный</string>
+    <string name="green">Зелёный</string>
+    <string name="blue">Синий</string>
+    <string name="color_tuner">Тюнер цвета</string>
+    <string name="enable">Включить</string>
+    <string name="please_wait">Подождите…</string>
 </resources>

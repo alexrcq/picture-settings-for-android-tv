@@ -16,6 +16,10 @@
         app:persistent="false"
         app:title="@string/picture_mode"
         app:useSimpleSummaryProvider="true" />
+    <Preference
+        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerPreferenceFragment"
+        app:key="color_tuner"
+        app:title="@string/color_tuner"/>
     <ListPreference
         app:entries="@array/picture_temperature"
         app:entryValues="@array/picture_temperature_values"
