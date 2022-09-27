@@ -4,6 +4,12 @@ import androidx.leanback.preference.LeanbackSettingsFragmentCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
+import com.alexrcq.tvpicturesettings.ui.fragment.SettingsFragment.FragmentsKeys.ADVANCED_VIDEO
+import com.alexrcq.tvpicturesettings.ui.fragment.SettingsFragment.FragmentsKeys.BRIGHTNESS_TUNE
+import com.alexrcq.tvpicturesettings.ui.fragment.SettingsFragment.FragmentsKeys.COLOR_TUNER
+import com.alexrcq.tvpicturesettings.ui.fragment.SettingsFragment.FragmentsKeys.HUE_TUNE
+import com.alexrcq.tvpicturesettings.ui.fragment.SettingsFragment.FragmentsKeys.OFFSET_TUNE
+import com.alexrcq.tvpicturesettings.ui.fragment.SettingsFragment.FragmentsKeys.SATURATION_TUNE
 import com.alexrcq.tvpicturesettings.ui.preference.TimePickerPreference
 
 class SettingsFragment : LeanbackSettingsFragmentCompat() {
@@ -17,12 +23,12 @@ class SettingsFragment : LeanbackSettingsFragmentCompat() {
         pref: Preference
     ): Boolean {
         when (pref.key) {
-            FragmentsKeys.ADVANCED_VIDEO -> startPreferenceFragment(
-                AdvancedVideoPreferenceFragment()
-            )
-            FragmentsKeys.COLOR_TUNER -> startPreferenceFragment(
-                ColorTunerPreferenceFragment()
-            )
+            ADVANCED_VIDEO -> startPreferenceFragment(AdvancedVideoPreferenceFragment())
+            COLOR_TUNER -> startPreferenceFragment(ColorTunerPreferenceFragment())
+            SATURATION_TUNE -> startPreferenceFragment(SaturationTunePreferenceFragment())
+            HUE_TUNE -> startPreferenceFragment(HueTunePreferenceFragment())
+            BRIGHTNESS_TUNE -> startPreferenceFragment(BrightnessTunePreferenceFragment())
+            OFFSET_TUNE -> startPreferenceFragment(OffsetTunePreferenceFragment())
         }
         return true
     }
@@ -49,5 +55,9 @@ class SettingsFragment : LeanbackSettingsFragmentCompat() {
     object FragmentsKeys {
         const val ADVANCED_VIDEO = "advanced_video"
         const val COLOR_TUNER = "color_tuner"
+        const val SATURATION_TUNE = "saturation_tune"
+        const val HUE_TUNE = "hue_tune"
+        const val BRIGHTNESS_TUNE = "brightness_tune"
+        const val OFFSET_TUNE = "offset_tune"
     }
 }

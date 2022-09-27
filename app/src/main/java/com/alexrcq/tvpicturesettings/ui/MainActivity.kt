@@ -1,90 +1,37 @@
 package com.alexrcq.tvpicturesettings.ui
 
 import android.Manifest
-import android.app.AlertDialog
-import android.app.Dialog
-import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.service.AutoBacklightService
-import com.alexrcq.tvpicturesettings.util.AdbUtils
-import com.alexrcq.tvpicturesettings.util.DialogButton.POSITIVE_BUTTON
-import com.alexrcq.tvpicturesettings.util.Utils
-import com.alexrcq.tvpicturesettings.util.makeButtonFocused
-import java.util.concurrent.LinkedBlockingQueue
+import com.alexrcq.tvpicturesettings.service.DarkModeManager
+import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AcceptDebuggingDialog
+import com.alexrcq.tvpicturesettings.ui.fragment.dialog.UsbDebuggingRequiredDialog
+import com.alexrcq.tvpicturesettings.util.enableAccessibilityService
+import com.alexrcq.tvpicturesettings.util.hasPermission
+import com.alexrcq.tvpicturesettings.util.isDarkModeManagerEnabled
+import com.alexrcq.tvpicturesettings.util.isDebuggingEnabled
 
-class MainActivity : FragmentActivity(R.layout.activity_main) {
 
-    private val dialogsToShow: LinkedBlockingQueue<Dialog> by lazy(LazyThreadSafetyMode.NONE) {
-        LinkedBlockingQueue()
-    }
-    private val notSupportedTVDialog: Dialog
-        get() {
-            return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-                .setMessage(R.string.not_supported_tv)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    finish()
-                }
-                .setOnCancelListener {
-                    finish()
-                }
-                .create()
-                .apply {
-                    setOnShowListener {
-                        makeButtonFocused(POSITIVE_BUTTON)
-                    }
-                }
-        }
-    private val usbDebuggingRequiredDialog: Dialog
-        get() {
-            return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-                .setMessage(R.string.adb_debugging_required)
-                .setPositiveButton(R.string.open_settings) { _, _ ->
-                    openTvSettings()
-                    finish()
-                }
-                .setOnCancelListener {
-                    finish()
-                }
-                .create()
-                .apply {
-                    setOnShowListener {
-                        makeButtonFocused(POSITIVE_BUTTON)
-                    }
-                }
-        }
-    private val acceptDebuggingDialog: Dialog
-        get() {
-            return AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
-                .setMessage(R.string.wait_for_debug_window)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    AdbUtils.grantWriteSecureSettingsPermission()
-                }.setOnCancelListener {
-                    finish()
-                }
-                .create()
-                .apply {
-                    setOnShowListener {
-                        makeButtonFocused(POSITIVE_BUTTON)
-                    }
-                }
-        }
-
+class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AutoBacklightService.start(this, false)
-        if (!Utils.isCurrentTVSupported(this)) {
-            showDialog(notSupportedTVDialog)
+        if (!isDebuggingEnabled) {
+            UsbDebuggingRequiredDialog().show(
+                supportFragmentManager,
+                UsbDebuggingRequiredDialog.TAG
+            )
+            return
         }
-        if (!Utils.isDebuggingEnabled(this)) {
-            showDialog(usbDebuggingRequiredDialog)
+        setContentView(R.layout.activity_main)
+        if (!hasPermission(Manifest.permission.WRITE_SECURE_SETTINGS)) {
+            AcceptDebuggingDialog().show(supportFragmentManager, AcceptDebuggingDialog.TAG)
+            return
         }
-        if (!Utils.hasPermission(this, Manifest.permission.WRITE_SECURE_SETTINGS)) {
-            showDialog(acceptDebuggingDialog)
+        if (!isDarkModeManagerEnabled) {
+            enableAccessibilityService(DarkModeManager::class.java)
         }
     }
 
@@ -98,27 +45,5 @@ class MainActivity : FragmentActivity(R.layout.activity_main) {
             gravity = Gravity.END
         }
         windowManager.updateViewLayout(view, layoutParams)
-    }
-
-    private fun showDialog(dialog: Dialog) {
-        if (dialogsToShow.isEmpty()) {
-            dialog.show()
-        }
-        dialogsToShow.offer(dialog)
-        dialog.setOnDismissListener {
-            dialogsToShow.remove(dialog)
-            if (!dialogsToShow.isEmpty()) {
-                dialogsToShow.peek()?.show()
-            }
-        }
-    }
-
-    private fun openTvSettings() {
-        startActivity(Intent(Settings.ACTION_SETTINGS))
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        AutoBacklightService.stop(this)
     }
 }

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="Насыщенность">
+    <SeekBarPreference
+        app:defaultValue="50"
+        app:key="tuner_saturation_blue"
+        app:persistent="false"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:title="@string/blue" />
+    <SeekBarPreference
+        app:defaultValue="50"
+        app:key="tuner_saturation_cvan"
+        app:persistent="false"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:title="@string/cvan" />
+    <SeekBarPreference
+        app:defaultValue="50"
+        app:key="tuner_saturation_flesh_tone"
+        app:persistent="false"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:title="@string/flesh_tone" />
+    <SeekBarPreference
+        app:defaultValue="50"
+        app:key="tuner_saturation_green"
+        app:persistent="false"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:title="@string/green" />
+    <SeekBarPreference
+        app:defaultValue="50"
+        app:key="tuner_saturation_magenta"
+        app:persistent="false"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:title="@string/magenta" />
+    <SeekBarPreference
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:key="tuner_saturation_red"
+        app:defaultValue="50"
+        app:persistent="false"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:title="@string/red" />
+    <SeekBarPreference
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:defaultValue="50"
+        app:key="tuner_saturation_yellow"
+        app:persistent="false"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        app:title="@string/yellow" />
+</PreferenceScreen>

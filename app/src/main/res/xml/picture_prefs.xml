@@ -5,7 +5,8 @@
         app:key="backlight"
         app:persistent="false"
         app:seekBarIncrement="1"
-        app:title="@string/backlight" />
+        app:title="@string/backlight"
+        app:summary="Нажмите, чтобы активировать ночной режим"/>
     <Preference
         app:key="power_picture_off"
         app:title="@string/power_picture_off" />
@@ -17,9 +18,8 @@
         app:title="@string/picture_mode"
         app:useSimpleSummaryProvider="true" />
     <Preference
-        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerPreferenceFragment"
-        app:key="color_tuner"
-        app:title="@string/color_tuner"/>
+        app:key="take_screenshot"
+        app:title="@string/take_screenshot" />
     <ListPreference
         app:entries="@array/picture_temperature"
         app:entryValues="@array/picture_temperature_values"
@@ -34,7 +34,7 @@
     <Preference
         app:key="reset_to_default"
         app:title="@string/reset_to_default" />
-    <PreferenceCategory app:title="@string/advanced" />
+    <PreferenceCategory app:title="@string/auto_backlight" />
     <SwitchPreference
         app:defaultValue="false"
         app:key="auto_backlight"
@@ -50,23 +50,17 @@
         app:dependency="auto_backlight"
         app:key="ab_night_time"
         app:title="@string/sunset" />
+    <PreferenceCategory app:title="@string/dark_mode_settings" />
+    <SwitchPreference
+        app:defaultValue="false"
+        app:key="is_enable_day_mode_after_screen_on_enabled"
+        app:title="@string/day_mode_after_screen_on" />
     <SeekBarPreference
-        app:dependency="auto_backlight"
         app:key="ab_night_backlight"
         app:seekBarIncrement="1"
         app:title="@string/backlight_at_night" />
-    <ListPreference
-        app:entries="@array/backlight_adjust_time"
-        app:entryValues="@array/picture_temperature_values"
-        app:defaultValue="1"
-        app:enabled="false"
-        app:key="temperature"
-        app:persistent="false"
-        app:title="Длительность смены подсветки"
-        app:useSimpleSummaryProvider="true" />
     <SwitchPreference
         app:defaultValue="false"
-        app:dependency="auto_backlight"
         app:key="is_dark_filter_enabled"
         app:summary="@string/make_it_even_darker_summary"
         app:title="@string/extra_dimming" />
@@ -75,5 +69,5 @@
         app:dependency="is_dark_filter_enabled"
         app:key="dark_filter_power"
         app:seekBarIncrement="1"
-        app:title="Сила затемнения" />
+        app:title="@string/dimming_power" />
 </PreferenceScreen>

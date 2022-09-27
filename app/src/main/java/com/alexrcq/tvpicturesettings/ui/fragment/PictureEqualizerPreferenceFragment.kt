@@ -9,8 +9,12 @@ import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
 import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
+import com.alexrcq.tvpicturesettings.ui.fragment.PictureEqualizerPreferenceFragment.PreferencesKeys.BRIGHTNESS
+import com.alexrcq.tvpicturesettings.ui.fragment.PictureEqualizerPreferenceFragment.PreferencesKeys.CONTRAST
+import com.alexrcq.tvpicturesettings.ui.fragment.PictureEqualizerPreferenceFragment.PreferencesKeys.HUE
+import com.alexrcq.tvpicturesettings.ui.fragment.PictureEqualizerPreferenceFragment.PreferencesKeys.SATURATION
+import com.alexrcq.tvpicturesettings.ui.fragment.PictureEqualizerPreferenceFragment.PreferencesKeys.SHARPNESS
 
 class PictureEqualizerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
     Preference.OnPreferenceChangeListener {
@@ -25,12 +29,12 @@ class PictureEqualizerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.picture_equalizer_prefs, rootKey)
-        pictureSettings = PictureSettings.getInstance(requireContext())
-        brightnessPref = findPreference(AppPreferences.Keys.BRIGHTNESS)
-        contrastPref = findPreference(AppPreferences.Keys.CONTRAST)
-        saturationPref = findPreference(AppPreferences.Keys.SATURATION)
-        huePref = findPreference(AppPreferences.Keys.HUE)
-        sharpnessPref = findPreference(AppPreferences.Keys.SHARPNESS)
+        pictureSettings = PictureSettings(requireContext())
+        brightnessPref = findPreference(BRIGHTNESS)
+        contrastPref = findPreference(CONTRAST)
+        saturationPref = findPreference(SATURATION)
+        huePref = findPreference(HUE)
+        sharpnessPref = findPreference(SHARPNESS)
         preferenceScreen.forEach { preference ->
             preference.onPreferenceChangeListener = this
         }
@@ -51,19 +55,19 @@ class PictureEqualizerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         when (preference.key) {
-            AppPreferences.Keys.BRIGHTNESS -> {
+            BRIGHTNESS -> {
                 pictureSettings.brightness = newValue as Int
             }
-            AppPreferences.Keys.CONTRAST -> {
+            CONTRAST -> {
                 pictureSettings.contrast = newValue as Int
             }
-            AppPreferences.Keys.SATURATION -> {
+            SATURATION -> {
                 pictureSettings.saturation = newValue as Int
             }
-            AppPreferences.Keys.HUE -> {
+            HUE -> {
                 pictureSettings.hue = newValue as Int
             }
-            AppPreferences.Keys.SHARPNESS -> {
+            SHARPNESS -> {
                 pictureSettings.sharpness = newValue as Int
             }
         }
@@ -92,5 +96,13 @@ class PictureEqualizerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
                 PicturePreferenceFragment()
             )
         }
+    }
+
+    private object PreferencesKeys {
+        const val BRIGHTNESS = "brightness"
+        const val CONTRAST = "contrast"
+        const val SATURATION = "saturation"
+        const val HUE = "hue"
+        const val SHARPNESS = "sharpness"
     }
 }

@@ -2,6 +2,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/advanced_video">
+    <Preference
+        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerPreferenceFragment"
+        app:key="color_tuner"
+        app:title="@string/color_tuner"/>
     <ListPreference
         app:persistent="false"
         app:title="@string/noise_reduction"

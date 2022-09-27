@@ -3,11 +3,11 @@ package com.alexrcq.tvpicturesettings.ui.preference
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import androidx.preference.DialogPreference
 import androidx.preference.PreferenceViewHolder
 import com.alexrcq.tvpicturesettings.R
+import timber.log.Timber
 import java.time.LocalTime
 import java.time.format.DateTimeParseException
 
@@ -56,7 +56,7 @@ class TimePickerPreference @JvmOverloads constructor(
         } else try {
             LocalTime.parse(timeStr)
         } catch (e: DateTimeParseException) {
-            Log.e("TimePickerPreference", "The time pattern should be 'HH:mm'", e)
+            Timber.d("The time pattern should be 'HH:mm'", e)
             getDefaultTime()
         }
         setTime(time.hour, time.minute)

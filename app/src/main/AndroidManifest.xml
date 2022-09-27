@@ -6,6 +6,8 @@
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
     <uses-permission
         android:name="android.permission.WRITE_SECURE_SETTINGS"
         tools:ignore="ProtectedPermissions" />
@@ -19,6 +21,7 @@
         android:required="false" />
 
     <application
+        android:name=".App"
         android:allowBackup="false"
         android:icon="@mipmap/ic_android"
         android:label="@string/app_name"
@@ -26,9 +29,9 @@
         android:theme="@style/Theme.AppTheme"
         tools:ignore="DataExtractionRules">
         <service
-            android:name="com.alexrcq.tvpicturesettings.service.DarkFilterService"
+            android:name=".service.DarkModeManager"
             android:exported="true"
-            android:label="Тёмный фильтр"
+            android:label="Служба ночного режима"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
@@ -40,7 +43,7 @@
             android:exported="false" />
 
         <receiver
-            android:name="com.alexrcq.tvpicturesettings.helper.AppReceiver"
+            android:name="com.alexrcq.tvpicturesettings.service.AutoBacklightService$StartServiceBroadcastReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

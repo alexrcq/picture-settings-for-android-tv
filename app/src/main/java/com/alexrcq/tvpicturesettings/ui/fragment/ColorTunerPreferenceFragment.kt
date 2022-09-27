@@ -8,8 +8,11 @@ import androidx.preference.SeekBarPreference
 import androidx.preference.SwitchPreference
 import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.storage.AppPreferences
-import com.alexrcq.tvpicturesettings.storage.PictureSettings
+import com.alexrcq.tvpicturesettings.storage.ColorTuner
+import com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerPreferenceFragment.PreferencesKeys.COLOR_TUNER_BLUE_GAIN
+import com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerPreferenceFragment.PreferencesKeys.COLOR_TUNER_ENABLED
+import com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerPreferenceFragment.PreferencesKeys.COLOR_TUNER_GREEN_GAIN
+import com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerPreferenceFragment.PreferencesKeys.COLOR_TUNER_RED_GAIN
 
 class ColorTunerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
     Preference.OnPreferenceChangeListener {
@@ -19,15 +22,15 @@ class ColorTunerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
     private var greenGainPref: SeekBarPreference? = null
     private var blueGainPref: SeekBarPreference? = null
 
-    private lateinit var pictureSettings: PictureSettings
+    private lateinit var colorTuner: ColorTuner
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.color_tuner_prefs, rootKey)
-        pictureSettings = PictureSettings.getInstance(requireContext())
-        colorTunerEnabledPref = findPreference(AppPreferences.Keys.COLOR_TUNER_ENABLED)
-        redGainPref = findPreference(AppPreferences.Keys.COLOR_TUNER_RED_GAIN)
-        greenGainPref = findPreference(AppPreferences.Keys.COLOR_TUNER_GREEN_GAIN)
-        blueGainPref = findPreference(AppPreferences.Keys.COLOR_TUNER_BLUE_GAIN)
+        colorTuner = ColorTuner(requireContext())
+        colorTunerEnabledPref = findPreference(COLOR_TUNER_ENABLED)
+        redGainPref = findPreference(COLOR_TUNER_RED_GAIN)
+        greenGainPref = findPreference(COLOR_TUNER_GREEN_GAIN)
+        blueGainPref = findPreference(COLOR_TUNER_BLUE_GAIN)
         preferenceScreen.forEach { preference ->
             preference.onPreferenceChangeListener = this
         }
@@ -39,31 +42,38 @@ class ColorTunerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
     }
 
     private fun updateUi() {
-        colorTunerEnabledPref?.isChecked = pictureSettings.isColorTuneEnabled
-        redGainPref?.value = pictureSettings.colorTuneRedGain
-        greenGainPref?.value = pictureSettings.colorTuneGreenGain
-        blueGainPref?.value = pictureSettings.colorTuneBlueGain
+        colorTunerEnabledPref?.isChecked = colorTuner.isColorTuneEnabled
+        redGainPref?.value = colorTuner.redGain
+        greenGainPref?.value = colorTuner.greenGain
+        blueGainPref?.value = colorTuner.blueGain
     }
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         when (preference.key) {
-            AppPreferences.Keys.COLOR_TUNER_ENABLED -> {
+            COLOR_TUNER_ENABLED -> {
                 val isColorTuneEnabled = newValue as Boolean
                 if (!isColorTuneEnabled) {
                     Toast.makeText(requireContext(), R.string.please_wait, Toast.LENGTH_LONG).show()
                 }
-                pictureSettings.isColorTuneEnabled = isColorTuneEnabled
+                colorTuner.isColorTuneEnabled = isColorTuneEnabled
             }
-            AppPreferences.Keys.COLOR_TUNER_RED_GAIN -> {
-                pictureSettings.colorTuneRedGain = newValue as Int
+            COLOR_TUNER_RED_GAIN -> {
+                colorTuner.redGain = newValue as Int
             }
-            AppPreferences.Keys.COLOR_TUNER_GREEN_GAIN -> {
-                pictureSettings.colorTuneGreenGain = newValue as Int
+            COLOR_TUNER_GREEN_GAIN -> {
+                colorTuner.greenGain = newValue as Int
             }
-            AppPreferences.Keys.COLOR_TUNER_BLUE_GAIN -> {
-                pictureSettings.colorTuneBlueGain = newValue as Int
+            COLOR_TUNER_BLUE_GAIN -> {
+                colorTuner.blueGain = newValue as Int
             }
         }
         return true
+    }
+
+    private object PreferencesKeys {
+        const val COLOR_TUNER_ENABLED = "color_tuner_enabled"
+        const val COLOR_TUNER_RED_GAIN = "color_tuner_red_gain"
+        const val COLOR_TUNER_GREEN_GAIN = "color_tuner_green_gain"
+        const val COLOR_TUNER_BLUE_GAIN = "color_tuner_blue_gain"
     }
 }
