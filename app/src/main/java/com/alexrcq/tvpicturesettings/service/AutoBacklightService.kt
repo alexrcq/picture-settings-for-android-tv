@@ -11,57 +11,19 @@ import android.os.IBinder
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.edit
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.service.AutoBacklightService.Preferences.Keys.DAY_TIME
-import com.alexrcq.tvpicturesettings.service.AutoBacklightService.Preferences.Keys.IS_AUTO_BACKLIGHT_ENABLED
-import com.alexrcq.tvpicturesettings.service.AutoBacklightService.Preferences.Keys.NIGHT_TIME
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
+import com.alexrcq.tvpicturesettings.storage.appPreferences
 import timber.log.Timber
 import java.time.LocalTime
 import java.util.*
 
 class AutoBacklightService : Service() {
 
-    private lateinit var serviceLaunchScheduler: ServiceLaunchScheduler
     private lateinit var pictureSettings: PictureSettings
-    private lateinit var preferences: Preferences
+    private lateinit var serviceLaunchScheduler: ServiceLaunchScheduler
 
     private var binder = ServiceBinder()
-
-    var isAutoBacklightEnabled: Boolean
-        get() = preferences.isAutoBacklightEnabled
-        set(enabled) {
-            preferences.isAutoBacklightEnabled = enabled
-            if (enabled) {
-                val isDarkModeEnabled = preferences.isNightNow
-                DarkModeManager.sharedInstance?.isDarkModeEnabled = isDarkModeEnabled
-                if (!isDarkModeEnabled) {
-                    DarkModeManager.sharedInstance?.dayBacklight = pictureSettings.backlight
-                }
-                serviceLaunchScheduler.setRepeatingLaunch(DAY_LAUNCH_ID, preferences.dayModeTime)
-                serviceLaunchScheduler.setRepeatingLaunch(NIGHT_LAUNCH_ID, preferences.darkModeTime)
-                return
-            }
-            DarkModeManager.sharedInstance?.isDarkModeEnabled = false
-            serviceLaunchScheduler.cancelAllScheduledLaunches()
-        }
-
-    var dayModeTime: String
-        get() = preferences.dayModeTime
-        set(value) {
-            preferences.dayModeTime = value
-            DarkModeManager.sharedInstance?.isDarkModeEnabled = preferences.isNightNow
-            serviceLaunchScheduler.setRepeatingLaunch(DAY_LAUNCH_ID, value)
-        }
-
-    var darkModeTime: String
-        get() = preferences.darkModeTime
-        set(value) {
-            preferences.darkModeTime = value
-            DarkModeManager.sharedInstance?.isDarkModeEnabled = preferences.isNightNow
-            serviceLaunchScheduler.setRepeatingLaunch(NIGHT_LAUNCH_ID, value)
-        }
 
     override fun onCreate() {
         super.onCreate()
@@ -81,27 +43,63 @@ class AutoBacklightService : Service() {
         )
         serviceLaunchScheduler = ServiceLaunchScheduler()
         pictureSettings = PictureSettings(applicationContext)
-        preferences = Preferences(applicationContext)
     }
 
     override fun onBind(intent: Intent?): IBinder = binder
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
-            with(DarkModeManager.requireInstance()) {
-                if (isDayModeAfterScreenOnEnabled) {
-                    isDarkModeEnabled = false
-                }
-            }
-        }
-        if (intent?.action == ACTION_SCHEDULED_SERVICE_LAUNCH) {
-            if (isAutoBacklightEnabled) {
-                DarkModeManager.requireInstance().isDarkModeEnabled = preferences.isNightNow
-            }
-        }
-        serviceLaunchScheduler.setRepeatingLaunch(DAY_LAUNCH_ID, dayModeTime)
-        serviceLaunchScheduler.setRepeatingLaunch(NIGHT_LAUNCH_ID, darkModeTime)
+        handleAction(intent?.action)
+        serviceLaunchScheduler.setRepeatingLaunch(DAY_LAUNCH_ID, appPreferences.dayTime)
+        serviceLaunchScheduler.setRepeatingLaunch(NIGHT_LAUNCH_ID, appPreferences.nightTime)
         return START_NOT_STICKY
+    }
+
+    private fun handleAction(action: String?) {
+        when(action) {
+            Intent.ACTION_BOOT_COMPLETED -> onBootCompleted()
+            ACTION_SCHEDULED_SERVICE_LAUNCH -> onScheduledServiceLaunch()
+        }
+    }
+
+    private fun onBootCompleted() {
+        with(appPreferences) {
+            if (isDayModeAfterScreenOnEnabled) {
+                DarkModeManager.requireInstance().isDarkModeEnabled = false
+            }
+        }
+    }
+
+    private fun onScheduledServiceLaunch() {
+        with(appPreferences) {
+            if (isAutoBacklightEnabled) {
+                DarkModeManager.requireInstance().isDarkModeEnabled = appPreferences.isNightNow
+            }
+        }
+    }
+
+    fun handleAutoBacklight(isAutoBacklightEnabled: Boolean) {
+        if (isAutoBacklightEnabled) {
+            val isDarkModeEnabled = appPreferences.isNightNow
+            DarkModeManager.requireInstance().isDarkModeEnabled = isDarkModeEnabled
+            if (!isDarkModeEnabled) {
+                appPreferences.dayBacklight = pictureSettings.backlight
+            }
+            serviceLaunchScheduler.setRepeatingLaunch(DAY_LAUNCH_ID, appPreferences.dayTime)
+            serviceLaunchScheduler.setRepeatingLaunch(NIGHT_LAUNCH_ID, appPreferences.nightTime)
+            return
+        }
+        DarkModeManager.requireInstance().isDarkModeEnabled = false
+        serviceLaunchScheduler.cancelAllScheduledLaunches()
+    }
+
+    fun setDayModeTime(dayModeTime: String) {
+        DarkModeManager.requireInstance().isDarkModeEnabled = appPreferences.isNightNow
+        serviceLaunchScheduler.setRepeatingLaunch(DAY_LAUNCH_ID, dayModeTime)
+    }
+
+    fun setDarkModeTime(darkModeTime: String) {
+        DarkModeManager.requireInstance().isDarkModeEnabled = appPreferences.isNightNow
+        serviceLaunchScheduler.setRepeatingLaunch(DAY_LAUNCH_ID, darkModeTime)
     }
 
     private inner class ServiceLaunchScheduler {
@@ -158,49 +156,6 @@ class AutoBacklightService : Service() {
             ) {
                 start(context, intent)
             }
-        }
-    }
-
-    class Preferences(context: Context) {
-        private val preferences =
-            context.applicationContext.getSharedPreferences("auto_backlight_prefs", MODE_PRIVATE)
-
-        var isAutoBacklightEnabled: Boolean
-            get() = preferences.getBoolean(IS_AUTO_BACKLIGHT_ENABLED, false)
-            set(value) {
-                preferences.edit {
-                    putBoolean(IS_AUTO_BACKLIGHT_ENABLED, value)
-                }
-            }
-
-        var dayModeTime: String
-            get() = preferences.getString(DAY_TIME, "08:00")!!
-            set(value) {
-                preferences.edit {
-                    putString(DAY_TIME, value)
-                }
-            }
-
-        var darkModeTime: String
-            get() = preferences.getString(NIGHT_TIME, "22:30")!!
-            set(value) {
-                preferences.edit {
-                    putString(NIGHT_TIME, value)
-                }
-            }
-
-        val isNightNow: Boolean
-            get() {
-                val currentTime = LocalTime.now()
-                val sunsetTime = LocalTime.parse(darkModeTime)
-                val sunriseTime = LocalTime.parse(dayModeTime)
-                return currentTime >= sunsetTime || currentTime <= sunriseTime
-            }
-
-        object Keys {
-            const val IS_AUTO_BACKLIGHT_ENABLED = "auto_backlight"
-            const val DAY_TIME = "day_time"
-            const val NIGHT_TIME = "night_time"
         }
     }
 

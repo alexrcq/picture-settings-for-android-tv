@@ -4,13 +4,13 @@ import androidx.leanback.preference.LeanbackSettingsFragmentCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
-import com.alexrcq.tvpicturesettings.ui.fragment.SettingsFragment.FragmentsKeys.ADVANCED_VIDEO
-import com.alexrcq.tvpicturesettings.ui.fragment.SettingsFragment.FragmentsKeys.BRIGHTNESS_TUNE
-import com.alexrcq.tvpicturesettings.ui.fragment.SettingsFragment.FragmentsKeys.COLOR_TUNER
-import com.alexrcq.tvpicturesettings.ui.fragment.SettingsFragment.FragmentsKeys.HUE_TUNE
-import com.alexrcq.tvpicturesettings.ui.fragment.SettingsFragment.FragmentsKeys.OFFSET_TUNE
-import com.alexrcq.tvpicturesettings.ui.fragment.SettingsFragment.FragmentsKeys.SATURATION_TUNE
-import com.alexrcq.tvpicturesettings.ui.preference.TimePickerPreference
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.ADVANCED_VIDEO
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BRIGHTNESS_TUNE
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.HUE_TUNE
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.OFFSET_TUNE
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.SATURATION_TUNE
+import com.alexrcq.tvpicturesettings.ui.TimePickerPreference
 
 class SettingsFragment : LeanbackSettingsFragmentCompat() {
 
@@ -51,13 +51,4 @@ class SettingsFragment : LeanbackSettingsFragmentCompat() {
 
     override fun onPreferenceStartScreen(caller: PreferenceFragmentCompat, pref: PreferenceScreen) =
         false
-
-    object FragmentsKeys {
-        const val ADVANCED_VIDEO = "advanced_video"
-        const val COLOR_TUNER = "color_tuner"
-        const val SATURATION_TUNE = "saturation_tune"
-        const val HUE_TUNE = "hue_tune"
-        const val BRIGHTNESS_TUNE = "brightness_tune"
-        const val OFFSET_TUNE = "offset_tune"
-    }
 }

@@ -6,14 +6,14 @@ import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
 import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_BLUE
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_CVAN
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_FLESH_TONE
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_GREEN
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_MAGENTA
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_RED
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_YELLOW
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
-import com.alexrcq.tvpicturesettings.ui.fragment.BrightnessTunePreferenceFragment.PreferencesKeys.TUNER_BRIGHTNESS_BLUE
-import com.alexrcq.tvpicturesettings.ui.fragment.BrightnessTunePreferenceFragment.PreferencesKeys.TUNER_BRIGHTNESS_CVAN
-import com.alexrcq.tvpicturesettings.ui.fragment.BrightnessTunePreferenceFragment.PreferencesKeys.TUNER_BRIGHTNESS_FLESH_TONE
-import com.alexrcq.tvpicturesettings.ui.fragment.BrightnessTunePreferenceFragment.PreferencesKeys.TUNER_BRIGHTNESS_GREEN
-import com.alexrcq.tvpicturesettings.ui.fragment.BrightnessTunePreferenceFragment.PreferencesKeys.TUNER_BRIGHTNESS_MAGENTA
-import com.alexrcq.tvpicturesettings.ui.fragment.BrightnessTunePreferenceFragment.PreferencesKeys.TUNER_BRIGHTNESS_RED
-import com.alexrcq.tvpicturesettings.ui.fragment.BrightnessTunePreferenceFragment.PreferencesKeys.TUNER_BRIGHTNESS_YELLOW
 
 class BrightnessTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     Preference.OnPreferenceChangeListener {
@@ -83,15 +83,5 @@ class BrightnessTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             }
         }
         return true
-    }
-
-    private object PreferencesKeys {
-        const val TUNER_BRIGHTNESS_BLUE = "tuner_brightness_blue"
-        const val TUNER_BRIGHTNESS_CVAN = "tuner_brightness_cvan"
-        const val TUNER_BRIGHTNESS_FLESH_TONE = "tuner_brightness_flesh_tone"
-        const val TUNER_BRIGHTNESS_GREEN = "tuner_brightness_green"
-        const val TUNER_BRIGHTNESS_MAGENTA = "tuner_brightness_magenta"
-        const val TUNER_BRIGHTNESS_RED = "tuner_brightness_red"
-        const val TUNER_BRIGHTNESS_YELLOW = "tuner_brightness_yellow"
     }
 }

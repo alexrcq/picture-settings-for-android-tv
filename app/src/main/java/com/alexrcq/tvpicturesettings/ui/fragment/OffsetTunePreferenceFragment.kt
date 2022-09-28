@@ -6,10 +6,10 @@ import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
 import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_BLUE
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_GREEN
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_RED
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
-import com.alexrcq.tvpicturesettings.ui.fragment.OffsetTunePreferenceFragment.PreferencesKeys.TUNER_OFFSET_BLUE
-import com.alexrcq.tvpicturesettings.ui.fragment.OffsetTunePreferenceFragment.PreferencesKeys.TUNER_OFFSET_GREEN
-import com.alexrcq.tvpicturesettings.ui.fragment.OffsetTunePreferenceFragment.PreferencesKeys.TUNER_OFFSET_RED
 
 class OffsetTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     Preference.OnPreferenceChangeListener {
@@ -55,11 +55,5 @@ class OffsetTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             }
         }
         return true
-    }
-
-    private object PreferencesKeys {
-        const val TUNER_OFFSET_BLUE = "tuner_offset_blue"
-        const val TUNER_OFFSET_GREEN = "tuner_offset_green"
-        const val TUNER_OFFSET_RED = "tuner_offset_red"
     }
 }

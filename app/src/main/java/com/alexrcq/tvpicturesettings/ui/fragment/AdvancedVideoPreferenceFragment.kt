@@ -7,11 +7,11 @@ import androidx.preference.Preference
 import androidx.preference.SwitchPreference
 import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.ADAPTIVE_LUMA_CONTROL
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.HDR
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.LOCAL_CONTRAST_CONTROL
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.NOISE_REDUCTION
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
-import com.alexrcq.tvpicturesettings.ui.fragment.AdvancedVideoPreferenceFragment.PreferencesKeys.ADAPTIVE_LUMA_CONTROL
-import com.alexrcq.tvpicturesettings.ui.fragment.AdvancedVideoPreferenceFragment.PreferencesKeys.HDR
-import com.alexrcq.tvpicturesettings.ui.fragment.AdvancedVideoPreferenceFragment.PreferencesKeys.LOCAL_CONTRAST_CONTROL
-import com.alexrcq.tvpicturesettings.ui.fragment.AdvancedVideoPreferenceFragment.PreferencesKeys.NOISE_REDUCTION
 
 class AdvancedVideoPreferenceFragment : LeanbackPreferenceFragmentCompat(),
     Preference.OnPreferenceChangeListener {
@@ -63,12 +63,5 @@ class AdvancedVideoPreferenceFragment : LeanbackPreferenceFragmentCompat(),
         localContrastPref?.isChecked = pictureSettings.isLocalContrastEnabled
         adaptiveLumaPref?.isChecked = pictureSettings.isAdaptiveLumaEnabled
         hdrPref?.isChecked = pictureSettings.isHdrEnabled
-    }
-
-    private object PreferencesKeys {
-        const val NOISE_REDUCTION = "noise_reduction"
-        const val ADAPTIVE_LUMA_CONTROL = "adaptive_luma_control"
-        const val LOCAL_CONTRAST_CONTROL = "local_contrast_control"
-        const val HDR = "hdr"
     }
 }

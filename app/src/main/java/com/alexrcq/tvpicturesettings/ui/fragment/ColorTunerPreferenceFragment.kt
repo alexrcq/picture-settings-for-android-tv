@@ -8,11 +8,11 @@ import androidx.preference.SeekBarPreference
 import androidx.preference.SwitchPreference
 import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_BLUE_GAIN
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_ENABLED
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_GREEN_GAIN
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_RED_GAIN
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
-import com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerPreferenceFragment.PreferencesKeys.COLOR_TUNER_BLUE_GAIN
-import com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerPreferenceFragment.PreferencesKeys.COLOR_TUNER_ENABLED
-import com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerPreferenceFragment.PreferencesKeys.COLOR_TUNER_GREEN_GAIN
-import com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerPreferenceFragment.PreferencesKeys.COLOR_TUNER_RED_GAIN
 
 class ColorTunerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
     Preference.OnPreferenceChangeListener {
@@ -68,12 +68,5 @@ class ColorTunerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
             }
         }
         return true
-    }
-
-    private object PreferencesKeys {
-        const val COLOR_TUNER_ENABLED = "color_tuner_enabled"
-        const val COLOR_TUNER_RED_GAIN = "color_tuner_red_gain"
-        const val COLOR_TUNER_GREEN_GAIN = "color_tuner_green_gain"
-        const val COLOR_TUNER_BLUE_GAIN = "color_tuner_blue_gain"
     }
 }

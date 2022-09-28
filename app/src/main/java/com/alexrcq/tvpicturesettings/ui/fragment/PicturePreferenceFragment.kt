@@ -8,9 +8,6 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.Settings
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.commitNow
@@ -21,20 +18,21 @@ import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.adblib.AdbShell
 import com.alexrcq.tvpicturesettings.service.AutoBacklightService
 import com.alexrcq.tvpicturesettings.service.DarkModeManager
+import com.alexrcq.tvpicturesettings.storage.AppPreferences
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BACKLIGHT
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_FILTER_POWER
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DAY_TIME
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.IS_AUTO_BACKLIGHT_ENABLED
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.IS_DARK_FILTER_ENABLED
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.NIGHT_BACKLIGHT
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.NIGHT_TIME
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.PICTURE_MODE
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.POWER_PICTURE_OFF
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.RESET_TO_DEFAULT
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TAKE_SCREENSHOT
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TEMPERATURE
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment.PreferencesKeys.BACKLIGHT
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment.PreferencesKeys.DARK_FILTER_POWER
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment.PreferencesKeys.DARK_MODE_TIME
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment.PreferencesKeys.DAY_MODE_TIME
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment.PreferencesKeys.IS_AUTO_BACKLIGHT_ENABLED
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment.PreferencesKeys.IS_DARK_FILTER_ENABLED
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment.PreferencesKeys.IS_DAY_MODE_AFTER_SCREEN_ON_ENABLED
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment.PreferencesKeys.NIGHT_BACKLIGHT
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment.PreferencesKeys.PICTURE_MODE
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment.PreferencesKeys.POWER_PICTURE_OFF
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment.PreferencesKeys.RESET_TO_DEFAULT
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment.PreferencesKeys.TAKE_SCREENSHOT
-import com.alexrcq.tvpicturesettings.ui.fragment.PicturePreferenceFragment.PreferencesKeys.TEMPERATURE
+import com.alexrcq.tvpicturesettings.storage.appPreferences
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.LoadingDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.NotSupportedTVDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.ResetToDefaultDialog
@@ -49,6 +47,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     private lateinit var pictureSettings: PictureSettings
     private lateinit var autoBacklightService: AutoBacklightService
+    private lateinit var appPreferences: AppPreferences
 
     private var backlightPref: SeekBarPreference? = null
     private var pictureModePref: ListPreference? = null
@@ -84,6 +83,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     }
 
     private fun iniPreferences() {
+        appPreferences = requireContext().appPreferences
         backlightPref = findPreference<SeekBarPreference?>(BACKLIGHT)?.apply {
             onPreferenceChangeListener = this@PicturePreferenceFragment
             setOnPreferenceClickListener {
@@ -134,8 +134,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     }
 
     private fun updateBacklightPreferenceSummary() {
-        val darkModePrefs = DarkModeManager.Preferences(requireContext())
-        backlightPref?.summary = if (darkModePrefs.isDarkModeEnabled)
+        backlightPref?.summary = if (appPreferences.isDarkModeEnabled)
             getString(R.string.click_to_day_mode)
         else
             getString(R.string.click_to_dark_mode)
@@ -160,7 +159,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             BACKLIGHT -> {
                 val backlight = newValue as Int
                 pictureSettings.backlight = backlight
-                with(DarkModeManager.requireInstance()) {
+                with(appPreferences) {
                     if (!isDarkModeEnabled) {
                         dayBacklight = backlight
                     }
@@ -177,27 +176,28 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
                 pictureSettings.temperature = (newValue as String).toInt()
             }
             IS_DARK_FILTER_ENABLED -> {
-                DarkModeManager.requireInstance().isDarkFilterOnDarkModeEnabled =
-                    newValue as Boolean
+                if (appPreferences.isDarkModeEnabled) {
+                    DarkModeManager.requireInstance().darkFilter.isEnabled = newValue as Boolean
+                }
             }
             NIGHT_BACKLIGHT -> {
-                DarkModeManager.requireInstance().nightBacklight = newValue as Int
+                with(appPreferences) {
+                    if (isDarkModeEnabled) {
+                        pictureSettings.backlight = nightBacklight
+                    }
+                }
             }
             DARK_FILTER_POWER -> {
-                DarkModeManager.requireInstance().darkFilterAlpha = (newValue as Int) / 100f
-            }
-            IS_DAY_MODE_AFTER_SCREEN_ON_ENABLED -> {
-                DarkModeManager.requireInstance().isDayModeAfterScreenOnEnabled =
-                    newValue as Boolean
+                DarkModeManager.requireInstance().darkFilter.alpha = (newValue as Int) / 100f
             }
             IS_AUTO_BACKLIGHT_ENABLED -> {
-                autoBacklightService.isAutoBacklightEnabled = newValue as Boolean
+                autoBacklightService.handleAutoBacklight(isAutoBacklightEnabled = newValue as Boolean)
             }
-            DAY_MODE_TIME -> {
-                autoBacklightService.dayModeTime = newValue as String
+            DAY_TIME -> {
+                autoBacklightService.setDayModeTime(newValue as String)
             }
-            DARK_MODE_TIME -> {
-                autoBacklightService.darkModeTime = newValue as String
+            NIGHT_TIME -> {
+                autoBacklightService.setDarkModeTime(newValue as String)
             }
         }
         return true
@@ -238,16 +238,14 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     override fun onStart() {
         super.onStart()
         Timber.d("onStart")
-        with(requireContext()) {
-            registerReceiver(
-                onDarkManagerConnectedBR,
-                IntentFilter(DarkModeManager.ACTION_SERVICE_CONNECTED)
-            )
-            contentResolver.registerContentObserver(
-                Settings.Global.CONTENT_URI, true,
-                globalSettingsObserver
-            )
-        }
+        requireContext().registerReceiver(
+            onDarkManagerConnectedBR,
+            IntentFilter(DarkModeManager.ACTION_SERVICE_CONNECTED)
+        )
+        requireContext().contentResolver.registerContentObserver(
+            Settings.Global.CONTENT_URI, true,
+            globalSettingsObserver
+        )
         if (DarkModeManager.sharedInstance == null) {
             Timber.d("DarkModeManager is loading...")
             LoadingDialog().show(childFragmentManager, LoadingDialog.TAG)
@@ -255,53 +253,8 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         updateUi()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Timber.d("onCreate")
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        Timber.d("onAttach")
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        Timber.d("onDetach")
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        Timber.d("onCreateView")
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Timber.d("onViewCreated")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Timber.d("onPause")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        Timber.d("onResume")
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        Timber.d("onDestroyView")
-    }
-
     override fun onStop() {
         super.onStop()
-        Timber.d("onStop")
         requireContext().unregisterReceiver(onDarkManagerConnectedBR)
     }
 
@@ -331,23 +284,5 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
                 PictureEqualizerPreferenceFragment()
             )
         }
-    }
-
-    private object PreferencesKeys {
-        const val IS_AUTO_BACKLIGHT_ENABLED = "auto_backlight"
-        const val BACKLIGHT = "backlight"
-        const val DAY_MODE_TIME = "ab_day_time"
-        const val DARK_MODE_TIME = "ab_night_time"
-        const val PICTURE_MODE = "picture_mode"
-        const val TEMPERATURE = "temperature"
-        const val RESET_TO_DEFAULT = "reset_to_default"
-        const val POWER_PICTURE_OFF = "power_picture_off"
-        const val TAKE_SCREENSHOT = "take_screenshot"
-
-        const val IS_DAY_MODE_AFTER_SCREEN_ON_ENABLED =
-            "is_enable_day_mode_after_screen_on_enabled"
-        const val IS_DARK_FILTER_ENABLED = "is_dark_filter_enabled"
-        const val NIGHT_BACKLIGHT = "ab_night_backlight"
-        const val DARK_FILTER_POWER = "dark_filter_power"
     }
 }

@@ -9,12 +9,12 @@ import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
 import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BRIGHTNESS
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.CONTRAST
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.HUE
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.SATURATION
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.SHARPNESS
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
-import com.alexrcq.tvpicturesettings.ui.fragment.PictureEqualizerPreferenceFragment.PreferencesKeys.BRIGHTNESS
-import com.alexrcq.tvpicturesettings.ui.fragment.PictureEqualizerPreferenceFragment.PreferencesKeys.CONTRAST
-import com.alexrcq.tvpicturesettings.ui.fragment.PictureEqualizerPreferenceFragment.PreferencesKeys.HUE
-import com.alexrcq.tvpicturesettings.ui.fragment.PictureEqualizerPreferenceFragment.PreferencesKeys.SATURATION
-import com.alexrcq.tvpicturesettings.ui.fragment.PictureEqualizerPreferenceFragment.PreferencesKeys.SHARPNESS
 
 class PictureEqualizerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
     Preference.OnPreferenceChangeListener {
@@ -96,13 +96,5 @@ class PictureEqualizerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
                 PicturePreferenceFragment()
             )
         }
-    }
-
-    private object PreferencesKeys {
-        const val BRIGHTNESS = "brightness"
-        const val CONTRAST = "contrast"
-        const val SATURATION = "saturation"
-        const val HUE = "hue"
-        const val SHARPNESS = "sharpness"
     }
 }

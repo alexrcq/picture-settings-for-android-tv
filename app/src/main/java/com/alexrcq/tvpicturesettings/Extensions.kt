@@ -1,19 +1,17 @@
-package com.alexrcq.tvpicturesettings.util
+package com.alexrcq.tvpicturesettings
 
 import android.accessibilityservice.AccessibilityService
-import android.app.AlertDialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.provider.Settings
+import android.widget.Button
 import com.alexrcq.tvpicturesettings.service.DarkModeManager
 import timber.log.Timber
 
-fun AlertDialog.setButtonFocused(@DialogButton button: Int) {
-    this.getButton(button).apply {
-        isFocusable = true
-        isFocusableInTouchMode = true
-        requestFocus()
-    }
+fun Button.requestFocusForced() {
+    isFocusable = true
+    isFocusableInTouchMode = true
+    requestFocus()
 }
 
 fun Context.hasPermission(permission: String): Boolean =

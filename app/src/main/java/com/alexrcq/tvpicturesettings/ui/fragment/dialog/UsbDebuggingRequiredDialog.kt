@@ -3,14 +3,14 @@ package com.alexrcq.tvpicturesettings.ui.fragment.dialog
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
+import android.content.DialogInterface.BUTTON_NEGATIVE
+import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import androidx.fragment.app.DialogFragment
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.util.DialogButton.NEGATIVE_BUTTON
-import com.alexrcq.tvpicturesettings.util.DialogButton.POSITIVE_BUTTON
-import com.alexrcq.tvpicturesettings.util.setButtonFocused
+import com.alexrcq.tvpicturesettings.requestFocusForced
 
 class UsbDebuggingRequiredDialog : DialogFragment(), DialogInterface.OnShowListener{
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -27,14 +27,15 @@ class UsbDebuggingRequiredDialog : DialogFragment(), DialogInterface.OnShowListe
     }
 
     override fun onShow(dialog: DialogInterface?) {
-        (dialog as AlertDialog).apply {
-            setButtonFocused(POSITIVE_BUTTON)
-            getButton(NEGATIVE_BUTTON).setOnClickListener {
-                onCancelClicked()
-            }
-            getButton(POSITIVE_BUTTON).setOnClickListener {
+        val alertDialog = dialog as AlertDialog
+        alertDialog.getButton(BUTTON_POSITIVE).apply {
+            setOnClickListener {
                 onOpenSettingsClicked()
             }
+            requestFocusForced()
+        }
+        alertDialog.getButton(BUTTON_NEGATIVE).setOnClickListener {
+            onCancelClicked()
         }
     }
 

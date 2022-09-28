@@ -8,7 +8,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.leanback.preference.LeanbackPreferenceDialogFragmentCompat
 import androidx.leanback.widget.picker.TimePicker
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.ui.preference.TimePickerPreference
+import com.alexrcq.tvpicturesettings.ui.TimePickerPreference
 
 
 class TimePickerDialog private constructor() : LeanbackPreferenceDialogFragmentCompat() {

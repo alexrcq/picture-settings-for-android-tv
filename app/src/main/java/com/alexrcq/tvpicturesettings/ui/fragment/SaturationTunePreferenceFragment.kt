@@ -6,14 +6,14 @@ import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
 import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_BLUE
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_CVAN
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_FLESH_TONE
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_GREEN
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_MAGENTA
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_RED
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_YELLOW
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
-import com.alexrcq.tvpicturesettings.ui.fragment.SaturationTunePreferenceFragment.PreferencesKeys.TUNER_SATURATION_BLUE
-import com.alexrcq.tvpicturesettings.ui.fragment.SaturationTunePreferenceFragment.PreferencesKeys.TUNER_SATURATION_CVAN
-import com.alexrcq.tvpicturesettings.ui.fragment.SaturationTunePreferenceFragment.PreferencesKeys.TUNER_SATURATION_FLESH_TONE
-import com.alexrcq.tvpicturesettings.ui.fragment.SaturationTunePreferenceFragment.PreferencesKeys.TUNER_SATURATION_GREEN
-import com.alexrcq.tvpicturesettings.ui.fragment.SaturationTunePreferenceFragment.PreferencesKeys.TUNER_SATURATION_MAGENTA
-import com.alexrcq.tvpicturesettings.ui.fragment.SaturationTunePreferenceFragment.PreferencesKeys.TUNER_SATURATION_RED
-import com.alexrcq.tvpicturesettings.ui.fragment.SaturationTunePreferenceFragment.PreferencesKeys.TUNER_SATURATION_YELLOW
 
 class SaturationTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     Preference.OnPreferenceChangeListener {
@@ -83,15 +83,5 @@ class SaturationTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             }
         }
         return true
-    }
-
-    private object PreferencesKeys {
-        const val TUNER_SATURATION_BLUE = "tuner_saturation_blue"
-        const val TUNER_SATURATION_CVAN = "tuner_saturation_cvan"
-        const val TUNER_SATURATION_FLESH_TONE = "tuner_saturation_flesh_tone"
-        const val TUNER_SATURATION_GREEN = "tuner_saturation_green"
-        const val TUNER_SATURATION_MAGENTA = "tuner_saturation_magenta"
-        const val TUNER_SATURATION_RED = "tuner_saturation_red"
-        const val TUNER_SATURATION_YELLOW = "tuner_saturation_yellow"
     }
 }

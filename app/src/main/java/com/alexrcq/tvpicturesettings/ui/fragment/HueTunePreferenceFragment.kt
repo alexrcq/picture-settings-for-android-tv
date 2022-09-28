@@ -6,14 +6,14 @@ import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
 import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_BLUE
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_CVAN
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_FLESH_TONE
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_GREEN
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_MAGENTA
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_RED
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_YELLOW
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
-import com.alexrcq.tvpicturesettings.ui.fragment.HueTunePreferenceFragment.PreferencesKeys.TUNER_HUE_BLUE
-import com.alexrcq.tvpicturesettings.ui.fragment.HueTunePreferenceFragment.PreferencesKeys.TUNER_HUE_CVAN
-import com.alexrcq.tvpicturesettings.ui.fragment.HueTunePreferenceFragment.PreferencesKeys.TUNER_HUE_FLESH_TONE
-import com.alexrcq.tvpicturesettings.ui.fragment.HueTunePreferenceFragment.PreferencesKeys.TUNER_HUE_GREEN
-import com.alexrcq.tvpicturesettings.ui.fragment.HueTunePreferenceFragment.PreferencesKeys.TUNER_HUE_MAGENTA
-import com.alexrcq.tvpicturesettings.ui.fragment.HueTunePreferenceFragment.PreferencesKeys.TUNER_HUE_RED
-import com.alexrcq.tvpicturesettings.ui.fragment.HueTunePreferenceFragment.PreferencesKeys.TUNER_HUE_YELLOW
 
 class HueTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     Preference.OnPreferenceChangeListener {
@@ -83,15 +83,5 @@ class HueTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             }
         }
         return true
-    }
-
-    private object PreferencesKeys {
-        const val TUNER_HUE_BLUE = "tuner_hue_blue"
-        const val TUNER_HUE_CVAN = "tuner_hue_cvan"
-        const val TUNER_HUE_FLESH_TONE = "tuner_hue_flesh_tone"
-        const val TUNER_HUE_GREEN = "tuner_hue_green"
-        const val TUNER_HUE_MAGENTA = "tuner_hue_magenta"
-        const val TUNER_HUE_RED = "tuner_hue_red"
-        const val TUNER_HUE_YELLOW = "tuner_hue_yellow"
     }
 }

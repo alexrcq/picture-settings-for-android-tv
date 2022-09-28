@@ -3,11 +3,11 @@ package com.alexrcq.tvpicturesettings.ui.fragment.dialog
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.DialogInterface
+import android.content.DialogInterface.BUTTON_POSITIVE
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.util.DialogButton
-import com.alexrcq.tvpicturesettings.util.setButtonFocused
+import com.alexrcq.tvpicturesettings.requestFocusForced
 
 class NotSupportedTVDialog: DialogFragment(), DialogInterface.OnShowListener {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -28,9 +28,11 @@ class NotSupportedTVDialog: DialogFragment(), DialogInterface.OnShowListener {
 
     override fun onShow(dialog: DialogInterface?) {
         val alertDialog = dialog as AlertDialog
-        alertDialog.setButtonFocused(DialogButton.POSITIVE_BUTTON)
-        alertDialog.getButton(DialogButton.POSITIVE_BUTTON).setOnClickListener {
-            onOkClicked()
+        alertDialog.getButton(BUTTON_POSITIVE).apply {
+            setOnClickListener {
+                onOkClicked()
+            }
+            requestFocusForced()
         }
     }
 

@@ -5,7 +5,7 @@ import android.content.Context
 import android.os.Environment
 import android.os.FileObserver
 import com.alexrcq.tvpicturesettings.BuildConfig
-import com.alexrcq.tvpicturesettings.util.hasPermission
+import com.alexrcq.tvpicturesettings.hasPermission
 import com.tananaev.adblib.AdbConnection
 import com.tananaev.adblib.AdbCrypto
 import com.tananaev.adblib.AdbStream
@@ -86,6 +86,7 @@ class AdbShell private constructor(
     private var fileObserver: FileObserver? = null
 
     private suspend fun waitForScreenshotCaptured() = suspendCoroutine { continuation ->
+        @Suppress("DEPRECATION")
         fileObserver = object : FileObserver(screenshotsPath, CREATE) {
             override fun onEvent(event: Int, path: String?) {
                 if (event == CREATE) {

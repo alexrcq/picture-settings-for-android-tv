@@ -1,4 +1,4 @@
-package com.alexrcq.tvpicturesettings.ui.preference
+package com.alexrcq.tvpicturesettings.ui
 
 import android.content.Context
 import android.content.res.TypedArray

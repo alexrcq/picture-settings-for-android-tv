@@ -5,14 +5,10 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
-import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.*
 import com.alexrcq.tvpicturesettings.service.DarkModeManager
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AcceptDebuggingDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.UsbDebuggingRequiredDialog
-import com.alexrcq.tvpicturesettings.util.enableAccessibilityService
-import com.alexrcq.tvpicturesettings.util.hasPermission
-import com.alexrcq.tvpicturesettings.util.isDarkModeManagerEnabled
-import com.alexrcq.tvpicturesettings.util.isDebuggingEnabled
 
 
 class MainActivity : FragmentActivity() {
