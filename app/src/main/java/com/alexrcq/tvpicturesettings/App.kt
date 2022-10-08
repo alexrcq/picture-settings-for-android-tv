@@ -6,7 +6,7 @@ import timber.log.Timber
 class App: Application() {
     override fun onCreate() {
         super.onCreate()
-        if (BuildConfig.BUILD_TYPE == "debugMinified") {
+        if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
     }

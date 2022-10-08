@@ -2,42 +2,42 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/hue">
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:defaultValue="50"
         app:key="tuner_hue_blue"
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/blue" />
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:defaultValue="50"
         app:key="tuner_hue_cvan"
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/cvan" />
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:defaultValue="50"
         app:key="tuner_hue_flesh_tone"
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/flesh_tone" />
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:defaultValue="50"
         app:key="tuner_hue_green"
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/green" />
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:defaultValue="50"
         app:key="tuner_hue_magenta"
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/magenta" />
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:key="tuner_hue_red"
@@ -46,7 +46,7 @@
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/red" />
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:defaultValue="50"
@@ -55,4 +55,7 @@
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/yellow" />
+    <Preference
+        app:key="tuner_hue_reset"
+        app:title="@string/reset"/>
 </PreferenceScreen>

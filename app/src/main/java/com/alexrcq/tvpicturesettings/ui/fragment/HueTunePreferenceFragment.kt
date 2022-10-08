@@ -12,6 +12,7 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_FLESH
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_GREEN
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_MAGENTA
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_RED
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_RESET
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_YELLOW
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
 
@@ -38,6 +39,11 @@ class HueTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         magentaPref = findPreference(TUNER_HUE_MAGENTA)
         redPref = findPreference(TUNER_HUE_RED)
         yellowPref = findPreference(TUNER_HUE_YELLOW)
+        findPreference<Preference>(TUNER_HUE_RESET)?.setOnPreferenceClickListener {
+            colorTuner.resetHue()
+            updateUi()
+            true
+        }
         preferenceScreen.forEach { preference ->
             preference.onPreferenceChangeListener = this
         }

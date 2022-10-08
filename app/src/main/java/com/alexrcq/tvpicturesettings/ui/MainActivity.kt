@@ -6,7 +6,7 @@ import android.view.Gravity
 import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
 import com.alexrcq.tvpicturesettings.*
-import com.alexrcq.tvpicturesettings.service.DarkModeManager
+import com.alexrcq.tvpicturesettings.DarkModeManager
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AcceptDebuggingDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.UsbDebuggingRequiredDialog
 

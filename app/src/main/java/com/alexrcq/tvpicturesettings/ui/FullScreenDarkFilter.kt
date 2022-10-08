@@ -9,7 +9,8 @@ import android.view.WindowManager
 import timber.log.Timber
 
 class FullScreenDarkFilter(val context: AccessibilityService) {
-    private var darkFilterView = View(context).apply {
+
+    private val darkFilterView = View(context).apply {
         setBackgroundColor(Color.BLACK)
     }
 
@@ -37,7 +38,8 @@ class FullScreenDarkFilter(val context: AccessibilityService) {
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
         )
-        val windowManager = context.getSystemService(AccessibilityService.WINDOW_SERVICE) as WindowManager
+        val windowManager =
+            context.getSystemService(AccessibilityService.WINDOW_SERVICE) as WindowManager
         try {
             windowManager.addView(darkFilterView, layoutParams)
         } catch (e: IllegalStateException) {
@@ -47,7 +49,8 @@ class FullScreenDarkFilter(val context: AccessibilityService) {
 
     private fun disable() {
         if (darkFilterView.windowToken != null) {
-            val windowManager = context.getSystemService(AccessibilityService.WINDOW_SERVICE) as WindowManager
+            val windowManager =
+                context.getSystemService(AccessibilityService.WINDOW_SERVICE) as WindowManager
             windowManager.removeView(darkFilterView)
         }
     }

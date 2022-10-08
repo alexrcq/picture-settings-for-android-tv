@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/picture">
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:key="backlight"
         app:persistent="false"
         app:seekBarIncrement="1"
-        app:title="@string/backlight"
-        app:summary="Нажмите, чтобы активировать ночной режим"/>
+        app:showSeekBarValue="true"
+        app:title="@string/backlight" />
     <Preference
         app:key="power_picture_off"
         app:title="@string/power_picture_off" />
@@ -34,40 +34,30 @@
     <Preference
         app:key="reset_to_default"
         app:title="@string/reset_to_default" />
-    <PreferenceCategory app:title="@string/auto_backlight" />
-    <SwitchPreference
-        app:defaultValue="false"
-        app:key="auto_backlight"
-        app:summary="@string/auto_backlight_summary"
-        app:title="@string/auto_backlight" />
-    <com.alexrcq.tvpicturesettings.ui.TimePickerPreference
-        app:defaultValue="07:30"
-        app:dependency="auto_backlight"
-        app:key="ab_day_time"
-        app:title="@string/sunrise" />
-    <com.alexrcq.tvpicturesettings.ui.TimePickerPreference
-        app:defaultValue="22:45"
-        app:dependency="auto_backlight"
-        app:key="ab_night_time"
-        app:title="@string/sunset" />
     <PreferenceCategory app:title="@string/dark_mode_settings" />
+    <Preference
+        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.ScheduledDarkModePreferenceFragment"
+        app:key="scheduled_dark_mode"
+        app:title="@string/scheduled_dark_mode" />
     <SwitchPreference
         app:defaultValue="false"
         app:key="is_enable_day_mode_after_screen_on_enabled"
         app:title="@string/day_mode_after_screen_on" />
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:key="ab_night_backlight"
         app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
         app:title="@string/backlight_at_night" />
     <SwitchPreference
         app:defaultValue="false"
         app:key="is_dark_filter_enabled"
         app:summary="@string/make_it_even_darker_summary"
         app:title="@string/extra_dimming" />
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:defaultValue="50"
         app:dependency="is_dark_filter_enabled"
         app:key="dark_filter_power"
         app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
         app:title="@string/dimming_power" />
 </PreferenceScreen>

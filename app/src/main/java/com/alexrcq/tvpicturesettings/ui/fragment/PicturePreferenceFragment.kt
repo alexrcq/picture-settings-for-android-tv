@@ -1,11 +1,13 @@
 package com.alexrcq.tvpicturesettings.ui.fragment
 
-import android.content.*
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
-import android.os.IBinder
 import android.os.Looper
 import android.provider.Settings
 import androidx.core.view.isVisible
@@ -14,18 +16,17 @@ import androidx.fragment.app.commitNow
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.*
+import com.alexrcq.tvpicturesettings.DarkModeManager
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.adblib.AdbShell
-import com.alexrcq.tvpicturesettings.service.AutoBacklightService
-import com.alexrcq.tvpicturesettings.service.DarkModeManager
 import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BACKLIGHT
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_FILTER_POWER
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DAY_TIME
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.IS_AUTO_BACKLIGHT_ENABLED
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_MODE_TIME
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DAY_MODE_TIME
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.IS_AUTO_DARK_MODE_ENABLED
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.IS_DARK_FILTER_ENABLED
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.NIGHT_BACKLIGHT
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.NIGHT_TIME
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.PICTURE_MODE
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.POWER_PICTURE_OFF
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.RESET_TO_DEFAULT
@@ -46,7 +47,6 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     Preference.OnPreferenceChangeListener {
 
     private lateinit var pictureSettings: PictureSettings
-    private lateinit var autoBacklightService: AutoBacklightService
     private lateinit var appPreferences: AppPreferences
 
     private var backlightPref: SeekBarPreference? = null
@@ -75,15 +75,19 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        Timber.d("onCreatePreferences")
         setPreferencesFromResource(R.xml.picture_prefs, rootKey)
-        iniPreferences()
         pictureSettings = PictureSettings(requireContext())
-        bindAutoBacklightService()
+        iniPreferences()
+
     }
 
     private fun iniPreferences() {
         appPreferences = requireContext().appPreferences
+        with(appPreferences) {
+            if (dayBacklight == -1) {
+                dayBacklight = pictureSettings.backlight
+            }
+        }
         backlightPref = findPreference<SeekBarPreference?>(BACKLIGHT)?.apply {
             onPreferenceChangeListener = this@PicturePreferenceFragment
             setOnPreferenceClickListener {
@@ -190,54 +194,21 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             DARK_FILTER_POWER -> {
                 DarkModeManager.requireInstance().darkFilter.alpha = (newValue as Int) / 100f
             }
-            IS_AUTO_BACKLIGHT_ENABLED -> {
-                autoBacklightService.handleAutoBacklight(isAutoBacklightEnabled = newValue as Boolean)
+            IS_AUTO_DARK_MODE_ENABLED -> {
+                DarkModeManager.requireInstance().setAutoDarkModeEnabled(newValue as Boolean)
             }
-            DAY_TIME -> {
-                autoBacklightService.setDayModeTime(newValue as String)
+            DARK_MODE_TIME -> {
+                DarkModeManager.requireInstance().setDarkModeTime(newValue as String)
             }
-            NIGHT_TIME -> {
-                autoBacklightService.setDarkModeTime(newValue as String)
+            DAY_MODE_TIME -> {
+                DarkModeManager.requireInstance().setDayModeTime(newValue as String)
             }
         }
         return true
     }
 
-    private var isAutoBacklightServiceBound = false
-
-    private val autoBacklightServiceConn = object : ServiceConnection {
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-            val binder = service as AutoBacklightService.ServiceBinder
-            autoBacklightService = binder.getService()
-            isAutoBacklightServiceBound = true
-        }
-
-        override fun onServiceDisconnected(name: ComponentName?) {
-            isAutoBacklightServiceBound = false
-        }
-    }
-
-    private fun bindAutoBacklightService() {
-        if (!isAutoBacklightServiceBound) {
-            requireActivity().bindService(
-                Intent(requireActivity(), AutoBacklightService::class.java),
-                autoBacklightServiceConn,
-                Context.BIND_AUTO_CREATE
-            )
-            isAutoBacklightServiceBound = true
-        }
-    }
-
-    private fun unbindAutoBacklightService() {
-        if (isAutoBacklightServiceBound) {
-            requireActivity().unbindService(autoBacklightServiceConn)
-            isAutoBacklightServiceBound = false
-        }
-    }
-
     override fun onStart() {
         super.onStart()
-        Timber.d("onStart")
         requireContext().registerReceiver(
             onDarkManagerConnectedBR,
             IntentFilter(DarkModeManager.ACTION_SERVICE_CONNECTED)
@@ -260,9 +231,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     override fun onDestroy() {
         super.onDestroy()
-        Timber.d("onDestroy")
         AdbShell.getInstance(requireContext()).disconnect()
-        unbindAutoBacklightService()
     }
 
     private fun updateUi() {

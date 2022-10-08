@@ -10,6 +10,7 @@ import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_BLUE_GAIN
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_ENABLED
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_GAIN_RESET
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_GREEN_GAIN
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_RED_GAIN
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
@@ -31,6 +32,11 @@ class ColorTunerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
         redGainPref = findPreference(COLOR_TUNER_RED_GAIN)
         greenGainPref = findPreference(COLOR_TUNER_GREEN_GAIN)
         blueGainPref = findPreference(COLOR_TUNER_BLUE_GAIN)
+        findPreference<Preference>(COLOR_TUNER_GAIN_RESET)?.setOnPreferenceClickListener {
+            colorTuner.resetGain()
+            updateUi()
+            true
+        }
         preferenceScreen.forEach { preference ->
             preference.onPreferenceChangeListener = this
         }

@@ -6,23 +6,23 @@
         app:persistent="false"
         app:title="@string/enable" />
     <PreferenceCategory
-        app:title="@string/color"
+        app:title="@string/color_gain"
         app:dependency="color_tuner_enabled"/>
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:key="color_tuner_red_gain"
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:dependency="color_tuner_enabled"
         app:title="@string/red" />
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:key="color_tuner_green_gain"
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:dependency="color_tuner_enabled"
         app:title="@string/green" />
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:key="color_tuner_blue_gain"
         app:persistent="false"
         app:seekBarIncrement="1"
@@ -30,6 +30,9 @@
         app:thumbTint="@color/default_background"
         app:dependency="color_tuner_enabled"
         app:title="@string/blue" />
+    <Preference
+        app:key="color_tuner_gain_reset"
+        app:title="@string/reset"/>
     <PreferenceCategory
         app:title="@string/advanced"
         app:dependency="color_tuner_enabled"/>

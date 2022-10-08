@@ -9,6 +9,7 @@ import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_BLUE
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_GREEN
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_RED
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_RESET
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
 
 class OffsetTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
@@ -26,6 +27,11 @@ class OffsetTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         bluePref = findPreference(TUNER_OFFSET_BLUE)
         greenPref = findPreference(TUNER_OFFSET_GREEN)
         redPref = findPreference(TUNER_OFFSET_RED)
+        findPreference<Preference>(TUNER_OFFSET_RESET)?.setOnPreferenceClickListener {
+            colorTuner.resetOffset()
+            updateUi()
+            true
+        }
         preferenceScreen.forEach { preference ->
             preference.onPreferenceChangeListener = this
         }

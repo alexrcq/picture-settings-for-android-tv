@@ -12,7 +12,6 @@
     <string name="reset_to_default_message">Reset picture settings to default values?</string>
     <string name="color_temperature">Color Temperature</string>
     <string name="reset_to_default">Reset to Default</string>
-    <string name="auto_backlight">Auto-backlight</string>
     <string name="sunrise">Sunrise</string>
     <string name="sunset">Sunset</string>
     <string name="backlight_at_night">Night backlight</string>
@@ -21,12 +20,10 @@
     <string name="saturation">Saturation</string>
     <string name="hue">HUE</string>
     <string name="sharpness">Sharpness</string>
-    <string name="auto_backlight_summary">Automatically decrease and increase the backlight after sunset and sunrise, respectively</string>
     <string name="extra_dimming">Extra dimming</string>
     <string name="make_it_even_darker_summary">The enabled preference overlays a non-interactive transparent dark rectangle on top of the TV picture in the dark mode</string>
     <string name="open_settings">Open settings</string>
     <string name="power_picture_off">Turn off the screen</string>
-    <string name="storage_permission_required">The application requires permission to write to external storage</string>
     <string name="adb_debugging_required">The app requires enabled USB debugging</string>
     <string name="wait_for_debug_window">In the next window, check the "Always allow from this computer" checkbox, then click OK.</string>
     <string name="dark_mode_activated">Switching to night mode…</string>
@@ -40,7 +37,7 @@
     <string name="click_to_dark_mode">Click to dark mode</string>
     <string name="click_to_day_mode">Click to day mode</string>
     <string name="take_screenshot">Take a screenshot</string>
-    <string name="day_mode_after_screen_on">Turn off dark mode after turning on the TV</string>
+    <string name="day_mode_after_screen_on">Turn off Dark Mode after turning on the TV</string>
     <string name="dimming_power">Dimming power</string>
     <string name="dark_mode_settings">Dark mode settings</string>
     <string name="screenshot_saved">The screenshot has been saved in /Screenshots</string>
@@ -48,7 +45,12 @@
     <string name="magenta">Magenta</string>
     <string name="flesh_tone">Flesh tone</string>
     <string name="cvan">Cvan</string>
-    <string name="color">Color</string>
+    <string name="color_gain">Color gain</string>
     <string name="offset">Offset</string>
     <string name="сonnection_timeout">Connection timeout</string>
+    <string name="scheduled_dark_mode">Scheduled dark mode</string>
+    <string name="dark_mode_enable_time">Dark mode activation time</string>
+    <string name="dark_mode_disable_time">Dark mode exit time</string>
+    <string name="reset">Reset</string>
+    <string name="equalizer_detail">Equalizer Detail</string>
 </resources>

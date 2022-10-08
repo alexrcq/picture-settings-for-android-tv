@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Настройки изображения</string>
     <string name="not_supported_tv">Модель телевизора не поддерживается</string>
-    <string name="adaptive_luma_control">Адаптивная подстветка</string>
+    <string name="adaptive_luma_control">Адаптивная подсветка</string>
     <string name="local_contrast_control">Локальный контраст</string>
     <string name="noise_reduction">Шумоподавление</string>
     <string name="advanced_video">Расширенные настройки видео</string>
@@ -12,7 +12,6 @@
     <string name="reset_to_default_message">Сбросить настройки изображения до значений по умолчанию?</string>
     <string name="color_temperature">Цветовая температура</string>
     <string name="reset_to_default">Восстановить по умолчанию</string>
-    <string name="auto_backlight">Автоматическая подсветка</string>
     <string name="sunrise">Рассвет</string>
     <string name="sunset">Закат</string>
     <string name="backlight_at_night">Ночная подсветка</string>
@@ -21,12 +20,10 @@
     <string name="saturation">Насыщенность</string>
     <string name="hue">Оттенок</string>
     <string name="sharpness">Резкость</string>
-    <string name="auto_backlight_summary">Автоматически снижать и повышать подсветку после заката и восхода соответственно</string>
     <string name="extra_dimming">Дополнительное затемнение</string>
     <string name="make_it_even_darker_summary">Помимо снижения подсветки, накладывать неинтерактивный прозрачный тёмный прямоугольник поверх изображения телевизора в ночном режиме</string>
     <string name="open_settings">Открыть настройки</string>
     <string name="power_picture_off">Выключить экран</string>
-    <string name="storage_permission_required">Для работы приложения требуется разрешение на запись во внешнее хранилище</string>
     <string name="adb_debugging_required">Для работы приложения требуется включить отладку по USB в настройках для разработчиков</string>
     <string name="wait_for_debug_window">В следующем окне отметьте галочкой \"Всегда разрешать отладку с этого компьютера\" и нажмите ОК.</string>
     <string name="dark_mode_activated">Переход в ночной режим…</string>
@@ -37,8 +34,8 @@
     <string name="color_tuner">Тюнер цвета</string>
     <string name="enable">Включить</string>
     <string name="please_wait">Подождите…</string>
-    <string name="click_to_dark_mode">Нажмите, чтобы перейти в ночной режим</string>
-    <string name="click_to_day_mode">Нажмите, чтобы перейти в дневной режим</string>
+    <string name="click_to_dark_mode">Нажмите для перехода в ночной режим подсветки</string>
+    <string name="click_to_day_mode">Нажмите для перехода в дневной режим подсветки</string>
     <string name="take_screenshot">Сделать снимок экрана</string>
     <string name="day_mode_after_screen_on">Выходить из ночного режима после включения ТВ</string>
     <string name="dimming_power">Сила затемнения</string>
@@ -48,7 +45,12 @@
     <string name="magenta">Розововато-пурпурный</string>
     <string name="flesh_tone">Телесный цветовой тон</string>
     <string name="cvan">Сине-зелёный</string>
-    <string name="color">Цвет</string>
+    <string name="color_gain">Цвет</string>
     <string name="offset">Смещение</string>
     <string name="сonnection_timeout">Время подключения истекло</string>
+    <string name="scheduled_dark_mode">Ночной режим по расписанию</string>
+    <string name="dark_mode_enable_time">Время перехода в ночной режим</string>
+    <string name="dark_mode_disable_time">Время выхода из ночного режима</string>
+    <string name="reset">Сбросить</string>
+    <string name="equalizer_detail">Эквалайзер</string>
 </resources>

@@ -9,11 +9,11 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
+import com.alexrcq.tvpicturesettings.DarkModeManager
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.adblib.AdbShell
 import com.alexrcq.tvpicturesettings.enableAccessibilityService
 import com.alexrcq.tvpicturesettings.requestFocusForced
-import com.alexrcq.tvpicturesettings.service.DarkModeManager
 import kotlinx.coroutines.launch
 import timber.log.Timber
 

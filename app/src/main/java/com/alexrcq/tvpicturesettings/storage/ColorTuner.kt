@@ -184,8 +184,50 @@ class ColorTuner(context: Context) : GlobalSettingsImpl(context.contentResolver)
         }
         get() = getInt(KEY_TV_PICTURE_COLOR_TUNE_OFFSET_BLUE)
 
+    fun resetGain() {
+        redGain = defaultValue
+        greenGain = defaultValue
+        blueGain = defaultValue
+    }
+
+    fun resetSaturation() {
+        blueSaturation = defaultValue
+        cyanSaturation = defaultValue
+        yellowSaturation = defaultValue
+        magentaSaturation = defaultValue
+        redSaturation = defaultValue
+        fleshToneSaturation = defaultValue
+        greenSaturation = defaultValue
+    }
+
+    fun resetHue() {
+        redHue = defaultValue
+        greenHue = defaultValue
+        cyanHue = defaultValue
+        magentaHue = defaultValue
+        blueHue = defaultValue
+        yellowHue = defaultValue
+        fleshToneHue = defaultValue
+    }
+
+    fun resetBrightness() {
+        greenBrightness = defaultValue
+        blueBrightness = defaultValue
+        redBrightness = defaultValue
+        magentaBrightness = defaultValue
+        yellowBrightness = defaultValue
+        fleshToneBrightness = defaultValue
+        cyanBrightness = defaultValue
+    }
+
+    fun resetOffset() {
+        greenOffset = defaultValue
+        redOffset = defaultValue
+        blueOffset = defaultValue
+    }
 
     companion object {
+        const val defaultValue = 50
         const val KEY_TV_PICTURE_COLOR_TUNE_ENABLE = "tv_picture_color_tune_enable"
 
         const val KEY_TV_PICTURE_COLOR_TUNE_GAIN_RED = "tv_picture_color_tune_gain_red"

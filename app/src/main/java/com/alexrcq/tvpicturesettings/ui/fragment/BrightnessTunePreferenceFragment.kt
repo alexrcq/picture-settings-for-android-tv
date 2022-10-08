@@ -12,6 +12,7 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNES
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_GREEN
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_MAGENTA
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_RED
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_RESET
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_YELLOW
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
 
@@ -38,6 +39,11 @@ class BrightnessTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         magentaPref = findPreference(TUNER_BRIGHTNESS_MAGENTA)
         redPref = findPreference(TUNER_BRIGHTNESS_RED)
         yellowPref = findPreference(TUNER_BRIGHTNESS_YELLOW)
+        findPreference<Preference>(TUNER_BRIGHTNESS_RESET)?.setOnPreferenceClickListener {
+            colorTuner.resetBrightness()
+            updateUi()
+            true
+        }
         preferenceScreen.forEach { preference ->
             preference.onPreferenceChangeListener = this
         }

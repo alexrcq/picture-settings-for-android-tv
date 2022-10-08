@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/offset">
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:key="tuner_offset_red"
@@ -11,18 +11,21 @@
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/red" />
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:defaultValue="50"
         app:key="tuner_offset_green"
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/green" />
-    <SeekBarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:defaultValue="50"
         app:key="tuner_offset_blue"
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/blue" />
+    <Preference
+        app:key="tuner_offset_reset"
+        app:title="@string/reset"/>
 </PreferenceScreen>

@@ -30,9 +30,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         release {
-            initWith(buildTypes.debugMinified)
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
+
     buildToolsVersion '32.0.0'
 
     applicationVariants.all { variant ->

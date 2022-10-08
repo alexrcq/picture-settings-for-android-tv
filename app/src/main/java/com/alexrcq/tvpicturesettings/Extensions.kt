@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.provider.Settings
 import android.widget.Button
-import com.alexrcq.tvpicturesettings.service.DarkModeManager
 import timber.log.Timber
 
 fun Button.requestFocusForced() {

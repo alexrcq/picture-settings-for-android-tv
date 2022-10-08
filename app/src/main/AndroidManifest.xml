@@ -29,7 +29,7 @@
         android:theme="@style/Theme.AppTheme"
         tools:ignore="DataExtractionRules">
         <service
-            android:name=".service.DarkModeManager"
+            android:name=".DarkModeManager"
             android:exported="true"
             android:label="Служба ночного режима"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
@@ -38,16 +38,12 @@
             </intent-filter>
         </service>
 
-        <service
-            android:name="com.alexrcq.tvpicturesettings.service.AutoBacklightService"
-            android:exported="false" />
-
         <receiver
-            android:name="com.alexrcq.tvpicturesettings.service.AutoBacklightService$StartServiceBroadcastReceiver"
+            android:name="com.alexrcq.tvpicturesettings.DarkModeManager$ChangeBacklightModeBroadcastReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="com.alerxrcq.tvpicturesettings.AutoBacklightService.ACTION_SCHEDULED_SERVICE_LAUNCH" />
+                <action android:name="com.alerxrcq.tvpicturesettings.DarkModeManager.ACTION_CHANGE_BACKLIGHT_MODE" />
             </intent-filter>
         </receiver>
 

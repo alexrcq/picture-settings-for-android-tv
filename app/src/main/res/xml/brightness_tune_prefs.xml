@@ -8,35 +8,40 @@
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:title="@string/blue" />
+        app:title="@string/blue"
+        app:layout="@layout/leanback_seekbar_preference"/>
     <SeekBarPreference
         app:defaultValue="50"
         app:key="tuner_brightness_cvan"
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:title="@string/cvan" />
+        app:title="@string/cvan"
+        app:layout="@layout/leanback_seekbar_preference"/>
     <SeekBarPreference
         app:defaultValue="50"
         app:key="tuner_brightness_flesh_tone"
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:title="@string/flesh_tone" />
+        app:title="@string/flesh_tone"
+        app:layout="@layout/leanback_seekbar_preference"/>
     <SeekBarPreference
         app:defaultValue="50"
         app:key="tuner_brightness_green"
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:title="@string/green" />
+        app:title="@string/green"
+        app:layout="@layout/leanback_seekbar_preference"/>
     <SeekBarPreference
         app:defaultValue="50"
         app:key="tuner_brightness_magenta"
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:title="@string/magenta" />
+        app:title="@string/magenta"
+        app:layout="@layout/leanback_seekbar_preference"/>
     <SeekBarPreference
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -45,7 +50,8 @@
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:title="@string/red" />
+        app:title="@string/red"
+        app:layout="@layout/leanback_seekbar_preference"/>
     <SeekBarPreference
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -54,5 +60,9 @@
         app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:title="@string/yellow" />
+        app:title="@string/yellow"
+        app:layout="@layout/leanback_seekbar_preference"/>
+    <Preference
+        app:key="tuner_brightness_reset"
+        app:title="@string/reset"/>
 </PreferenceScreen>

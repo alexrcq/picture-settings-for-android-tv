@@ -10,7 +10,8 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.HUE_TUNE
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.OFFSET_TUNE
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.SATURATION_TUNE
-import com.alexrcq.tvpicturesettings.ui.TimePickerPreference
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.SCHEDULED_DARK_MODE
+import com.alexrcq.tvpicturesettings.ui.preference.TimePickerPreference
 
 class SettingsFragment : LeanbackSettingsFragmentCompat() {
 
@@ -29,6 +30,7 @@ class SettingsFragment : LeanbackSettingsFragmentCompat() {
             HUE_TUNE -> startPreferenceFragment(HueTunePreferenceFragment())
             BRIGHTNESS_TUNE -> startPreferenceFragment(BrightnessTunePreferenceFragment())
             OFFSET_TUNE -> startPreferenceFragment(OffsetTunePreferenceFragment())
+            SCHEDULED_DARK_MODE -> startPreferenceFragment(ScheduledDarkModePreferenceFragment())
         }
         return true
     }

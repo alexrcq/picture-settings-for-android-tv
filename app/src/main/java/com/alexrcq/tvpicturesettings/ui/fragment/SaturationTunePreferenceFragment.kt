@@ -12,6 +12,7 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATIO
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_GREEN
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_MAGENTA
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_RED
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_RESET
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_YELLOW
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
 
@@ -38,6 +39,11 @@ class SaturationTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         magentaPref = findPreference(TUNER_SATURATION_MAGENTA)
         redPref = findPreference(TUNER_SATURATION_RED)
         yellowPref = findPreference(TUNER_SATURATION_YELLOW)
+        findPreference<Preference>(TUNER_SATURATION_RESET)?.setOnPreferenceClickListener {
+            colorTuner.resetSaturation()
+            updateUi()
+            true
+        }
         preferenceScreen.forEach { preference ->
             preference.onPreferenceChangeListener = this
         }
