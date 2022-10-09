@@ -78,7 +78,6 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         setPreferencesFromResource(R.xml.picture_prefs, rootKey)
         pictureSettings = PictureSettings(requireContext())
         iniPreferences()
-
     }
 
     private fun iniPreferences() {

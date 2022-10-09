@@ -55,7 +55,8 @@
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/yellow" />
+    <PreferenceCategory app:title="@string/advanced"/>
     <Preference
         app:key="tuner_saturation_reset"
-        app:title="@string/reset"/>
+        app:title="@string/reset_values"/>
 </PreferenceScreen>

@@ -32,7 +32,7 @@
         app:title="@string/blue" />
     <Preference
         app:key="color_tuner_gain_reset"
-        app:title="@string/reset"/>
+        app:title="@string/reset_values"/>
     <PreferenceCategory
         app:title="@string/advanced"
         app:dependency="color_tuner_enabled"/>

@@ -51,6 +51,6 @@
     <string name="scheduled_dark_mode">Scheduled dark mode</string>
     <string name="dark_mode_enable_time">Dark mode activation time</string>
     <string name="dark_mode_disable_time">Dark mode exit time</string>
-    <string name="reset">Reset</string>
+    <string name="reset_values">Reset to default</string>
     <string name="equalizer_detail">Equalizer Detail</string>
 </resources>

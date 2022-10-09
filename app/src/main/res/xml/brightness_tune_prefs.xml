@@ -62,7 +62,8 @@
         app:showSeekBarValue="true"
         app:title="@string/yellow"
         app:layout="@layout/leanback_seekbar_preference"/>
+    <PreferenceCategory app:title="@string/advanced"/>
     <Preference
         app:key="tuner_brightness_reset"
-        app:title="@string/reset"/>
+        app:title="@string/reset_values"/>
 </PreferenceScreen>

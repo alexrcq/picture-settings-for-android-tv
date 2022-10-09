@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- This is modified layout for the project needs. Original author: "The Android Open Source Project" -->
+<!-- This is modified layout for the project needs. Source: "The Android Open Source Project" -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -33,7 +33,8 @@
         android:clipChildren="false"
         android:clipToPadding="false">
 
-        <TextView android:id="@android:id/title"
+        <TextView
+            android:id="@android:id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
@@ -44,7 +45,8 @@
             android:textAppearance="?android:attr/textAppearanceListItem"
             tools:ignore="PrivateResource" />
 
-        <TextView android:id="@android:id/summary"
+        <TextView
+            android:id="@android:id/summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@android:id/title"
@@ -77,13 +79,15 @@
                 android:background="@null"
                 tools:ignore="PrivateResource" />
 
-            <TextView android:id="@+id/seekbar_value"
+            <TextView
+                android:id="@+id/seekbar_value"
                 android:layout_width="@dimen/lb_preference_seekbar_value_width"
                 android:layout_height="match_parent"
-                android:gravity="right|center_vertical"
+                android:gravity="end|center_vertical"
                 android:duplicateParentState="true"
                 android:textAppearance="?android:attr/textAppearanceListItem"
-                tools:ignore="PrivateResource,RtlHardcoded" />
+                android:scrollbars="none"
+                tools:ignore="PrivateResource" />
         </LinearLayout>
     </RelativeLayout>
 </LinearLayout>

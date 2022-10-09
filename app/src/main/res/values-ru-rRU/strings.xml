@@ -45,12 +45,12 @@
     <string name="magenta">Розововато-пурпурный</string>
     <string name="flesh_tone">Телесный цветовой тон</string>
     <string name="cvan">Сине-зелёный</string>
-    <string name="color_gain">Цвет</string>
-    <string name="offset">Смещение</string>
+    <string name="color_gain">Усиление цвета</string>
+    <string name="offset">Цветовой сдвиг</string>
     <string name="сonnection_timeout">Время подключения истекло</string>
     <string name="scheduled_dark_mode">Ночной режим по расписанию</string>
     <string name="dark_mode_enable_time">Время перехода в ночной режим</string>
     <string name="dark_mode_disable_time">Время выхода из ночного режима</string>
-    <string name="reset">Сбросить</string>
+    <string name="reset_values">Сбросить значения</string>
     <string name="equalizer_detail">Эквалайзер</string>
 </resources>
