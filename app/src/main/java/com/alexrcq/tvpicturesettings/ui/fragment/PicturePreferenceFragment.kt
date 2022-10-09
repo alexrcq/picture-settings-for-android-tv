@@ -67,9 +67,11 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == DarkModeManager.ACTION_SERVICE_CONNECTED) {
                 Timber.d("loading completed")
-                val loadingDialog =
-                    childFragmentManager.findFragmentByTag(LoadingDialog.TAG) as DialogFragment?
-                loadingDialog?.dismiss()
+                viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+                    val loadingDialog =
+                        childFragmentManager.findFragmentByTag(LoadingDialog.TAG) as DialogFragment?
+                    loadingDialog?.dismiss()
+                }
             }
         }
     }
@@ -78,6 +80,10 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         setPreferencesFromResource(R.xml.picture_prefs, rootKey)
         pictureSettings = PictureSettings(requireContext())
         iniPreferences()
+        requireContext().registerReceiver(
+            onDarkManagerConnectedBR,
+            IntentFilter(DarkModeManager.ACTION_SERVICE_CONNECTED)
+        )
     }
 
     private fun iniPreferences() {
@@ -208,10 +214,6 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     override fun onStart() {
         super.onStart()
-        requireContext().registerReceiver(
-            onDarkManagerConnectedBR,
-            IntentFilter(DarkModeManager.ACTION_SERVICE_CONNECTED)
-        )
         requireContext().contentResolver.registerContentObserver(
             Settings.Global.CONTENT_URI, true,
             globalSettingsObserver
@@ -223,13 +225,9 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         updateUi()
     }
 
-    override fun onStop() {
-        super.onStop()
-        requireContext().unregisterReceiver(onDarkManagerConnectedBR)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
+        requireContext().unregisterReceiver(onDarkManagerConnectedBR)
         AdbShell.getInstance(requireContext()).disconnect()
     }
 
