@@ -143,10 +143,11 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     }
 
     private fun updateBacklightPreferenceSummary() {
-        backlightPref?.summary = if (appPreferences.isDarkModeEnabled)
+        backlightPref?.summary = if (appPreferences.isDarkModeEnabled) {
             getString(R.string.click_to_day_mode)
-        else
+        } else {
             getString(R.string.click_to_dark_mode)
+        }
     }
 
     private fun onGlobalSettingChanged(key: String) {

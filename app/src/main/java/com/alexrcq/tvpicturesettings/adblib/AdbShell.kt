@@ -47,16 +47,15 @@ class AdbShell private constructor(
     }
 
     private suspend fun execute(command: String) = withContext(IO) {
-        Timber.d("executing \"$command\"")
+        Timber.d(command)
         openShell()?.write("$command\n")
     }
 
     suspend fun grantPermission(permission: String) {
-        Timber.d("granting permission...")
         execute("pm grant ${BuildConfig.APPLICATION_ID} $permission")
         while (true) {
-            delay(100)
-            if (appContext.hasPermission(Manifest.permission.WRITE_SECURE_SETTINGS)) {
+            delay(250)
+            if (appContext.hasPermission(permission)) {
                 Timber.d("$permission granted")
                 break
             }
