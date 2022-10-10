@@ -39,7 +39,7 @@
     <string name="take_screenshot">Сделать снимок экрана</string>
     <string name="day_mode_after_screen_on">Выходить из ночного режима после включения ТВ</string>
     <string name="dimming_power">Сила затемнения</string>
-    <string name="dark_mode_settings">Настройки ночного режима</string>
+    <string name="dark_mode_settings">Настройки ночного режима подсветки</string>
     <string name="screenshot_saved">Cнимок экрана сохранён в /Screenshots</string>
     <string name="yellow">Жёлтый</string>
     <string name="magenta">Розововато-пурпурный</string>

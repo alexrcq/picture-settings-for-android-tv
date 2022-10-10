@@ -39,7 +39,7 @@
     <string name="take_screenshot">Take a screenshot</string>
     <string name="day_mode_after_screen_on">Turn off Dark Mode after turning on the TV</string>
     <string name="dimming_power">Dimming power</string>
-    <string name="dark_mode_settings">Dark mode settings</string>
+    <string name="dark_mode_settings">Dark mode backlight preferences</string>
     <string name="screenshot_saved">The screenshot has been saved in /Screenshots</string>
     <string name="yellow">Yellow</string>
     <string name="magenta">Magenta</string>
