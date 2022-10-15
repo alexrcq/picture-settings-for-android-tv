@@ -226,6 +226,11 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         updateUi()
     }
 
+    override fun onStop() {
+        super.onStop()
+        requireContext().contentResolver.unregisterContentObserver(globalSettingsObserver)
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         requireContext().unregisterReceiver(onDarkManagerConnectedBR)
