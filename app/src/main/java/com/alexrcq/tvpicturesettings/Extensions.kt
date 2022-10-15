@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.provider.Settings
 import android.widget.Button
+import com.alexrcq.tvpicturesettings.storage.PictureSettings
 import timber.log.Timber
 
 fun Button.requestFocusForced() {
@@ -18,6 +19,16 @@ fun Context.hasPermission(permission: String): Boolean =
 
 val Context.isDebuggingEnabled: Boolean
     get() = Settings.Global.getInt(contentResolver, Settings.Global.ADB_ENABLED, 0) == 1
+
+val Context.isCurrentTvSupported: Boolean
+    get() {
+        return try {
+            PictureSettings(this).isAdaptiveLumaEnabled
+            true
+        } catch (e: NoSuchElementException) {
+            false
+        }
+    }
 
 val Context.isDarkModeManagerEnabled: Boolean
     get() {

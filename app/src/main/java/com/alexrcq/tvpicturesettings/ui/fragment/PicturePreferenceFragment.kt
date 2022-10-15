@@ -35,7 +35,6 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TEMPERATURE
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 import com.alexrcq.tvpicturesettings.storage.appPreferences
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.LoadingDialog
-import com.alexrcq.tvpicturesettings.ui.fragment.dialog.NotSupportedTVDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.ResetToDefaultDialog
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -238,13 +237,9 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
     }
 
     private fun updateUi() {
-        try {
-            backlightPref?.value = pictureSettings.backlight
-            pictureModePref?.value = pictureSettings.pictureMode.toString()
-            temperaturePref?.value = pictureSettings.temperature.toString()
-        } catch (e: Settings.SettingNotFoundException) {
-            NotSupportedTVDialog().show(childFragmentManager, NotSupportedTVDialog.TAG)
-        }
+        backlightPref?.value = pictureSettings.backlight
+        pictureModePref?.value = pictureSettings.pictureMode.toString()
+        temperaturePref?.value = pictureSettings.temperature.toString()
         updateBacklightPreferenceSummary()
     }
 

@@ -8,12 +8,17 @@ import androidx.fragment.app.FragmentActivity
 import com.alexrcq.tvpicturesettings.*
 import com.alexrcq.tvpicturesettings.DarkModeManager
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AcceptDebuggingDialog
+import com.alexrcq.tvpicturesettings.ui.fragment.dialog.NotSupportedTVDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.UsbDebuggingRequiredDialog
 
 
 class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!isCurrentTvSupported) {
+            NotSupportedTVDialog().show(supportFragmentManager, NotSupportedTVDialog.TAG)
+            return
+        }
         if (!isDebuggingEnabled) {
             UsbDebuggingRequiredDialog().show(
                 supportFragmentManager,
