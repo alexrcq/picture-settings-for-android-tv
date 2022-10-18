@@ -53,4 +53,5 @@
     <string name="dark_mode_disable_time">Время выхода из ночного режима</string>
     <string name="reset_values">Сбросить значения</string>
     <string name="equalizer_detail">Эквалайзер</string>
+    <string name="screen_capture_error_try_again">Ошибка захвата изображения. Пожалуйста, попробуйте снова</string>
 </resources>

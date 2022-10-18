@@ -28,17 +28,15 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.IS_AUTO_DARK_MO
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.IS_DARK_FILTER_ENABLED
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.NIGHT_BACKLIGHT
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.PICTURE_MODE
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.POWER_PICTURE_OFF
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.RESET_TO_DEFAULT
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TAKE_SCREENSHOT
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TEMPERATURE
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TURN_OFF_SCREEN
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 import com.alexrcq.tvpicturesettings.storage.appPreferences
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.LoadingDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.ResetToDefaultDialog
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 
 
@@ -95,8 +93,7 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         backlightPref = findPreference<SeekBarPreference?>(BACKLIGHT)?.apply {
             onPreferenceChangeListener = this@PicturePreferenceFragment
             setOnPreferenceClickListener {
-                DarkModeManager.sharedInstance?.toggleDarkmode()
-                updateBacklightPreferenceSummary()
+                onBacklightPreferenceClicked()
                 true
             }
         }
@@ -109,15 +106,14 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         pictureModePref = findPreference(PICTURE_MODE)
         temperaturePref = findPreference(TEMPERATURE)
         isDarkFilterEnabledPref = findPreference(IS_DARK_FILTER_ENABLED)
-        findPreference<Preference>(POWER_PICTURE_OFF)?.setOnPreferenceClickListener {
-            pictureSettings.turnOffScreen()
+        findPreference<Preference>(TURN_OFF_SCREEN)?.setOnPreferenceClickListener {
+            onTurnOffScreenClicked()
             true
         }
         findPreference<Preference>(RESET_TO_DEFAULT)?.setOnPreferenceClickListener {
-            ResetToDefaultDialog().show(childFragmentManager, ResetToDefaultDialog.TAG)
+            onResetToDefaultClicked()
             true
         }
-        findPreference<SeekBarPreference>(DARK_FILTER_POWER)?.max = 98
         preferenceScreen.forEach { preference ->
             preference.onPreferenceChangeListener = this
         }
@@ -130,23 +126,34 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         takeScreenshotJob = viewLifecycleOwner.lifecycleScope.launch {
             val windowView = requireActivity().window.decorView
             windowView.isVisible = false
-            with(AdbShell.getInstance(requireContext())) {
-                connect()
-                takeScreenshot()
+            val adbShell = AdbShell.getInstance(requireContext())
+            adbShell.connect()
+            val resultSummary = try {
+                withTimeout(7500) {
+                    adbShell.takeScreenshot()
+                }
+                getString(R.string.screenshot_saved)
+            } catch (e: TimeoutCancellationException) {
+                getString(R.string.screen_capture_error_try_again)
             }
             windowView.isVisible = true
-            takeScreenshotPref?.summary = getString(R.string.screenshot_saved)
+            takeScreenshotPref?.summary = resultSummary
             delay(3500)
             takeScreenshotPref?.summary = ""
         }
     }
 
-    private fun updateBacklightPreferenceSummary() {
-        backlightPref?.summary = if (appPreferences.isDarkModeEnabled) {
-            getString(R.string.click_to_day_mode)
-        } else {
-            getString(R.string.click_to_dark_mode)
-        }
+    private fun onTurnOffScreenClicked() {
+        pictureSettings.turnOffScreen()
+    }
+
+    private fun onBacklightPreferenceClicked() {
+        DarkModeManager.requireInstance().toggleDarkmode()
+        updateBacklightPreferenceSummary()
+    }
+
+    private fun onResetToDefaultClicked() {
+        ResetToDefaultDialog().show(childFragmentManager, ResetToDefaultDialog.TAG)
     }
 
     private fun onGlobalSettingChanged(key: String) {
@@ -212,6 +219,16 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         return true
     }
 
+    private fun showPictureEqualizer() {
+        parentFragmentManager.popBackStackImmediate()
+        parentFragmentManager.commitNow {
+            replace(
+                androidx.leanback.preference.R.id.settings_preference_fragment_container,
+                PictureEqualizerPreferenceFragment()
+            )
+        }
+    }
+
     override fun onStart() {
         super.onStart()
         requireContext().contentResolver.registerContentObserver(
@@ -225,6 +242,21 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         updateUi()
     }
 
+    private fun updateUi() {
+        backlightPref?.value = pictureSettings.backlight
+        pictureModePref?.value = pictureSettings.pictureMode.toString()
+        temperaturePref?.value = pictureSettings.temperature.toString()
+        updateBacklightPreferenceSummary()
+    }
+
+    private fun updateBacklightPreferenceSummary() {
+        backlightPref?.summary = if (appPreferences.isDarkModeEnabled) {
+            getString(R.string.click_to_day_mode)
+        } else {
+            getString(R.string.click_to_dark_mode)
+        }
+    }
+
     override fun onStop() {
         super.onStop()
         requireContext().contentResolver.unregisterContentObserver(globalSettingsObserver)
@@ -234,22 +266,5 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
         super.onDestroy()
         requireContext().unregisterReceiver(onDarkManagerConnectedBR)
         AdbShell.getInstance(requireContext()).disconnect()
-    }
-
-    private fun updateUi() {
-        backlightPref?.value = pictureSettings.backlight
-        pictureModePref?.value = pictureSettings.pictureMode.toString()
-        temperaturePref?.value = pictureSettings.temperature.toString()
-        updateBacklightPreferenceSummary()
-    }
-
-    private fun showPictureEqualizer() {
-        parentFragmentManager.popBackStackImmediate()
-        parentFragmentManager.commitNow {
-            replace(
-                androidx.leanback.preference.R.id.settings_preference_fragment_container,
-                PictureEqualizerPreferenceFragment()
-            )
-        }
     }
 }

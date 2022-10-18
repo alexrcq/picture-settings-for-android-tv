@@ -11,6 +11,7 @@ import com.tananaev.adblib.AdbCrypto
 import com.tananaev.adblib.AdbStream
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
@@ -20,7 +21,6 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 
 class AdbShell private constructor(
@@ -54,8 +54,10 @@ class AdbShell private constructor(
     suspend fun grantPermission(permission: String) {
         execute("pm grant ${BuildConfig.APPLICATION_ID} $permission")
         while (true) {
-            delay(250)
+            delay(50)
             if (appContext.hasPermission(permission)) {
+                // added the extra time to permissions handling
+                delay(200)
                 Timber.d("$permission granted")
                 break
             }
@@ -63,12 +65,14 @@ class AdbShell private constructor(
     }
 
     suspend fun takeScreenshot() {
-        if (!appContext.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            grantPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (!appContext.hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
             grantPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
         val screenshotsDir = File(screenshotsPath)
         if (!screenshotsDir.exists()) {
+            if (!appContext.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                grantPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
             screenshotsDir.mkdirs()
         }
         val currentTime = LocalDateTime.now().format(
@@ -84,17 +88,19 @@ class AdbShell private constructor(
 
     private var fileObserver: FileObserver? = null
 
-    private suspend fun waitForScreenshotCaptured() = suspendCoroutine { continuation ->
-        @Suppress("DEPRECATION")
-        fileObserver = object : FileObserver(screenshotsPath, CREATE) {
-            override fun onEvent(event: Int, path: String?) {
-                if (event == CREATE) {
-                    continuation.resume(null)
-                    stopWatching()
+    private suspend fun waitForScreenshotCaptured() {
+        suspendCancellableCoroutine { continuation ->
+            @Suppress("DEPRECATION")
+            fileObserver = object : FileObserver(screenshotsPath, CREATE) {
+                override fun onEvent(event: Int, path: String?) {
+                    if (event == CREATE) {
+                        continuation.resume(null)
+                        stopWatching()
+                    }
                 }
             }
+            fileObserver?.startWatching()
         }
-        fileObserver?.startWatching()
     }
 
     private fun setupCrypto(pubKeyFile: String, privKeyFile: String): AdbCrypto? {
@@ -111,9 +117,9 @@ class AdbShell private constructor(
         if (crypto == null) {
             crypto = AdbCrypto.generateAdbKeyPair(AndroidBase64())
             crypto.saveAdbKeyPair(privateKey, publicKey)
-            Timber.d( "Generated new keypair")
+            Timber.d("Generated new keypair")
         } else {
-            Timber.d( "Loaded existing keypair")
+            Timber.d("Loaded existing keypair")
         }
         return crypto
     }
@@ -129,7 +135,7 @@ class AdbShell private constructor(
         if (isConnected) {
             adbConnection?.close()
             isConnected = false
-            Timber.d( "disconnected")
+            Timber.d("disconnected")
         }
     }
 

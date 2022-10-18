@@ -23,9 +23,10 @@ val Context.isDebuggingEnabled: Boolean
 val Context.isCurrentTvSupported: Boolean
     get() {
         return try {
+            // just trying to take a random setting
             PictureSettings(this).isAdaptiveLumaEnabled
             true
-        } catch (e: NoSuchElementException) {
+        } catch (e: Settings.SettingNotFoundException) {
             false
         }
     }

@@ -53,4 +53,5 @@
     <string name="dark_mode_disable_time">Dark mode exit time</string>
     <string name="reset_values">Reset to default</string>
     <string name="equalizer_detail">Equalizer Detail</string>
+    <string name="screen_capture_error_try_again">Screen capture error. Please try again</string>
 </resources>

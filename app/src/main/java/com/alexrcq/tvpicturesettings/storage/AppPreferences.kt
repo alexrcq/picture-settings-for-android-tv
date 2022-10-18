@@ -88,7 +88,7 @@ class AppPreferences(val context: Context) {
         const val TEMPERATURE = "temperature"
         const val TAKE_SCREENSHOT = "take_screenshot"
         const val RESET_TO_DEFAULT = "reset_to_default"
-        const val POWER_PICTURE_OFF = "power_picture_off"
+        const val TURN_OFF_SCREEN = "power_picture_off"
         const val DARK_FILTER_POWER = "dark_filter_power"
         const val IS_DAY_MODE_AFTER_SCREEN_ON_ENABLED =
             "is_enable_day_mode_after_screen_on_enabled"
