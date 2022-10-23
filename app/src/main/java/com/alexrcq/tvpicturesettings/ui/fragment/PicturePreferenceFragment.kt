@@ -19,6 +19,7 @@ import androidx.preference.*
 import com.alexrcq.tvpicturesettings.DarkModeManager
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.adblib.AdbShell
+import com.alexrcq.tvpicturesettings.hasActiveTvSource
 import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BACKLIGHT
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_FILTER_POWER
@@ -235,14 +236,17 @@ class PicturePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             Settings.Global.CONTENT_URI, true,
             globalSettingsObserver
         )
-        if (DarkModeManager.sharedInstance == null) {
-            Timber.d("DarkModeManager is loading...")
-            LoadingDialog().show(childFragmentManager, LoadingDialog.TAG)
-        }
         updateUi()
     }
 
     private fun updateUi() {
+        if (DarkModeManager.sharedInstance == null) {
+            Timber.d("DarkModeManager is loading...")
+            LoadingDialog().show(childFragmentManager, LoadingDialog.TAG)
+        }
+        if (requireContext().hasActiveTvSource) {
+            takeScreenshotPref?.isEnabled = false
+        }
         backlightPref?.value = pictureSettings.backlight
         pictureModePref?.value = pictureSettings.pictureMode.toString()
         temperaturePref?.value = pictureSettings.temperature.toString()
