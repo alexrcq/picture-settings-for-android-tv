@@ -4,6 +4,7 @@ plugins {
 }
 
 android {
+    namespace 'com.alexrcq.tvpicturesettings'
     compileSdkVersion 32
 
     defaultConfig {

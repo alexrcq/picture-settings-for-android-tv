@@ -2,10 +2,9 @@ package com.alexrcq.tvpicturesettings.adblib
 
 import android.Manifest
 import android.content.Context
-import android.os.Environment
 import android.os.FileObserver
 import com.alexrcq.tvpicturesettings.BuildConfig
-import com.alexrcq.tvpicturesettings.hasPermission
+import com.alexrcq.tvpicturesettings.util.hasPermission
 import com.tananaev.adblib.AdbConnection
 import com.tananaev.adblib.AdbCrypto
 import com.tananaev.adblib.AdbStream
@@ -22,7 +21,6 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 import kotlin.coroutines.resume
 
-
 class AdbShell private constructor(
     private val appContext: Context,
     private val host: String = "127.0.0.1",
@@ -31,13 +29,15 @@ class AdbShell private constructor(
     private var adbConnection: AdbConnection? = null
     private var isConnected = false
 
-    var screenshotsPath = Environment.getExternalStorageDirectory().path + "/Screenshots"
-
     suspend fun connect() = withContext(IO) {
         if (!isConnected) {
             adbConnection = createConnection()
             Timber.d("connecting...")
-            val isConnectionEstablished = adbConnection?.connect(15L, TimeUnit.SECONDS, false)
+            val isConnectionEstablished = adbConnection?.connect(
+                CONNECTION_TIMEOUT_SECONDS,
+                TimeUnit.SECONDS,
+                false
+            )
             if (isConnectionEstablished == false) {
                 throw TimeoutException()
             }
@@ -56,7 +56,7 @@ class AdbShell private constructor(
         while (true) {
             delay(50)
             if (appContext.hasPermission(permission)) {
-                // added the extra time to permissions handling
+                // added extra time to permissions handling
                 delay(200)
                 Timber.d("$permission granted")
                 break
@@ -64,42 +64,43 @@ class AdbShell private constructor(
         }
     }
 
-    suspend fun takeScreenshot() {
+    suspend fun takeScreenshot(savePath: String) {
         if (!appContext.hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
             grantPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
-        val screenshotsDir = File(screenshotsPath)
-        if (!screenshotsDir.exists()) {
+        val saveDir = File(savePath)
+        if (!saveDir.exists()) {
             if (!appContext.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 grantPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
             }
-            screenshotsDir.mkdirs()
+            saveDir.mkdirs()
         }
         val currentTime = LocalDateTime.now().format(
             DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss_SSS")
         )
-        execute("screencap -p $screenshotsPath/screenshot$currentTime.png")
-        waitForScreenshotCaptured()
+        execute("screencap -p $savePath/screenshot$currentTime.png")
+        waitForScreenshotFileCreation(savePath)
     }
 
     private fun openShell(): AdbStream? {
         return adbConnection?.open("shell:")
     }
 
-    private var fileObserver: FileObserver? = null
-
-    private suspend fun waitForScreenshotCaptured() {
+    private suspend fun waitForScreenshotFileCreation(screenshotsPath: String) {
         suspendCancellableCoroutine { continuation ->
             @Suppress("DEPRECATION")
-            fileObserver = object : FileObserver(screenshotsPath, CREATE) {
+            val fileObserver = object : FileObserver(screenshotsPath, CREATE) {
                 override fun onEvent(event: Int, path: String?) {
                     if (event == CREATE) {
-                        continuation.resume(null)
+                        continuation.resume(Unit)
                         stopWatching()
                     }
                 }
             }
-            fileObserver?.startWatching()
+            fileObserver.startWatching()
+            continuation.invokeOnCancellation {
+                fileObserver.stopWatching()
+            }
         }
     }
 
@@ -140,10 +141,11 @@ class AdbShell private constructor(
     }
 
     companion object {
+        const val CONNECTION_TIMEOUT_SECONDS = 15L
+
         @Volatile
         private var INSTANCE: AdbShell? = null
 
-        @Synchronized
         fun getInstance(context: Context): AdbShell =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: AdbShell(context).also { INSTANCE = it }

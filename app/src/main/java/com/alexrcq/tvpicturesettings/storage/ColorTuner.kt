@@ -185,62 +185,68 @@ class ColorTuner(context: Context) : GlobalSettingsImpl(context.contentResolver)
         get() = getInt(KEY_TV_PICTURE_COLOR_TUNE_OFFSET_BLUE)
 
     fun resetGain() {
-        redGain = defaultValue
-        greenGain = defaultValue
-        blueGain = defaultValue
+        redGain = DEFAULT_TUNER_VALUE
+        greenGain = DEFAULT_TUNER_VALUE
+        blueGain = DEFAULT_TUNER_VALUE
     }
 
     fun resetSaturation() {
-        blueSaturation = defaultValue
-        cyanSaturation = defaultValue
-        yellowSaturation = defaultValue
-        magentaSaturation = defaultValue
-        redSaturation = defaultValue
-        fleshToneSaturation = defaultValue
-        greenSaturation = defaultValue
+        blueSaturation = DEFAULT_TUNER_VALUE
+        cyanSaturation = DEFAULT_TUNER_VALUE
+        yellowSaturation = DEFAULT_TUNER_VALUE
+        magentaSaturation = DEFAULT_TUNER_VALUE
+        redSaturation = DEFAULT_TUNER_VALUE
+        fleshToneSaturation = DEFAULT_TUNER_VALUE
+        greenSaturation = DEFAULT_TUNER_VALUE
     }
 
     fun resetHue() {
-        redHue = defaultValue
-        greenHue = defaultValue
-        cyanHue = defaultValue
-        magentaHue = defaultValue
-        blueHue = defaultValue
-        yellowHue = defaultValue
-        fleshToneHue = defaultValue
+        redHue = DEFAULT_TUNER_VALUE
+        greenHue = DEFAULT_TUNER_VALUE
+        cyanHue = DEFAULT_TUNER_VALUE
+        magentaHue = DEFAULT_TUNER_VALUE
+        blueHue = DEFAULT_TUNER_VALUE
+        yellowHue = DEFAULT_TUNER_VALUE
+        fleshToneHue = DEFAULT_TUNER_VALUE
     }
 
     fun resetBrightness() {
-        greenBrightness = defaultValue
-        blueBrightness = defaultValue
-        redBrightness = defaultValue
-        magentaBrightness = defaultValue
-        yellowBrightness = defaultValue
-        fleshToneBrightness = defaultValue
-        cyanBrightness = defaultValue
+        greenBrightness = DEFAULT_TUNER_VALUE
+        blueBrightness = DEFAULT_TUNER_VALUE
+        redBrightness = DEFAULT_TUNER_VALUE
+        magentaBrightness = DEFAULT_TUNER_VALUE
+        yellowBrightness = DEFAULT_TUNER_VALUE
+        fleshToneBrightness = DEFAULT_TUNER_VALUE
+        cyanBrightness = DEFAULT_TUNER_VALUE
     }
 
     fun resetOffset() {
-        greenOffset = defaultValue
-        redOffset = defaultValue
-        blueOffset = defaultValue
+        greenOffset = DEFAULT_TUNER_VALUE
+        redOffset = DEFAULT_TUNER_VALUE
+        blueOffset = DEFAULT_TUNER_VALUE
     }
 
     companion object {
-        const val defaultValue = 50
+        const val DEFAULT_TUNER_VALUE = 50
         const val KEY_TV_PICTURE_COLOR_TUNE_ENABLE = "tv_picture_color_tune_enable"
 
         const val KEY_TV_PICTURE_COLOR_TUNE_GAIN_RED = "tv_picture_color_tune_gain_red"
         const val KEY_TV_PICTURE_COLOR_TUNE_GAIN_GREEN = "tv_picture_color_tune_gain_green"
         const val KEY_TV_PICTURE_COLOR_TUNE_GAIN_BLUE = "tv_picture_color_tune_gain_blue"
 
-        const val KEY_TV_PICTURE_COLOR_TUNE_SATURATION_BLUE = "tv_picture_color_tune_saturation_blue"
-        const val KEY_TV_PICTURE_COLOR_TUNE_SATURATION_CVAN = "tv_picture_color_tune_saturation_cvan"
-        const val KEY_TV_PICTURE_COLOR_TUNE_SATURATION_FLESH_TONE = "tv_picture_color_tune_saturation_flesh_tone"
-        const val KEY_TV_PICTURE_COLOR_TUNE_SATURATION_GREEN = "tv_picture_color_tune_saturation_green"
-        const val KEY_TV_PICTURE_COLOR_TUNE_SATURATION_MEGENTA = "tv_picture_color_tune_saturation_megenta"
+        const val KEY_TV_PICTURE_COLOR_TUNE_SATURATION_BLUE =
+            "tv_picture_color_tune_saturation_blue"
+        const val KEY_TV_PICTURE_COLOR_TUNE_SATURATION_CVAN =
+            "tv_picture_color_tune_saturation_cvan"
+        const val KEY_TV_PICTURE_COLOR_TUNE_SATURATION_FLESH_TONE =
+            "tv_picture_color_tune_saturation_flesh_tone"
+        const val KEY_TV_PICTURE_COLOR_TUNE_SATURATION_GREEN =
+            "tv_picture_color_tune_saturation_green"
+        const val KEY_TV_PICTURE_COLOR_TUNE_SATURATION_MEGENTA =
+            "tv_picture_color_tune_saturation_megenta"
         const val KEY_TV_PICTURE_COLOR_TUNE_SATURATION_RED = "tv_picture_color_tune_saturation_red"
-        const val KEY_TV_PICTURE_COLOR_TUNE_SATURATION_YELLOW = "tv_picture_color_tune_saturation_yellow"
+        const val KEY_TV_PICTURE_COLOR_TUNE_SATURATION_YELLOW =
+            "tv_picture_color_tune_saturation_yellow"
 
         const val KEY_TV_PICTURE_COLOR_TUNE_HUE_BLUE = "tv_picture_color_tune_hue_blue"
         const val KEY_TV_PICTURE_COLOR_TUNE_HUE_CVAN = "tv_picture_color_tune_hue_cvan"
@@ -250,13 +256,19 @@ class ColorTuner(context: Context) : GlobalSettingsImpl(context.contentResolver)
         const val KEY_TV_PICTURE_COLOR_TUNE_HUE_RED = "tv_picture_color_tune_hue_red"
         const val KEY_TV_PICTURE_COLOR_TUNE_HUE_YELLOW = "tv_picture_color_tune_hue_yellow"
 
-        const val KEY_TV_PICTURE_COLOR_TUNE_BRIGHTNESS_BLUE = "tv_picture_color_tune_brightness_blue"
-        const val KEY_TV_PICTURE_COLOR_TUNE_BRIGHTNESS_CVAN = "tv_picture_color_tune_brightness_cvan"
-        const val KEY_TV_PICTURE_COLOR_TUNE_BRIGHTNESS_FLESH_TONE = "tv_picture_color_tune_brightness_flesh_tone"
-        const val KEY_TV_PICTURE_COLOR_TUNE_BRIGHTNESS_GREEN = "tv_picture_color_tune_brightness_green"
-        const val KEY_TV_PICTURE_COLOR_TUNE_BRIGHTNESS_MEGENTA = "tv_picture_color_tune_brightness_megenta"
+        const val KEY_TV_PICTURE_COLOR_TUNE_BRIGHTNESS_BLUE =
+            "tv_picture_color_tune_brightness_blue"
+        const val KEY_TV_PICTURE_COLOR_TUNE_BRIGHTNESS_CVAN =
+            "tv_picture_color_tune_brightness_cvan"
+        const val KEY_TV_PICTURE_COLOR_TUNE_BRIGHTNESS_FLESH_TONE =
+            "tv_picture_color_tune_brightness_flesh_tone"
+        const val KEY_TV_PICTURE_COLOR_TUNE_BRIGHTNESS_GREEN =
+            "tv_picture_color_tune_brightness_green"
+        const val KEY_TV_PICTURE_COLOR_TUNE_BRIGHTNESS_MEGENTA =
+            "tv_picture_color_tune_brightness_megenta"
         const val KEY_TV_PICTURE_COLOR_TUNE_BRIGHTNESS_RED = "tv_picture_color_tune_brightness_red"
-        const val KEY_TV_PICTURE_COLOR_TUNE_BRIGHTNESS_YELLOW = "tv_picture_color_tune_brightness_yellow"
+        const val KEY_TV_PICTURE_COLOR_TUNE_BRIGHTNESS_YELLOW =
+            "tv_picture_color_tune_brightness_yellow"
 
         const val KEY_TV_PICTURE_COLOR_TUNE_OFFSET_BLUE = "tv_picture_color_tune_offset_blue"
         const val KEY_TV_PICTURE_COLOR_TUNE_OFFSET_GREEN = "tv_picture_color_tune_offset_green"

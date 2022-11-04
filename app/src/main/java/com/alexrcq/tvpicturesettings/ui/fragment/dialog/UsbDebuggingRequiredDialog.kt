@@ -10,7 +10,7 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.fragment.app.DialogFragment
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.requestFocusForced
+import com.alexrcq.tvpicturesettings.util.requestFocusForced
 
 class UsbDebuggingRequiredDialog : DialogFragment(), DialogInterface.OnShowListener{
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

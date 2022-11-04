@@ -12,8 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import com.alexrcq.tvpicturesettings.DarkModeManager
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.adblib.AdbShell
-import com.alexrcq.tvpicturesettings.enableAccessibilityService
-import com.alexrcq.tvpicturesettings.requestFocusForced
+import com.alexrcq.tvpicturesettings.util.enableAccessibilityService
+import com.alexrcq.tvpicturesettings.util.requestFocusForced
 import kotlinx.coroutines.launch
 import timber.log.Timber
 

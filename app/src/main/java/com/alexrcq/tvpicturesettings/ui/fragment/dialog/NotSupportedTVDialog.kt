@@ -7,7 +7,7 @@ import android.content.DialogInterface.BUTTON_POSITIVE
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.requestFocusForced
+import com.alexrcq.tvpicturesettings.util.requestFocusForced
 
 class NotSupportedTVDialog: DialogFragment(), DialogInterface.OnShowListener {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

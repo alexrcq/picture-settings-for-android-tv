@@ -1,4 +1,4 @@
-package com.alexrcq.tvpicturesettings
+package com.alexrcq.tvpicturesettings.util
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Button
+import com.alexrcq.tvpicturesettings.DarkModeManager
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 import timber.log.Timber
 

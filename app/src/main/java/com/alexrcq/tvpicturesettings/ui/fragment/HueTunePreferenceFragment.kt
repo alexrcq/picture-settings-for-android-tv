@@ -1,10 +1,9 @@
 package com.alexrcq.tvpicturesettings.ui.fragment
 
 import android.os.Bundle
-import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
+import android.view.View
 import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
-import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_BLUE
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_CVAN
@@ -16,8 +15,7 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_RESET
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_YELLOW
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
 
-class HueTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
-    Preference.OnPreferenceChangeListener {
+class HueTunePreferenceFragment : BasePreferenceFragment(R.xml.hue_tune_prefs) {
 
     private var bluePref: SeekBarPreference? = null
     private var cvanPref: SeekBarPreference? = null
@@ -29,8 +27,8 @@ class HueTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     private lateinit var colorTuner: ColorTuner
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.hue_tune_prefs, rootKey)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         colorTuner = ColorTuner(requireContext())
         bluePref = findPreference(TUNER_HUE_BLUE)
         cvanPref = findPreference(TUNER_HUE_CVAN)
@@ -43,9 +41,6 @@ class HueTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             colorTuner.resetHue()
             updateUi()
             true
-        }
-        preferenceScreen.forEach { preference ->
-            preference.onPreferenceChangeListener = this
         }
     }
 

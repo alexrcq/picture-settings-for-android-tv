@@ -110,6 +110,23 @@ class DarkModeManager : AccessibilityService() {
         changeModeAlarmManager.cancelAllAlarms()
     }
 
+    private fun onBootCompleted() {
+        if (appPreferences.isDayModeAfterScreenOnEnabled) {
+            isDarkModeEnabled = false
+        }
+        ChangeModeAlarmManager().apply {
+            setRepeatingAlarm(DARK_MODE_ALARM_ID, appPreferences.darkModeTime)
+            setRepeatingAlarm(DAY_MODE_ALARM_ID, appPreferences.dayModeTime)
+        }
+    }
+
+    private fun handleModeChangeAlarm(alarmId: Int) {
+        when (alarmId) {
+            DARK_MODE_ALARM_ID -> isDarkModeEnabled = true
+            DAY_MODE_ALARM_ID -> isDarkModeEnabled = false
+        }
+    }
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
 
     override fun onInterrupt() {}
@@ -164,23 +181,6 @@ class DarkModeManager : AccessibilityService() {
                     requireInstance().handleModeChangeAlarm(alarmId)
                 }
             }
-        }
-    }
-
-    private fun onBootCompleted() {
-        if (appPreferences.isDayModeAfterScreenOnEnabled) {
-            isDarkModeEnabled = false
-        }
-        ChangeModeAlarmManager().apply {
-            setRepeatingAlarm(DARK_MODE_ALARM_ID, appPreferences.darkModeTime)
-            setRepeatingAlarm(DAY_MODE_ALARM_ID, appPreferences.dayModeTime)
-        }
-    }
-
-    private fun handleModeChangeAlarm(alarmId: Int) {
-        when (alarmId) {
-            DARK_MODE_ALARM_ID -> isDarkModeEnabled = true
-            DAY_MODE_ALARM_ID -> isDarkModeEnabled = false
         }
     }
 

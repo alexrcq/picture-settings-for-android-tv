@@ -1,10 +1,9 @@
 package com.alexrcq.tvpicturesettings.ui.fragment
 
 import android.os.Bundle
-import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
+import android.view.View
 import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
-import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_BLUE
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_GREEN
@@ -12,8 +11,7 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_RE
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_RESET
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
 
-class OffsetTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
-    Preference.OnPreferenceChangeListener {
+class OffsetTunePreferenceFragment : BasePreferenceFragment(R.xml.offset_tune_prefs) {
 
     private var bluePref: SeekBarPreference? = null
     private var greenPref: SeekBarPreference? = null
@@ -21,8 +19,8 @@ class OffsetTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     private lateinit var colorTuner: ColorTuner
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.offset_tune_prefs, rootKey)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         colorTuner = ColorTuner(requireContext())
         bluePref = findPreference(TUNER_OFFSET_BLUE)
         greenPref = findPreference(TUNER_OFFSET_GREEN)
@@ -31,9 +29,6 @@ class OffsetTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             colorTuner.resetOffset()
             updateUi()
             true
-        }
-        preferenceScreen.forEach { preference ->
-            preference.onPreferenceChangeListener = this
         }
     }
 

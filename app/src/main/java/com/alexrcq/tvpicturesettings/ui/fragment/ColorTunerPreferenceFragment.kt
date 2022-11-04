@@ -1,12 +1,11 @@
 package com.alexrcq.tvpicturesettings.ui.fragment
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
-import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
 import androidx.preference.SwitchPreference
-import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_BLUE_GAIN
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_ENABLED
@@ -15,8 +14,7 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_GRE
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_RED_GAIN
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
 
-class ColorTunerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
-    Preference.OnPreferenceChangeListener {
+class ColorTunerPreferenceFragment : BasePreferenceFragment(R.xml.color_tuner_prefs) {
 
     private var colorTunerEnabledPref: SwitchPreference? = null
     private var redGainPref: SeekBarPreference? = null
@@ -25,8 +23,8 @@ class ColorTunerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     private lateinit var colorTuner: ColorTuner
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.color_tuner_prefs, rootKey)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         colorTuner = ColorTuner(requireContext())
         colorTunerEnabledPref = findPreference(COLOR_TUNER_ENABLED)
         redGainPref = findPreference(COLOR_TUNER_RED_GAIN)
@@ -36,9 +34,6 @@ class ColorTunerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
             colorTuner.resetGain()
             updateUi()
             true
-        }
-        preferenceScreen.forEach { preference ->
-            preference.onPreferenceChangeListener = this
         }
     }
 

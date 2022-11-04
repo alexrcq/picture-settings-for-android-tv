@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.commitNow
-import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
-import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BRIGHTNESS
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.CONTRAST
@@ -16,8 +14,7 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.SATURATION
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.SHARPNESS
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 
-class PictureEqualizerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
-    Preference.OnPreferenceChangeListener {
+class PictureEqualizerPreferenceFragment : BasePreferenceFragment(R.xml.picture_equalizer_prefs) {
 
     private var brightnessPref: SeekBarPreference? = null
     private var contrastPref: SeekBarPreference? = null
@@ -27,17 +24,23 @@ class PictureEqualizerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     private lateinit var pictureSettings: PictureSettings
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.picture_equalizer_prefs, rootKey)
+    private val onBackPressCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            showPicturePreferenceFragment()
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         pictureSettings = PictureSettings(requireContext())
         brightnessPref = findPreference(BRIGHTNESS)
         contrastPref = findPreference(CONTRAST)
         saturationPref = findPreference(SATURATION)
         huePref = findPreference(HUE)
         sharpnessPref = findPreference(SHARPNESS)
-        preferenceScreen.forEach { preference ->
-            preference.onPreferenceChangeListener = this
-        }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner, onBackPressCallback
+        )
     }
 
     override fun onStart() {
@@ -72,20 +75,6 @@ class PictureEqualizerPreferenceFragment : LeanbackPreferenceFragmentCompat(),
             }
         }
         return true
-    }
-
-
-    private val onBackPressCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            showPicturePreferenceFragment()
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner, onBackPressCallback
-        )
     }
 
     private fun showPicturePreferenceFragment() {

@@ -1,10 +1,9 @@
 package com.alexrcq.tvpicturesettings.ui.fragment
 
 import android.os.Bundle
-import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
+import android.view.View
 import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
-import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_BLUE
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_CVAN
@@ -16,8 +15,7 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNES
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_BRIGHTNESS_YELLOW
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
 
-class BrightnessTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
-    Preference.OnPreferenceChangeListener {
+class BrightnessTunePreferenceFragment : BasePreferenceFragment(R.xml.brightness_tune_prefs) {
 
     private var bluePref: SeekBarPreference? = null
     private var cyanPref: SeekBarPreference? = null
@@ -29,8 +27,8 @@ class BrightnessTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     private lateinit var colorTuner: ColorTuner
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.brightness_tune_prefs, rootKey)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         colorTuner = ColorTuner(requireContext())
         bluePref = findPreference(TUNER_BRIGHTNESS_BLUE)
         cyanPref = findPreference(TUNER_BRIGHTNESS_CVAN)
@@ -43,9 +41,6 @@ class BrightnessTunePreferenceFragment : LeanbackPreferenceFragmentCompat(),
             colorTuner.resetBrightness()
             updateUi()
             true
-        }
-        preferenceScreen.forEach { preference ->
-            preference.onPreferenceChangeListener = this
         }
     }
 

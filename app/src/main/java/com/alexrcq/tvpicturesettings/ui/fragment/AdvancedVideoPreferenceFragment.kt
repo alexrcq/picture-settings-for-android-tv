@@ -1,11 +1,10 @@
 package com.alexrcq.tvpicturesettings.ui.fragment
 
 import android.os.Bundle
-import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
+import android.view.View
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SwitchPreference
-import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.ADAPTIVE_LUMA_CONTROL
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.HDR
@@ -13,8 +12,7 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.LOCAL_CONTRAST_
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.NOISE_REDUCTION
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 
-class AdvancedVideoPreferenceFragment : LeanbackPreferenceFragmentCompat(),
-    Preference.OnPreferenceChangeListener {
+class AdvancedVideoPreferenceFragment : BasePreferenceFragment(R.xml.advanced_video_prefs) {
 
     private var noiseReductionPref: ListPreference? = null
     private var adaptiveLumaPref: SwitchPreference? = null
@@ -23,16 +21,13 @@ class AdvancedVideoPreferenceFragment : LeanbackPreferenceFragmentCompat(),
 
     private lateinit var pictureSettings: PictureSettings
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        setPreferencesFromResource(R.xml.advanced_video_prefs, rootKey)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         pictureSettings = PictureSettings(requireContext())
         noiseReductionPref = findPreference(NOISE_REDUCTION)
         adaptiveLumaPref = findPreference(ADAPTIVE_LUMA_CONTROL)
         localContrastPref = findPreference(LOCAL_CONTRAST_CONTROL)
         hdrPref = findPreference(HDR)
-        preferenceScreen.forEach { preference ->
-            preference.onPreferenceChangeListener = this
-        }
     }
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
