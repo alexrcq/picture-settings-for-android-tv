@@ -52,6 +52,14 @@ class AppPreferences(val context: Context) {
             }
         }
 
+    var isAutoDarkModeEnabled: Boolean
+        get() = preferences.getBoolean(Keys.IS_AUTO_DARK_MODE_ENABLED, false)
+        set(value) {
+            preferences.edit {
+                putBoolean(Keys.IS_AUTO_DARK_MODE_ENABLED, value)
+            }
+        }
+
     var dayModeTime: String
         get() = preferences.getString(Keys.DAY_MODE_TIME, "08:00")!!
         set(value) {

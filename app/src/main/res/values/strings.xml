@@ -14,7 +14,7 @@
     <string name="reset_to_default">Reset to Default</string>
     <string name="sunrise">Sunrise</string>
     <string name="sunset">Sunset</string>
-    <string name="backlight_at_night">Night backlight</string>
+    <string name="backlight_at_night">Dark mode backlight</string>
     <string name="brightness">Brightness</string>
     <string name="contrast">Contrast</string>
     <string name="saturation">Saturation</string>

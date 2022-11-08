@@ -21,9 +21,6 @@ import com.alexrcq.tvpicturesettings.adblib.AdbShell
 import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BACKLIGHT
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_FILTER_POWER
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_MODE_TIME
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DAY_MODE_TIME
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.IS_AUTO_DARK_MODE_ENABLED
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.IS_DARK_FILTER_ENABLED
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.NIGHT_BACKLIGHT
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.PICTURE_MODE
@@ -172,23 +169,8 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
             IS_DARK_FILTER_ENABLED -> onDarkFilterPreferenceChange(newValue)
             NIGHT_BACKLIGHT -> onNightBacklightPreferenceChange(newValue)
             DARK_FILTER_POWER -> onDarkFilterPowerPreferenceChange(newValue)
-            IS_AUTO_DARK_MODE_ENABLED -> onAutoDarkModeEnabledPreferenceChange(newValue)
-            DARK_MODE_TIME -> onDarkModeTimePreferenceChange(newValue)
-            DAY_MODE_TIME -> onDayModeTimePreferenceChange(newValue)
         }
         return true
-    }
-
-    private fun onDayModeTimePreferenceChange(newValue: Any) {
-        DarkModeManager.requireInstance().setDayModeTime(newValue as String)
-    }
-
-    private fun onDarkModeTimePreferenceChange(newValue: Any) {
-        DarkModeManager.requireInstance().setDarkModeTime(newValue as String)
-    }
-
-    private fun onAutoDarkModeEnabledPreferenceChange(newValue: Any) {
-        DarkModeManager.requireInstance().setAutoDarkModeEnabled(newValue as Boolean)
     }
 
     private fun onDarkFilterPowerPreferenceChange(newValue: Any) {

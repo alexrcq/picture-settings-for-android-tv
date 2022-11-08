@@ -14,7 +14,7 @@
     <string name="reset_to_default">Восстановить по умолчанию</string>
     <string name="sunrise">Рассвет</string>
     <string name="sunset">Закат</string>
-    <string name="backlight_at_night">Ночная подсветка</string>
+    <string name="backlight_at_night">Подсветка ночного режима</string>
     <string name="brightness">Яркость</string>
     <string name="contrast">Контраст</string>
     <string name="saturation">Насыщенность</string>
@@ -37,7 +37,7 @@
     <string name="click_to_dark_mode">Нажмите для перехода в ночной режим подсветки</string>
     <string name="click_to_day_mode">Нажмите для перехода в дневной режим подсветки</string>
     <string name="take_screenshot">Сделать снимок экрана</string>
-    <string name="day_mode_after_screen_on">Выходить из ночного режима после включения ТВ</string>
+    <string name="day_mode_after_screen_on">Выходить из ночного режима подсветки после включения ТВ</string>
     <string name="dimming_power">Сила затемнения</string>
     <string name="dark_mode_settings">Настройки ночного режима подсветки</string>
     <string name="screenshot_saved">Cнимок экрана сохранён в /Screenshots</string>

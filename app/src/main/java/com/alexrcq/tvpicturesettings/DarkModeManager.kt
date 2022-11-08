@@ -95,28 +95,30 @@ class DarkModeManager : AccessibilityService() {
 
     fun setAutoDarkModeEnabled(isAutoDarkModeEnabled: Boolean) {
         val changeModeAlarmManager = ChangeModeAlarmManager()
-        if (isAutoDarkModeEnabled) {
-            if (!isDarkModeEnabled) {
-                appPreferences.dayBacklight = pictureSettings.backlight
-            }
-            changeModeAlarmManager.setRepeatingAlarm(DAY_MODE_ALARM_ID, appPreferences.dayModeTime)
-            changeModeAlarmManager.setRepeatingAlarm(
-                DARK_MODE_ALARM_ID,
-                appPreferences.darkModeTime
-            )
+        if (!isAutoDarkModeEnabled) {
+            isDarkModeEnabled = false
+            changeModeAlarmManager.cancelAllAlarms()
             return
         }
-        isDarkModeEnabled = false
-        changeModeAlarmManager.cancelAllAlarms()
+        if (!isDarkModeEnabled) {
+            appPreferences.dayBacklight = pictureSettings.backlight
+        }
+        changeModeAlarmManager.setRepeatingAlarm(DAY_MODE_ALARM_ID, appPreferences.dayModeTime)
+        changeModeAlarmManager.setRepeatingAlarm(
+            DARK_MODE_ALARM_ID,
+            appPreferences.darkModeTime
+        )
     }
 
     private fun onBootCompleted() {
         if (appPreferences.isDayModeAfterScreenOnEnabled) {
             isDarkModeEnabled = false
         }
-        ChangeModeAlarmManager().apply {
-            setRepeatingAlarm(DARK_MODE_ALARM_ID, appPreferences.darkModeTime)
-            setRepeatingAlarm(DAY_MODE_ALARM_ID, appPreferences.dayModeTime)
+        if (appPreferences.isAutoDarkModeEnabled) {
+            with(ChangeModeAlarmManager()) {
+                setRepeatingAlarm(DARK_MODE_ALARM_ID, appPreferences.darkModeTime)
+                setRepeatingAlarm(DAY_MODE_ALARM_ID, appPreferences.dayModeTime)
+            }
         }
     }
 
@@ -152,18 +154,21 @@ class DarkModeManager : AccessibilityService() {
             )
         }
 
-        private fun getPendingIntent(modeId: Int): PendingIntent? = PendingIntent.getBroadcast(
-            applicationContext,
-            modeId,
-            getIntent(applicationContext, modeId),
-            PendingIntent.FLAG_IMMUTABLE
-        )
+        private fun getPendingIntent(modeId: Int): PendingIntent? {
+            return PendingIntent.getBroadcast(
+                applicationContext,
+                modeId,
+                createChangeModeIntent(applicationContext, modeIdExtra = modeId),
+                PendingIntent.FLAG_IMMUTABLE
+            )
+        }
 
-        private fun getIntent(context: Context, modeId: Int): Intent =
-            Intent(context, ChangeBacklightModeBroadcastReceiver::class.java).apply {
+        private fun createChangeModeIntent(context: Context, modeIdExtra: Int): Intent {
+            return Intent(context, ChangeBacklightModeBroadcastReceiver::class.java).apply {
                 action = ACTION_CHANGE_BACKLIGHT_MODE
-                putExtra(EXTRA_BACKLIGHT_MODE_ALARM_ID, modeId)
+                putExtra(EXTRA_BACKLIGHT_MODE_ALARM_ID, modeIdExtra)
             }
+        }
 
         fun cancelAllAlarms() {
             alarmManager.cancel(getPendingIntent(DAY_MODE_ALARM_ID))
