@@ -1,4 +1,4 @@
-package com.alexrcq.tvpicturesettings.util
+package com.alexrcq.tvpicturesettings
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Context
@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import android.widget.Button
-import com.alexrcq.tvpicturesettings.DarkModeManager
+import com.alexrcq.tvpicturesettings.helper.DarkModeManager
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
 import timber.log.Timber
 
@@ -68,10 +68,10 @@ val Context.isDarkModeManagerEnabled: Boolean
 fun Context.enableAccessibilityService(cls: Class<out AccessibilityService>) {
     Timber.d("enabling the ${cls.name} service...")
     val allEnabledServices =
-        Settings.Secure.getString(contentResolver, "enabled_accessibility_services")
+        Settings.Secure.getString(contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES)
     Settings.Secure.putString(
         contentResolver,
-        "enabled_accessibility_services",
+        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
         "$allEnabledServices:${packageName}/${cls.name}"
     )
 }

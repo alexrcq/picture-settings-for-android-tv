@@ -8,8 +8,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.requestFocusForced
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
-import com.alexrcq.tvpicturesettings.util.requestFocusForced
 
 class ResetToDefaultDialog: DialogFragment(), DialogInterface.OnShowListener {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

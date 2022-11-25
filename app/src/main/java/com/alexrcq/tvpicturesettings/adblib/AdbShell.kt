@@ -4,14 +4,12 @@ import android.Manifest
 import android.content.Context
 import android.os.FileObserver
 import com.alexrcq.tvpicturesettings.BuildConfig
-import com.alexrcq.tvpicturesettings.util.hasPermission
+import com.alexrcq.tvpicturesettings.hasPermission
 import com.tananaev.adblib.AdbConnection
 import com.tananaev.adblib.AdbCrypto
 import com.tananaev.adblib.AdbStream
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.net.Socket
@@ -39,7 +37,7 @@ class AdbShell private constructor(
                 false
             )
             if (isConnectionEstablished == false) {
-                throw TimeoutException()
+                throw TimeoutException("adb connection timeout")
             }
             isConnected = true
             Timber.d("connected")
@@ -141,7 +139,7 @@ class AdbShell private constructor(
     }
 
     companion object {
-        const val CONNECTION_TIMEOUT_SECONDS = 15L
+        const val CONNECTION_TIMEOUT_SECONDS = 25L
 
         @Volatile
         private var INSTANCE: AdbShell? = null

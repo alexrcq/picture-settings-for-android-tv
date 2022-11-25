@@ -1,4 +1,4 @@
-package com.alexrcq.tvpicturesettings.util
+package com.alexrcq.tvpicturesettings.helper
 
 import android.content.ContentResolver
 import android.database.ContentObserver

@@ -15,9 +15,12 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
 import androidx.preference.SwitchPreference
-import com.alexrcq.tvpicturesettings.DarkModeManager
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.adblib.AdbShell
+import com.alexrcq.tvpicturesettings.hasActiveTvSource
+import com.alexrcq.tvpicturesettings.helper.DarkModeManager
+import com.alexrcq.tvpicturesettings.helper.GlobalSettingsObserver
+import com.alexrcq.tvpicturesettings.helper.GlobalSettingsObserverImpl
 import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BACKLIGHT
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_FILTER_POWER
@@ -32,9 +35,6 @@ import com.alexrcq.tvpicturesettings.storage.PictureSettings
 import com.alexrcq.tvpicturesettings.storage.appPreferences
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.LoadingDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.ResetToDefaultDialog
-import com.alexrcq.tvpicturesettings.util.GlobalSettingsObserver
-import com.alexrcq.tvpicturesettings.util.GlobalSettingsObserverImpl
-import com.alexrcq.tvpicturesettings.util.hasActiveTvSource
 import kotlinx.coroutines.*
 import timber.log.Timber
 
@@ -51,7 +51,7 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
     private var temperaturePref: ListPreference? = null
     private var isDarkFilterEnabledPref: SwitchPreference? = null
 
-    private val onDarkManagerConnectedBR = object : BroadcastReceiver() {
+    private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == DarkModeManager.ACTION_SERVICE_CONNECTED) {
                 viewLifecycleOwner.lifecycleScope.launchWhenStarted {
@@ -69,7 +69,7 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
         pictureSettings = PictureSettings(requireContext())
         iniPreferences()
         requireContext().registerReceiver(
-            onDarkManagerConnectedBR,
+            broadcastReceiver,
             IntentFilter(DarkModeManager.ACTION_SERVICE_CONNECTED)
         )
         registerGlobalSettingsObserver(viewLifecycleOwner, requireContext().contentResolver, this)
@@ -178,10 +178,8 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
     }
 
     private fun onNightBacklightPreferenceChange(newValue: Any) {
-        with(appPreferences) {
-            if (isDarkModeEnabled) {
-                pictureSettings.backlight = newValue as Int
-            }
+        if (appPreferences.isDarkModeEnabled) {
+            pictureSettings.backlight = newValue as Int
         }
     }
 
@@ -252,7 +250,7 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
 
     override fun onDestroy() {
         super.onDestroy()
-        requireContext().unregisterReceiver(onDarkManagerConnectedBR)
+        requireContext().unregisterReceiver(broadcastReceiver)
         AdbShell.getInstance(requireContext()).disconnect()
     }
 }

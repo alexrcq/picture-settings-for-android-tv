@@ -9,11 +9,11 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
-import com.alexrcq.tvpicturesettings.DarkModeManager
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.adblib.AdbShell
-import com.alexrcq.tvpicturesettings.util.enableAccessibilityService
-import com.alexrcq.tvpicturesettings.util.requestFocusForced
+import com.alexrcq.tvpicturesettings.enableAccessibilityService
+import com.alexrcq.tvpicturesettings.helper.DarkModeManager
+import com.alexrcq.tvpicturesettings.requestFocusForced
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -37,8 +37,8 @@ class AcceptDebuggingDialog: DialogFragment(), DialogInterface.OnShowListener {
                 try {
                     connect()
                 } catch (e: Exception) {
-                    Timber.e("adb timeout")
-                    Toast.makeText(context, getString(R.string.сonnection_timeout), Toast.LENGTH_LONG).show()
+                    Timber.e(e)
+                    Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
                     requireActivity().finish()
                     return@launch
                 }
