@@ -4,7 +4,7 @@
     <string name="adaptive_luma_control">Adaptive luma control</string>
     <string name="local_contrast_control">Local contrast control</string>
     <string name="noise_reduction">Noise reduction</string>
-    <string name="advanced_video">Advanced video</string>
+    <string name="video_preferences">Video preferences</string>
     <string name="backlight">Backlight</string>
     <string name="picture_mode">Picture mode</string>
     <string name="picture">Picture</string>
@@ -39,7 +39,7 @@
     <string name="take_screenshot">Take a screenshot</string>
     <string name="day_mode_after_screen_on">Turn off Dark Mode after turning on the TV</string>
     <string name="dimming_power">Dimming power</string>
-    <string name="dark_mode_settings">Dark mode backlight preferences</string>
+    <string name="dark_mode_preferences">Dark mode backlight preferences</string>
     <string name="screenshot_saved">The screenshot has been saved in /Screenshots</string>
     <string name="yellow">Yellow</string>
     <string name="magenta">Magenta</string>

@@ -10,8 +10,9 @@ import com.alexrcq.tvpicturesettings.helper.DarkModeManager
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AcceptDebuggingDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.NotSupportedTVDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.UsbDebuggingRequiredDialog
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

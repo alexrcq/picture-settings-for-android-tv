@@ -10,18 +10,21 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_GR
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_RED
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_OFFSET_RESET
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class OffsetTunePreferenceFragment : BasePreferenceFragment(R.xml.offset_tune_prefs) {
 
     private var bluePref: SeekBarPreference? = null
     private var greenPref: SeekBarPreference? = null
     private var redPref: SeekBarPreference? = null
 
-    private lateinit var colorTuner: ColorTuner
+    @Inject
+    lateinit var colorTuner: ColorTuner
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        colorTuner = ColorTuner(requireContext())
         bluePref = findPreference(TUNER_OFFSET_BLUE)
         greenPref = findPreference(TUNER_OFFSET_GREEN)
         redPref = findPreference(TUNER_OFFSET_RED)

@@ -14,7 +14,10 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATIO
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_RESET
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_SATURATION_YELLOW
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class SaturationTunePreferenceFragment : BasePreferenceFragment(R.xml.saturation_tune_prefs) {
 
     private var bluePref: SeekBarPreference? = null
@@ -25,11 +28,11 @@ class SaturationTunePreferenceFragment : BasePreferenceFragment(R.xml.saturation
     private var redPref: SeekBarPreference? = null
     private var yellowPref: SeekBarPreference? = null
 
-    private lateinit var colorTuner: ColorTuner
+    @Inject
+    lateinit var colorTuner: ColorTuner
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        colorTuner = ColorTuner(requireContext())
         bluePref = findPreference(TUNER_SATURATION_BLUE)
         cvanPref = findPreference(TUNER_SATURATION_CVAN)
         fleshTonePref = findPreference(TUNER_SATURATION_FLESH_TONE)

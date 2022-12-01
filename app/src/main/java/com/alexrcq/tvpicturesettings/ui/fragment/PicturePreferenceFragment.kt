@@ -9,9 +9,7 @@ import android.os.Environment
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.commitNow
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
 import androidx.preference.SwitchPreference
@@ -26,29 +24,29 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BACKLIGHT
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_FILTER_POWER
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.IS_DARK_FILTER_ENABLED
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.NIGHT_BACKLIGHT
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.PICTURE_MODE
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.RESET_TO_DEFAULT
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TAKE_SCREENSHOT
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TEMPERATURE
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TURN_OFF_SCREEN
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
-import com.alexrcq.tvpicturesettings.storage.appPreferences
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.LoadingDialog
-import com.alexrcq.tvpicturesettings.ui.fragment.dialog.ResetToDefaultDialog
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import timber.log.Timber
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
     GlobalSettingsObserver by GlobalSettingsObserverImpl(),
     GlobalSettingsObserver.OnGlobalSettingChangedCallback {
 
-    private lateinit var pictureSettings: PictureSettings
-    private lateinit var appPreferences: AppPreferences
+    @Inject
+    lateinit var pictureSettings: PictureSettings
+
+    @Inject
+    lateinit var appPreferences: AppPreferences
 
     private var backlightPref: SeekBarPreference? = null
-    private var pictureModePref: ListPreference? = null
     private var takeScreenshotPref: Preference? = null
-    private var temperaturePref: ListPreference? = null
     private var isDarkFilterEnabledPref: SwitchPreference? = null
 
     private val broadcastReceiver = object : BroadcastReceiver() {
@@ -66,7 +64,6 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        pictureSettings = PictureSettings(requireContext())
         iniPreferences()
         requireContext().registerReceiver(
             broadcastReceiver,
@@ -76,7 +73,6 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
     }
 
     private fun iniPreferences() {
-        appPreferences = requireContext().appPreferences
         with(appPreferences) {
             if (dayBacklight !in 0..100) {
                 dayBacklight = pictureSettings.backlight
@@ -95,15 +91,9 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
                 true
             }
         }
-        pictureModePref = findPreference(PICTURE_MODE)
-        temperaturePref = findPreference(TEMPERATURE)
         isDarkFilterEnabledPref = findPreference(IS_DARK_FILTER_ENABLED)
         findPreference<Preference>(TURN_OFF_SCREEN)?.setOnPreferenceClickListener {
             onTurnOffScreenClicked()
-            true
-        }
-        findPreference<Preference>(RESET_TO_DEFAULT)?.setOnPreferenceClickListener {
-            onResetToDefaultClicked()
             true
         }
     }
@@ -143,29 +133,15 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
         updateBacklightPreferenceSummary()
     }
 
-    private fun onResetToDefaultClicked() {
-        ResetToDefaultDialog().show(childFragmentManager, ResetToDefaultDialog.TAG)
-    }
-
     override fun onGlobalSettingChanged(key: String) {
-        when (key) {
-            PictureSettings.KEY_PICTURE_BACKLIGHT -> {
-                backlightPref?.value = pictureSettings.backlight
-            }
-            PictureSettings.KEY_PICTURE_TEMPERATURE -> {
-                temperaturePref?.value = pictureSettings.temperature.toString()
-            }
-            PictureSettings.KEY_PICTURE_MODE -> {
-                pictureModePref?.value = pictureSettings.pictureMode.toString()
-            }
+        if (key == GlobalSettings.Keys.PICTURE_BACKLIGHT) {
+            backlightPref?.value = pictureSettings.backlight
         }
     }
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         when (preference.key) {
             BACKLIGHT -> onBacklightPreferenceChange(newValue)
-            PICTURE_MODE -> onPictureModePreferenceChange(newValue)
-            TEMPERATURE -> onTemperaturePreferenceChange(newValue)
             IS_DARK_FILTER_ENABLED -> onDarkFilterPreferenceChange(newValue)
             NIGHT_BACKLIGHT -> onNightBacklightPreferenceChange(newValue)
             DARK_FILTER_POWER -> onDarkFilterPowerPreferenceChange(newValue)
@@ -189,18 +165,6 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
         }
     }
 
-    private fun onPictureModePreferenceChange(newValue: Any) {
-        val pictureMode = (newValue as String).toInt()
-        pictureSettings.pictureMode = pictureMode
-        if (pictureMode == PictureSettings.PICTURE_MODE_USER) {
-            showPictureEqualizer()
-        }
-    }
-
-    private fun onTemperaturePreferenceChange(newValue: Any) {
-        pictureSettings.temperature = (newValue as String).toInt()
-    }
-
     private fun onBacklightPreferenceChange(newValue: Any) {
         val backlight = newValue as Int
         pictureSettings.backlight = backlight
@@ -208,16 +172,6 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
             if (!isDarkModeEnabled) {
                 dayBacklight = backlight
             }
-        }
-    }
-
-    private fun showPictureEqualizer() {
-        parentFragmentManager.popBackStackImmediate()
-        parentFragmentManager.commitNow {
-            replace(
-                androidx.leanback.preference.R.id.settings_preference_fragment_container,
-                PictureEqualizerPreferenceFragment()
-            )
         }
     }
 
@@ -235,8 +189,6 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
             takeScreenshotPref?.isEnabled = false
         }
         backlightPref?.value = pictureSettings.backlight
-        pictureModePref?.value = pictureSettings.pictureMode.toString()
-        temperaturePref?.value = pictureSettings.temperature.toString()
         updateBacklightPreferenceSummary()
     }
 
@@ -248,8 +200,8 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         requireContext().unregisterReceiver(broadcastReceiver)
         AdbShell.getInstance(requireContext()).disconnect()
     }

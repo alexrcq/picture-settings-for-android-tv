@@ -1,8 +1,11 @@
 package com.alexrcq.tvpicturesettings.storage
 
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class ColorTuner(context: Context) : GlobalSettingsImpl(context.contentResolver) {
+class ColorTuner @Inject constructor(@ApplicationContext context: Context) :
+    GlobalSettings(context.contentResolver) {
 
     var isColorTuneEnabled: Boolean
         set(value) {

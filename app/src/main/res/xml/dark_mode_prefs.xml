@@ -2,24 +2,7 @@
 <PreferenceScreen
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    app:title="@string/picture">
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:key="backlight"
-        app:persistent="false"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
-        app:title="@string/backlight" />
-    <Preference
-        app:key="power_picture_off"
-        app:title="@string/power_picture_off" />
-    <Preference
-        app:key="take_screenshot"
-        app:title="@string/take_screenshot" />
-    <Preference
-        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.VideoPreferencesFragment"
-        app:key="video_preferences"
-        app:title="@string/video_preferences" />
-    <PreferenceCategory app:title="@string/dark_mode_preferences" />
+    app:title="@string/dark_mode_preferences">
     <Preference
         app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.ScheduledDarkModePreferenceFragment"
         app:key="scheduled_dark_mode"

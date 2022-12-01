@@ -18,9 +18,6 @@ class UsbDebuggingRequiredDialog : DialogFragment(), DialogInterface.OnShowListe
             .setMessage(R.string.adb_debugging_required)
             .setPositiveButton(R.string.open_settings, null)
             .setNegativeButton(android.R.string.cancel, null)
-            .setOnCancelListener {
-                requireActivity().finish()
-            }
             .create()
         alertDialog.setOnShowListener(this)
         return alertDialog
@@ -45,6 +42,10 @@ class UsbDebuggingRequiredDialog : DialogFragment(), DialogInterface.OnShowListe
 
     private fun onOpenSettingsClicked() {
         startActivity(Intent(Settings.ACTION_SETTINGS))
+        requireActivity().finish()
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
         requireActivity().finish()
     }
 

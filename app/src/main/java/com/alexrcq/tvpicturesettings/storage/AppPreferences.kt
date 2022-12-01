@@ -3,14 +3,12 @@ package com.alexrcq.tvpicturesettings.storage
 import android.content.Context
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
 
-val Context.appPreferences: AppPreferences
-    get() = AppPreferences(this)
-
-class AppPreferences(val context: Context) {
-    private val preferences =
-        PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+class AppPreferences @Inject constructor(@ApplicationContext context: Context) {
+    private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     var isDayModeAfterScreenOnEnabled: Boolean
         get() = preferences.getBoolean(Keys.IS_DAY_MODE_AFTER_SCREEN_ON_ENABLED, false)
@@ -92,8 +90,6 @@ class AppPreferences(val context: Context) {
         const val IS_DARK_FILTER_ENABLED = "is_dark_filter_enabled"
         const val DAY_BACKLIGHT = "ab_day_backlight"
         const val NIGHT_BACKLIGHT = "ab_night_backlight"
-        const val PICTURE_MODE = "picture_mode"
-        const val TEMPERATURE = "temperature"
         const val TAKE_SCREENSHOT = "take_screenshot"
         const val RESET_TO_DEFAULT = "reset_to_default"
         const val TURN_OFF_SCREEN = "power_picture_off"
@@ -102,12 +98,13 @@ class AppPreferences(val context: Context) {
             "is_enable_day_mode_after_screen_on_enabled"
         const val IS_DARK_MODE_ENABLED = "is_dark_mode_enabled"
 
+        const val PICTURE_MODE = "picture_mode"
+        const val TEMPERATURE = "temperature"
         const val BRIGHTNESS = "brightness"
         const val CONTRAST = "contrast"
         const val SATURATION = "saturation"
         const val HUE = "hue"
         const val SHARPNESS = "sharpness"
-
         const val NOISE_REDUCTION = "noise_reduction"
         const val ADAPTIVE_LUMA_CONTROL = "adaptive_luma_control"
         const val LOCAL_CONTRAST_CONTROL = "local_contrast_control"
@@ -151,7 +148,7 @@ class AppPreferences(val context: Context) {
         const val TUNER_SATURATION_YELLOW = "tuner_saturation_yellow"
         const val TUNER_SATURATION_RESET = "tuner_saturation_reset"
 
-        const val ADVANCED_VIDEO = "advanced_video"
+        const val VIDEO_PREFERENCES = "video_preferences"
         const val COLOR_TUNER = "color_tuner"
         const val SATURATION_TUNE = "saturation_tune"
         const val HUE_TUNE = "hue_tune"

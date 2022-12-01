@@ -4,7 +4,7 @@
     <string name="adaptive_luma_control">Адаптивная подсветка</string>
     <string name="local_contrast_control">Локальный контраст</string>
     <string name="noise_reduction">Шумоподавление</string>
-    <string name="advanced_video">Расширенные настройки видео</string>
+    <string name="video_preferences">Настройки видео</string>
     <string name="backlight">Подсветка</string>
     <string name="picture_mode">Режим изображения</string>
     <string name="picture">Изображение</string>
@@ -21,7 +21,7 @@
     <string name="hue">Оттенок</string>
     <string name="sharpness">Резкость</string>
     <string name="extra_dimming">Дополнительное затемнение</string>
-    <string name="make_it_even_darker_summary">Помимо снижения подсветки, накладывать неинтерактивный прозрачный тёмный прямоугольник поверх изображения телевизора в ночном режиме</string>
+    <string name="make_it_even_darker_summary">Помимо ночного снижения подсветки, накладывать прозрачный чёрный прямоугольник поверх изображения телевизора</string>
     <string name="open_settings">Открыть настройки</string>
     <string name="power_picture_off">Выключить экран</string>
     <string name="adb_debugging_required">Для работы приложения требуется включить отладку по USB в настройках для разработчиков</string>
@@ -39,7 +39,7 @@
     <string name="take_screenshot">Сделать снимок экрана</string>
     <string name="day_mode_after_screen_on">Выходить из ночного режима подсветки после включения ТВ</string>
     <string name="dimming_power">Сила затемнения</string>
-    <string name="dark_mode_settings">Настройки ночного режима подсветки</string>
+    <string name="dark_mode_preferences">Настройки ночного режима подсветки</string>
     <string name="screenshot_saved">Cнимок экрана сохранён в /Screenshots</string>
     <string name="yellow">Жёлтый</string>
     <string name="magenta">Розововато-пурпурный</string>

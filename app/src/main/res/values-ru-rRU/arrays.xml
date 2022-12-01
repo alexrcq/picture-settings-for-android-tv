@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="picture_mode">
+    <array name="picture_mode">
         <item>По умолчанию</item>
         <item>Яркий</item>
         <item>Спорт</item>
         <item>Фильм</item>
         <item>Пользовательский</item>
-    </string-array>
-    <string-array name="picture_temperature">
+    </array>
+    <array name="picture_temperature">
         <item>Теплая</item>
         <item>Холодная</item>
         <item>По умолчанию</item>
-    </string-array>
+    </array>
     <array name="picture_advanced_video_noise_reduction_entries">
         <item>Выключено</item>
         <item>Слабо</item>
         <item>Средне</item>
         <item>Сильно</item>
+    </array>
+    <array name="picture_mode_ref_entries_hdr">
+        <item>HDR По умолчанию</item>
+        <item>HDR Яркий</item>
+        <item>HDR Фильм</item>
     </array>
 </resources>

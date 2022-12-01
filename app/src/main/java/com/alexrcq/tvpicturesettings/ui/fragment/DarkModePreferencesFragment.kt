@@ -11,7 +11,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ScheduledDarkModePreferenceFragment :
+class DarkModePreferencesFragment :
     BasePreferenceFragment(R.xml.scheduled_dark_mode_prefs) {
 
     @Inject

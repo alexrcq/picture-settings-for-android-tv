@@ -22,9 +22,6 @@ class AcceptDebuggingDialog: DialogFragment(), DialogInterface.OnShowListener {
         val alertDialog = AlertDialog.Builder(requireActivity(), android.R.style.Theme_Material_Dialog_Alert)
             .setMessage(R.string.wait_for_debug_window)
             .setPositiveButton(android.R.string.ok, null)
-            .setOnCancelListener {
-                requireActivity().finish()
-            }
             .create()
         alertDialog.setOnShowListener(this@AcceptDebuggingDialog)
         return alertDialog
@@ -58,6 +55,10 @@ class AcceptDebuggingDialog: DialogFragment(), DialogInterface.OnShowListener {
             }
             requestFocusForced()
         }
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        requireActivity().finish()
     }
 
     companion object {

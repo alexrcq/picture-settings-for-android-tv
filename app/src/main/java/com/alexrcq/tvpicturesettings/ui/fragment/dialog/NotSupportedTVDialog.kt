@@ -14,9 +14,6 @@ class NotSupportedTVDialog: DialogFragment(), DialogInterface.OnShowListener {
         val alertDialog = AlertDialog.Builder(requireActivity(), android.R.style.Theme_Material_Dialog_Alert)
             .setMessage(R.string.not_supported_tv)
             .setPositiveButton(android.R.string.ok, null)
-            .setOnCancelListener {
-                requireActivity().finish()
-            }
             .create()
         alertDialog.setOnShowListener(this@NotSupportedTVDialog)
         return alertDialog
@@ -34,6 +31,10 @@ class NotSupportedTVDialog: DialogFragment(), DialogInterface.OnShowListener {
             }
             requestFocusForced()
         }
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        requireActivity().finish()
     }
 
     companion object {

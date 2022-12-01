@@ -4,10 +4,11 @@ import android.accessibilityservice.AccessibilityService
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
 import android.widget.Button
 import com.alexrcq.tvpicturesettings.helper.DarkModeManager
-import com.alexrcq.tvpicturesettings.storage.PictureSettings
+import com.alexrcq.tvpicturesettings.storage.PictureSettingsImpl
 import timber.log.Timber
 
 fun Button.requestFocusForced() {
@@ -21,9 +22,7 @@ fun Context.hasPermission(permission: String): Boolean =
 
 val Context.hasActiveTvSource: Boolean
     get() {
-        val currentSourceNameUri = Uri.parse(
-            "content://com.mediatek.tv.internal.data/global_value/multi_view_main_source_name"
-        )
+        val currentSourceNameUri = Uri.parse(TvConstants.CURRENT_TV_SOURCE_URI)
         val cursor = contentResolver.query(
             currentSourceNameUri,
             null,
@@ -49,20 +48,24 @@ val Context.isCurrentTvSupported: Boolean
     get() {
         return try {
             // just trying to take a random setting
-            PictureSettings(this).isAdaptiveLumaEnabled
+            PictureSettingsImpl(this).isAdaptiveLumaEnabled
             true
         } catch (e: Settings.SettingNotFoundException) {
             false
         }
     }
 
+val isCurrentTvModelP1Croods: Boolean
+    get() = Build.MODEL.contains(TvConstants.TV_MODEL_CROODS, true)
+
 val Context.isDarkModeManagerEnabled: Boolean
     get() {
-        val prefString = Settings.Secure.getString(
+        val allEnabledServices = Settings.Secure.getString(
             contentResolver,
             Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
         )
-        return prefString != null && prefString.contains(packageName + "/" + DarkModeManager::class.java.name)
+        return allEnabledServices != null &&
+                allEnabledServices.contains(packageName + "/" + DarkModeManager::class.java.name)
     }
 
 fun Context.enableAccessibilityService(cls: Class<out AccessibilityService>) {

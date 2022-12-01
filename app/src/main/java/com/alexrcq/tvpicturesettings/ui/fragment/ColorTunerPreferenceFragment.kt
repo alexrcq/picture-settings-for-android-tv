@@ -13,7 +13,10 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_GAI
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_GREEN_GAIN
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER_RED_GAIN
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ColorTunerPreferenceFragment : BasePreferenceFragment(R.xml.color_tuner_prefs) {
 
     private var colorTunerEnabledPref: SwitchPreference? = null
@@ -21,11 +24,11 @@ class ColorTunerPreferenceFragment : BasePreferenceFragment(R.xml.color_tuner_pr
     private var greenGainPref: SeekBarPreference? = null
     private var blueGainPref: SeekBarPreference? = null
 
-    private lateinit var colorTuner: ColorTuner
+    @Inject
+    lateinit var colorTuner: ColorTuner
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        colorTuner = ColorTuner(requireContext())
         colorTunerEnabledPref = findPreference(COLOR_TUNER_ENABLED)
         redGainPref = findPreference(COLOR_TUNER_RED_GAIN)
         greenGainPref = findPreference(COLOR_TUNER_GREEN_GAIN)

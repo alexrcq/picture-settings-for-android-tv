@@ -34,8 +34,8 @@ class GlobalSettingsObserverImpl : GlobalSettingsObserver, LifecycleEventObserve
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
-            Lifecycle.Event.ON_START -> registerContentObserver()
-            Lifecycle.Event.ON_STOP -> unregisterContentObserver()
+            Lifecycle.Event.ON_CREATE -> registerContentObserver()
+            Lifecycle.Event.ON_DESTROY -> unregisterContentObserver()
             else -> Unit
         }
     }

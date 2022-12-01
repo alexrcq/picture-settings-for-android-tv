@@ -14,7 +14,10 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_RED
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_RESET
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TUNER_HUE_YELLOW
 import com.alexrcq.tvpicturesettings.storage.ColorTuner
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class HueTunePreferenceFragment : BasePreferenceFragment(R.xml.hue_tune_prefs) {
 
     private var bluePref: SeekBarPreference? = null
@@ -25,11 +28,11 @@ class HueTunePreferenceFragment : BasePreferenceFragment(R.xml.hue_tune_prefs) {
     private var redPref: SeekBarPreference? = null
     private var yellowPref: SeekBarPreference? = null
 
-    private lateinit var colorTuner: ColorTuner
+    @Inject
+    lateinit var colorTuner: ColorTuner
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        colorTuner = ColorTuner(requireContext())
         bluePref = findPreference(TUNER_HUE_BLUE)
         cvanPref = findPreference(TUNER_HUE_CVAN)
         fleshTonePref = findPreference(TUNER_HUE_FLESH_TONE)

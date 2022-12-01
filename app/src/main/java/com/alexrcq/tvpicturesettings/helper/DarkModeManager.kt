@@ -9,15 +9,22 @@ import android.content.IntentFilter
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
-import com.alexrcq.tvpicturesettings.storage.appPreferences
 import com.alexrcq.tvpicturesettings.ui.FullScreenDarkFilter
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class DarkModeManager : AccessibilityService() {
 
-    private lateinit var pictureSettings: PictureSettings
+    @Inject
+    lateinit var pictureSettings: PictureSettings
+
+    @Inject
+    lateinit var appPreferences: AppPreferences
+
     lateinit var darkFilter: FullScreenDarkFilter
 
     private val broadcastReceiver = object : BroadcastReceiver() {
@@ -60,7 +67,6 @@ class DarkModeManager : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         Timber.d("onServiceConnected")
-        pictureSettings = PictureSettings(applicationContext)
         darkFilter = FullScreenDarkFilter(this).apply {
             alpha = appPreferences.darkFilterPower / 100f
         }
