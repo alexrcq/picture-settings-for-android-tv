@@ -97,6 +97,7 @@ class AppPreferences @Inject constructor(@ApplicationContext context: Context) {
         const val IS_DAY_MODE_AFTER_SCREEN_ON_ENABLED =
             "is_enable_day_mode_after_screen_on_enabled"
         const val IS_DARK_MODE_ENABLED = "is_dark_mode_enabled"
+        const val OPEN_PICTURE_SETTINGS = "open_picture_settings"
 
         const val PICTURE_MODE = "picture_mode"
         const val TEMPERATURE = "temperature"

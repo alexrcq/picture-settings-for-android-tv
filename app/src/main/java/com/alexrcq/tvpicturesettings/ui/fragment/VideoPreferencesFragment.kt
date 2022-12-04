@@ -10,7 +10,6 @@ import androidx.preference.SwitchPreference
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.helper.GlobalSettingsObserver
 import com.alexrcq.tvpicturesettings.helper.GlobalSettingsObserverImpl
-import com.alexrcq.tvpicturesettings.isCurrentTvModelP1Croods
 import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.ADAPTIVE_LUMA_CONTROL
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BRIGHTNESS
@@ -28,6 +27,7 @@ import com.alexrcq.tvpicturesettings.storage.PictureSettings
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.ResetToDefaultDialog
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class VideoPreferencesFragment : BasePreferenceFragment(R.xml.video_prefs),
@@ -52,9 +52,6 @@ class VideoPreferencesFragment : BasePreferenceFragment(R.xml.video_prefs),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         iniPreferences()
-        if (isCurrentTvModelP1Croods) {
-            setupP1Preferences()
-        }
         registerGlobalSettingsObserver(viewLifecycleOwner, requireContext().contentResolver, this)
     }
 
@@ -73,13 +70,6 @@ class VideoPreferencesFragment : BasePreferenceFragment(R.xml.video_prefs),
         findPreference<Preference>(AppPreferences.Keys.RESET_TO_DEFAULT)?.setOnPreferenceClickListener {
             onResetToDefaultClicked()
             true
-        }
-    }
-
-    private fun setupP1Preferences() {
-        pictureModePref.apply {
-            entries = resources.getStringArray(R.array.picture_mode_ref_entries_hdr)
-            entryValues = resources.getStringArray(R.array.picture_mode_ref_entry_values_hdr)
         }
     }
 
@@ -116,14 +106,9 @@ class VideoPreferencesFragment : BasePreferenceFragment(R.xml.video_prefs),
     }
 
     private fun setupUserMode() {
-        if (isCurrentTvModelP1Croods) return
-        if (!isCurrentModeUser()) {
+        if (pictureSettings.pictureMode != PictureSettings.PICTURE_MODE_USER) {
             pictureSettings.pictureMode = PictureSettings.PICTURE_MODE_USER
         }
-    }
-
-    private fun isCurrentModeUser(): Boolean {
-        return pictureSettings.pictureMode == PictureSettings.PICTURE_MODE_USER
     }
 
     override fun onGlobalSettingChanged(key: String) {
@@ -140,8 +125,7 @@ class VideoPreferencesFragment : BasePreferenceFragment(R.xml.video_prefs),
                 pictureSettings.isLocalContrastEnabled
             GlobalSettings.Keys.PICTURE_ADAPTIVE_LUMA_CONTROL -> adaptiveLumaPref.isChecked =
                 pictureSettings.isAdaptiveLumaEnabled
-            GlobalSettings.Keys.PICTURE_LIST_HDR -> hdrPref.isChecked =
-                pictureSettings.isHdrEnabled
+            GlobalSettings.Keys.PICTURE_LIST_HDR -> hdrPref.isChecked = pictureSettings.isHdrEnabled
         }
     }
 

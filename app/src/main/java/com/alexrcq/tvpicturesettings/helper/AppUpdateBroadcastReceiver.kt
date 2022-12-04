@@ -7,6 +7,7 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import timber.log.Timber
 
 class AppUpdateBroadcastReceiver: BroadcastReceiver() {
+
     override fun onReceive(context: Context, intent: Intent) {
         Timber.e(intent.action)
         if (intent.action == Intent.ACTION_MY_PACKAGE_REPLACED) {

@@ -11,7 +11,7 @@ interface GlobalSettingsObserver {
         onGlobalSettingChangedCallback: OnGlobalSettingChangedCallback
     )
 
-    interface OnGlobalSettingChangedCallback {
+    fun interface OnGlobalSettingChangedCallback {
         fun onGlobalSettingChanged(key: String)
     }
 }

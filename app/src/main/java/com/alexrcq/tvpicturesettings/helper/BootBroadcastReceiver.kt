@@ -13,15 +13,12 @@ class BootBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun onBootCompleted(context: Context) {
-        setupDarkMode(AppPreferences(context), AlarmScheduler(context))
-    }
-
-    private fun setupDarkMode(appPreferences: AppPreferences, alarmScheduler: AlarmScheduler) {
+        val appPreferences = AppPreferences(context)
         if (appPreferences.isDayModeAfterScreenOnEnabled) {
             DarkModeManager.requireInstance().isDarkModeEnabled = false
         }
         if (appPreferences.isAutoDarkModeEnabled) {
-            alarmScheduler.apply {
+            AlarmScheduler(context).apply {
                 setDailyAlarm(AlarmScheduler.AlarmType.DAY_MODE_ALARM, appPreferences.dayModeTime)
                 setDailyAlarm(AlarmScheduler.AlarmType.DARK_MODE_ALARM, appPreferences.darkModeTime)
             }

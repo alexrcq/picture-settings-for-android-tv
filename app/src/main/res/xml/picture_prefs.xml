@@ -17,8 +17,12 @@
         app:title="@string/take_screenshot" />
     <Preference
         app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.VideoPreferencesFragment"
+        app:isPreferenceVisible="false"
         app:key="video_preferences"
         app:title="@string/video_preferences" />
+    <Preference
+        app:key="open_picture_settings"
+        app:title="@string/open_picture_settings" />
     <PreferenceCategory app:title="@string/dark_mode_preferences" />
     <Preference
         app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.ScheduledDarkModePreferenceFragment"

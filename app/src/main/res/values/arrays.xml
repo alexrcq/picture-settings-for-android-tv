@@ -8,6 +8,14 @@
         <item>Custom</item>
     </string-array>
 
+    <string-array name="picture_mode_values">
+        <item>7</item>
+        <item>3</item>
+        <item>2</item>
+        <item>9</item>
+        <item>0</item>
+    </string-array>
+
     <string-array name="picture_temperature">
         <item>Warm</item>
         <item>Cold</item>
@@ -24,14 +32,6 @@
         <item>15</item>
         <item>21</item>
         <item>20</item>
-    </string-array>
-
-    <string-array name="picture_mode_values">
-        <item>7</item>
-        <item>3</item>
-        <item>2</item>
-        <item>9</item>
-        <item>0</item>
     </string-array>
 
     <string-array name="picture_temperature_values">
@@ -53,4 +53,28 @@
         <item>2</item>
         <item>3</item>
     </string-array>
+
+    <string-array name="picture_mode_dovi_entries">
+        <item>Dolby Vision Bright</item>
+        <item>Dolby Vision Dark</item>
+    </string-array>
+
+    <string-array name="picture_mode_dovi_entry_values">
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+
+    <string-array name="picture_mode_ref_entries">
+        <item>По умолчанию</item>
+        <item>Яркий</item>
+        <item>Спорт</item>
+        <item>Фильм</item>
+    </string-array>
+
+    <array name="picture_mode_ref_entry_values">
+        <item>7</item>
+        <item>3</item>
+        <item>2</item>
+        <item>9</item>
+    </array>
 </resources>
