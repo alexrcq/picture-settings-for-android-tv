@@ -18,9 +18,4 @@
         <item>Средне</item>
         <item>Сильно</item>
     </array>
-    <array name="picture_mode_ref_entries_hdr">
-        <item>HDR По умолчанию</item>
-        <item>HDR Яркий</item>
-        <item>HDR Фильм</item>
-    </array>
 </resources>

@@ -30,9 +30,7 @@ class DarkModeManager : AccessibilityService() {
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             Timber.d("${intent.action}")
-            if (intent.action == ACTION_SCREEN_ON) {
-                onScreenOn()
-            }
+            handleBroadcastAction(intent.action)
         }
     }
 
@@ -55,6 +53,13 @@ class DarkModeManager : AccessibilityService() {
         }
     }
 
+    private fun handleBroadcastAction(action: String?) {
+        when (action) {
+            ACTION_SCREEN_ON -> onScreenOn()
+            ACTION_TOGGLE_MODE -> toggleDarkmode()
+        }
+    }
+
     private fun showModeChangedToast() {
         val messageResId: Int = if (isDarkModeEnabled) {
             R.string.dark_mode_activated
@@ -70,7 +75,10 @@ class DarkModeManager : AccessibilityService() {
         darkFilter = FullScreenDarkFilter(this).apply {
             alpha = appPreferences.darkFilterPower / 100f
         }
-        registerReceiver(broadcastReceiver, IntentFilter(ACTION_SCREEN_ON))
+        registerReceiver(broadcastReceiver, IntentFilter().apply {
+            addAction(ACTION_SCREEN_ON)
+            addAction(ACTION_TOGGLE_MODE)
+        })
         sharedInstance = this
         application.sendBroadcast(
             Intent(ACTION_SERVICE_CONNECTED).apply {
@@ -101,7 +109,8 @@ class DarkModeManager : AccessibilityService() {
 
     companion object {
         const val ACTION_SERVICE_CONNECTED =
-            "com.alexrcq.tvpicturesettings.helper.DarkModeManager.action.SERVICE_CONNECTED"
+            "com.alexrcq.tvpicturesettings.ACTION_DARK_MODE_MANAGER_CONNECTED"
+        const val ACTION_TOGGLE_MODE = "com.alexrcq.tvpicturesettings.ACTION_TOGGLE_DARK_MODE"
 
         var sharedInstance: DarkModeManager? = null
 
