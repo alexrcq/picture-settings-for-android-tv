@@ -12,7 +12,7 @@ import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.TvConstants
-import com.alexrcq.tvpicturesettings.adblib.AdbShell
+import com.alexrcq.tvpicturesettings.adblib.RemoteAdbShell
 import com.alexrcq.tvpicturesettings.hasActiveTvSource
 import com.alexrcq.tvpicturesettings.helper.DarkModeManager
 import com.alexrcq.tvpicturesettings.helper.GlobalSettingsObserver
@@ -124,16 +124,14 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
 
     private fun onTakeScreenshotClicked() {
         takeScreenshotJob?.cancel()
+        val screenshotsDirPath = Environment.getExternalStorageDirectory().path + "/Screenshots"
         val windowView = requireActivity().window.decorView
         windowView.isVisible = false
+        val adbShell = RemoteAdbShell.getInstance(requireContext())
         takeScreenshotJob = viewLifecycleOwner.lifecycleScope.launch {
             withTimeout(7500) {
-                with(AdbShell.getInstance(requireContext())) {
-                    connect()
-                    takeScreenshot(
-                        Environment.getExternalStorageDirectory().path + "/Screenshots"
-                    )
-                }
+                adbShell.connect()
+                adbShell.captureScreen(screenshotsDirPath)
             }
         }
         takeScreenshotJob?.invokeOnCompletion { cause ->
@@ -147,11 +145,15 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
         }
     }
 
+    private var showScreenCaptureMessageJob: Job? = null
+
     private fun showScreenCaptureResultMessage(@StringRes message: Int) {
+        showScreenCaptureMessageJob?.cancel()
         takeScreenshotPref.summary = getString(message)
-        viewLifecycleOwner.lifecycleScope.launch {
+        showScreenCaptureMessageJob = viewLifecycleOwner.lifecycleScope.launch {
             delay(3500)
-        }.invokeOnCompletion {
+        }
+        showScreenCaptureMessageJob?.invokeOnCompletion {
             takeScreenshotPref.summary = ""
         }
     }
@@ -228,6 +230,6 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
     override fun onDestroyView() {
         super.onDestroyView()
         requireContext().unregisterReceiver(broadcastReceiver)
-        AdbShell.getInstance(requireContext()).disconnect()
+        RemoteAdbShell.getInstance(requireContext()).disconnect()
     }
 }

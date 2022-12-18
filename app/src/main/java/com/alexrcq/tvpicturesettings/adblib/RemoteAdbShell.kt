@@ -2,14 +2,18 @@ package com.alexrcq.tvpicturesettings.adblib
 
 import android.Manifest
 import android.content.Context
-import android.os.FileObserver
+import android.os.FileObserver.CREATE
 import com.alexrcq.tvpicturesettings.BuildConfig
 import com.alexrcq.tvpicturesettings.hasPermission
+import com.alexrcq.tvpicturesettings.waitForFileEvent
 import com.tananaev.adblib.AdbConnection
 import com.tananaev.adblib.AdbCrypto
 import com.tananaev.adblib.AdbStream
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import java.net.Socket
@@ -17,9 +21,9 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
-import kotlin.coroutines.resume
 
-class AdbShell private constructor(
+
+class RemoteAdbShell private constructor(
     private val appContext: Context,
     private val host: String = "127.0.0.1",
     private val port: Int = 5555
@@ -62,11 +66,11 @@ class AdbShell private constructor(
         }
     }
 
-    suspend fun takeScreenshot(savePath: String) {
+    suspend fun captureScreen(screenshotsDirPath: String) = withContext(IO) {
         if (!appContext.hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
             grantPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
-        val saveDir = File(savePath)
+        val saveDir = File(screenshotsDirPath)
         if (!saveDir.exists()) {
             if (!appContext.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 grantPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -76,30 +80,15 @@ class AdbShell private constructor(
         val currentTime = LocalDateTime.now().format(
             DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss_SSS")
         )
-        execute("screencap -p $savePath/screenshot$currentTime.png")
-        waitForScreenshotFileCreation(savePath)
+        val waitForScreenshotFileCreationJob = launch(start = CoroutineStart.UNDISPATCHED) {
+            saveDir.waitForFileEvent(CREATE)
+        }
+        execute("screencap -p ${screenshotsDirPath}/screenshot$currentTime.png")
+        waitForScreenshotFileCreationJob.join()
     }
 
     private fun openShell(): AdbStream? {
         return adbConnection?.open("shell:")
-    }
-
-    private suspend fun waitForScreenshotFileCreation(screenshotsPath: String) {
-        suspendCancellableCoroutine { continuation ->
-            @Suppress("DEPRECATION")
-            val fileObserver = object : FileObserver(screenshotsPath, CREATE) {
-                override fun onEvent(event: Int, path: String?) {
-                    if (event == CREATE) {
-                        continuation.resume(Unit)
-                        stopWatching()
-                    }
-                }
-            }
-            fileObserver.startWatching()
-            continuation.invokeOnCancellation {
-                fileObserver.stopWatching()
-            }
-        }
     }
 
     private fun setupCrypto(pubKeyFile: String, privKeyFile: String): AdbCrypto? {
@@ -142,11 +131,11 @@ class AdbShell private constructor(
         const val CONNECTION_TIMEOUT_SECONDS = 25L
 
         @Volatile
-        private var INSTANCE: AdbShell? = null
+        private var INSTANCE: RemoteAdbShell? = null
 
-        fun getInstance(context: Context): AdbShell =
+        fun getInstance(context: Context): RemoteAdbShell =
             INSTANCE ?: synchronized(this) {
-                INSTANCE ?: AdbShell(context).also { INSTANCE = it }
+                INSTANCE ?: RemoteAdbShell(context).also { INSTANCE = it }
             }
     }
 }

@@ -74,6 +74,7 @@ class DarkModeManager : AccessibilityService() {
         Timber.d("onServiceConnected")
         darkFilter = FullScreenDarkFilter(this).apply {
             alpha = appPreferences.darkFilterPower / 100f
+            isEnabled = appPreferences.isDarkFilterEnabled && appPreferences.isDarkModeEnabled
         }
         registerReceiver(broadcastReceiver, IntentFilter().apply {
             addAction(ACTION_SCREEN_ON)

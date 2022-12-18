@@ -6,7 +6,6 @@ import android.graphics.PixelFormat
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import timber.log.Timber
 
 class FullScreenDarkFilter(val context: AccessibilityService) {
 
@@ -40,15 +39,13 @@ class FullScreenDarkFilter(val context: AccessibilityService) {
         )
         val windowManager =
             context.getSystemService(AccessibilityService.WINDOW_SERVICE) as WindowManager
-        try {
+        if (darkFilterView.parent == null) {
             windowManager.addView(darkFilterView, layoutParams)
-        } catch (e: IllegalStateException) {
-            Timber.d("the dark filter view has already added", e)
         }
     }
 
     private fun disable() {
-        if (darkFilterView.windowToken != null) {
+        if (darkFilterView.parent != null) {
             val windowManager =
                 context.getSystemService(AccessibilityService.WINDOW_SERVICE) as WindowManager
             windowManager.removeView(darkFilterView)

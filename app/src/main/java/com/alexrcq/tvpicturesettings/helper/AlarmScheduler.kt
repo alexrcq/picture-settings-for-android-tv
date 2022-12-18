@@ -28,14 +28,14 @@ class AlarmScheduler @Inject constructor(@ApplicationContext private val context
             context,
             alarmType.ordinal,
             intent,
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
         var alarmDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.parse(alarmTime))
         if (alarmDateTime.isBefore(LocalDateTime.now())) {
             alarmDateTime = alarmDateTime.plusDays(1)
         }
         alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
+            AlarmManager.RTC,
             alarmDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
             AlarmManager.INTERVAL_DAY,
             pendingIntent

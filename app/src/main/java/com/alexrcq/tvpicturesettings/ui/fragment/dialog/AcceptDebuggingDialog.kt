@@ -10,7 +10,7 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.adblib.AdbShell
+import com.alexrcq.tvpicturesettings.adblib.RemoteAdbShell
 import com.alexrcq.tvpicturesettings.enableAccessibilityService
 import com.alexrcq.tvpicturesettings.helper.DarkModeManager
 import com.alexrcq.tvpicturesettings.requestFocusForced
@@ -30,7 +30,7 @@ class AcceptDebuggingDialog: DialogFragment(), DialogInterface.OnShowListener {
     private fun onOkClicked() {
         dialog?.hide()
         lifecycleScope.launch {
-            with(AdbShell.getInstance(requireActivity())) {
+            with(RemoteAdbShell.getInstance(requireActivity())) {
                 try {
                     connect()
                 } catch (e: Exception) {

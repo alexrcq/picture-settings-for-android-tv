@@ -5,8 +5,9 @@ import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
+import javax.inject.Singleton
 
-
+@Singleton
 class AppPreferences @Inject constructor(@ApplicationContext context: Context) {
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
