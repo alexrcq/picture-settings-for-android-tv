@@ -35,7 +35,7 @@ class AlarmScheduler @Inject constructor(@ApplicationContext private val context
             alarmDateTime = alarmDateTime.plusDays(1)
         }
         alarmManager.setRepeating(
-            AlarmManager.RTC,
+            AlarmManager.RTC_WAKEUP,
             alarmDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
             AlarmManager.INTERVAL_DAY,
             pendingIntent

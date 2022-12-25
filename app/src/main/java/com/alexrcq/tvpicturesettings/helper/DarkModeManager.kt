@@ -57,6 +57,8 @@ class DarkModeManager : AccessibilityService() {
         when (action) {
             ACTION_SCREEN_ON -> onScreenOn()
             ACTION_TOGGLE_MODE -> toggleDarkmode()
+            ACTION_ENABLE_MODE -> isDarkModeEnabled = true
+            ACTION_DISABLE_MODE -> isDarkModeEnabled = false
         }
     }
 
@@ -79,6 +81,8 @@ class DarkModeManager : AccessibilityService() {
         registerReceiver(broadcastReceiver, IntentFilter().apply {
             addAction(ACTION_SCREEN_ON)
             addAction(ACTION_TOGGLE_MODE)
+            addAction(ACTION_ENABLE_MODE)
+            addAction(ACTION_DISABLE_MODE)
         })
         sharedInstance = this
         application.sendBroadcast(
@@ -112,11 +116,13 @@ class DarkModeManager : AccessibilityService() {
         const val ACTION_SERVICE_CONNECTED =
             "com.alexrcq.tvpicturesettings.ACTION_DARK_MODE_MANAGER_CONNECTED"
         const val ACTION_TOGGLE_MODE = "com.alexrcq.tvpicturesettings.ACTION_TOGGLE_DARK_MODE"
+        const val ACTION_ENABLE_MODE = "com.alexrcq.tvpicturesettings.ACTION_ENABLE_DARK_MODE"
+        const val ACTION_DISABLE_MODE = "com.alexrcq.tvpicturesettings.ACTION_DISABLE_DARK_MODE"
 
         var sharedInstance: DarkModeManager? = null
 
         fun requireInstance(): DarkModeManager {
-            return sharedInstance ?: throw java.lang.IllegalStateException(
+            return sharedInstance ?: error(
                 "${DarkModeManager::class.java.simpleName} is not initialized yet"
             )
         }
