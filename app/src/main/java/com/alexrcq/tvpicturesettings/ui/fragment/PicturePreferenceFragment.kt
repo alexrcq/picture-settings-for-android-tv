@@ -1,5 +1,7 @@
 package com.alexrcq.tvpicturesettings.ui.fragment
 
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.*
 import android.os.Bundle
 import android.os.Environment
@@ -10,14 +12,12 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
-import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.TvConstants
-import com.alexrcq.tvpicturesettings.adblib.RemoteAdbShell
-import com.alexrcq.tvpicturesettings.hasActiveTvSource
+import com.alexrcq.tvpicturesettings.*
+import com.alexrcq.tvpicturesettings.TvConstants.TV_MODEL_CROODS
+import com.alexrcq.tvpicturesettings.adblib.AdbShell
 import com.alexrcq.tvpicturesettings.helper.DarkModeManager
 import com.alexrcq.tvpicturesettings.helper.GlobalSettingsObserver
 import com.alexrcq.tvpicturesettings.helper.GlobalSettingsObserverImpl
-import com.alexrcq.tvpicturesettings.isCurrentTvModelP1Croods
 import com.alexrcq.tvpicturesettings.storage.AppPreferences
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BACKLIGHT
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_FILTER_POWER
@@ -29,13 +29,18 @@ import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TURN_OFF_SCREEN
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.VIDEO_PREFERENCES
 import com.alexrcq.tvpicturesettings.storage.GlobalSettings
 import com.alexrcq.tvpicturesettings.storage.PictureSettings
+import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AdbRequiredDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.LoadingDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import java.io.File
 import javax.inject.Inject
+
+private const val SCREENSHOTS_FOLDER_NAME = "Screenshots"
+private const val SCREEN_CAPTURE_TIMEOUT = 7500L
 
 @AndroidEntryPoint
 class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
@@ -43,6 +48,9 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
 
     @Inject
     lateinit var pictureSettings: PictureSettings
+
+    @Inject
+    lateinit var adbShell: AdbShell
 
     @Inject
     lateinit var appPreferences: AppPreferences
@@ -102,13 +110,13 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
             true
         }
         findPreference<Preference>(OPEN_PICTURE_SETTINGS)?.apply {
-            isVisible = isCurrentTvModelP1Croods
+            isVisible = isModelName(TV_MODEL_CROODS)
             setOnPreferenceClickListener {
                 openPictureSettings()
                 true
             }
         }
-        findPreference<Preference>(VIDEO_PREFERENCES)?.isVisible = !isCurrentTvModelP1Croods
+        findPreference<Preference>(VIDEO_PREFERENCES)?.isVisible = !isModelName(TV_MODEL_CROODS)
     }
 
     private fun openPictureSettings() {
@@ -124,14 +132,16 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
 
     private fun onTakeScreenshotClicked() {
         takeScreenshotJob?.cancel()
-        val screenshotsDirPath = Environment.getExternalStorageDirectory().path + "/Screenshots"
+        if (!requireContext().isAdbEnabled) {
+            AdbRequiredDialog().show(childFragmentManager, AdbRequiredDialog.TAG)
+            return
+        }
         val windowView = requireActivity().window.decorView
         windowView.isVisible = false
-        val adbShell = RemoteAdbShell.getInstance(requireContext())
         takeScreenshotJob = viewLifecycleOwner.lifecycleScope.launch {
-            withTimeout(7500) {
+            withTimeout(SCREEN_CAPTURE_TIMEOUT) {
                 adbShell.connect()
-                adbShell.captureScreen(screenshotsDirPath)
+                adbShell.captureScreen(saveDir = prepareScreenshotsDir())
             }
         }
         takeScreenshotJob?.invokeOnCompletion { cause ->
@@ -143,6 +153,23 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
                 )
             }
         }
+    }
+
+    private suspend fun prepareScreenshotsDir(): File {
+        if (!requireContext().hasPermission(READ_EXTERNAL_STORAGE) &&
+            !requireContext().hasPermission(WRITE_EXTERNAL_STORAGE)
+        ) {
+            adbShell.grantPermission(READ_EXTERNAL_STORAGE)
+            adbShell.grantPermission(WRITE_EXTERNAL_STORAGE)
+        }
+        val fullPath =
+            Environment.getExternalStorageDirectory().path + "/" + SCREENSHOTS_FOLDER_NAME
+        val screenshotsDir = File(fullPath)
+        if (screenshotsDir.exists()) {
+            return screenshotsDir
+        }
+        screenshotsDir.mkdirs()
+        return screenshotsDir
     }
 
     private var showScreenCaptureMessageJob: Job? = null
@@ -230,6 +257,6 @@ class PicturePreferenceFragment : BasePreferenceFragment(R.xml.picture_prefs),
     override fun onDestroyView() {
         super.onDestroyView()
         requireContext().unregisterReceiver(broadcastReceiver)
-        RemoteAdbShell.getInstance(requireContext()).disconnect()
+        adbShell.disconnect()
     }
 }

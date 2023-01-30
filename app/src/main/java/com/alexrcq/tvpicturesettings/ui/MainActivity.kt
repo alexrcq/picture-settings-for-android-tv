@@ -8,8 +8,8 @@ import androidx.fragment.app.FragmentActivity
 import com.alexrcq.tvpicturesettings.*
 import com.alexrcq.tvpicturesettings.helper.DarkModeManager
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AcceptDebuggingDialog
+import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AdbRequiredDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.NotSupportedTVDialog
-import com.alexrcq.tvpicturesettings.ui.fragment.dialog.UsbDebuggingRequiredDialog
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -20,10 +20,9 @@ class MainActivity : FragmentActivity() {
             NotSupportedTVDialog().show(supportFragmentManager, NotSupportedTVDialog.TAG)
             return
         }
-        if (!isDebuggingEnabled) {
-            UsbDebuggingRequiredDialog().show(
-                supportFragmentManager,
-                UsbDebuggingRequiredDialog.TAG
+        if (!isAdbEnabled && !hasPermission(Manifest.permission.WRITE_SECURE_SETTINGS)) {
+            AdbRequiredDialog().show(
+                supportFragmentManager, AdbRequiredDialog.TAG
             )
             return
         }
@@ -32,7 +31,7 @@ class MainActivity : FragmentActivity() {
             AcceptDebuggingDialog().show(supportFragmentManager, AcceptDebuggingDialog.TAG)
             return
         }
-        if (!isDarkModeManagerEnabled) {
+        if (!isAccessibilityServiceEnabled(DarkModeManager::class.java)) {
             enableAccessibilityService(DarkModeManager::class.java)
         }
     }

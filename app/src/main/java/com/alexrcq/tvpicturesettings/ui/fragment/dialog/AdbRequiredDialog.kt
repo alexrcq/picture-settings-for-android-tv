@@ -12,7 +12,7 @@ import androidx.fragment.app.DialogFragment
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.requestFocusForced
 
-class UsbDebuggingRequiredDialog : DialogFragment(), DialogInterface.OnShowListener{
+class AdbRequiredDialog : DialogFragment(), DialogInterface.OnShowListener{
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val alertDialog = AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert)
             .setMessage(R.string.adb_debugging_required)

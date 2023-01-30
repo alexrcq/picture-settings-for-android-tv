@@ -24,7 +24,7 @@
     <string name="make_it_even_darker_summary">Помимо ночного снижения подсветки, накладывать прозрачный чёрный прямоугольник поверх изображения телевизора</string>
     <string name="open_settings">Открыть настройки</string>
     <string name="power_picture_off">Выключить экран</string>
-    <string name="adb_debugging_required">Для работы приложения требуется включить отладку по USB в настройках для разработчиков</string>
+    <string name="adb_debugging_required">Необходимо включить отладку по USB в настройках для разработчиков</string>
     <string name="wait_for_debug_window">В следующем окне отметьте галочкой \"Всегда разрешать отладку с этого компьютера\" и нажмите ОК.</string>
     <string name="dark_mode_activated">Переход в ночной режим…</string>
     <string name="day_mode_activated">Переход в дневной режим…</string>

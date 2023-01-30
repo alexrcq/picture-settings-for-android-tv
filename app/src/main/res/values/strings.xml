@@ -24,7 +24,7 @@
     <string name="make_it_even_darker_summary">The enabled preference overlays a non-interactive transparent dark rectangle on top of the TV picture in the dark mode</string>
     <string name="open_settings">Open settings</string>
     <string name="power_picture_off">Turn off the screen</string>
-    <string name="adb_debugging_required">The app requires enabled USB debugging</string>
+    <string name="adb_debugging_required">You need to enable USB debugging in developer options.</string>
     <string name="wait_for_debug_window">In the next window, check the "Always allow from this computer" checkbox, then click OK.</string>
     <string name="dark_mode_activated">Switching to night mode…</string>
     <string name="day_mode_activated">Switching to day mode…</string>

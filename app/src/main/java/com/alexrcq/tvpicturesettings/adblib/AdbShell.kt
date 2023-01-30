@@ -1,6 +1,5 @@
 package com.alexrcq.tvpicturesettings.adblib
 
-import android.Manifest
 import android.content.Context
 import android.os.FileObserver.CREATE
 import com.alexrcq.tvpicturesettings.BuildConfig
@@ -23,8 +22,10 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 
-class RemoteAdbShell private constructor(
-    private val appContext: Context,
+private const val CONNECTION_TIMEOUT_SECONDS = 25L
+
+class AdbShell(
+    private val context: Context,
     private val host: String = "127.0.0.1",
     private val port: Int = 5555
 ) {
@@ -36,9 +37,7 @@ class RemoteAdbShell private constructor(
             adbConnection = createConnection()
             Timber.d("connecting...")
             val isConnectionEstablished = adbConnection?.connect(
-                CONNECTION_TIMEOUT_SECONDS,
-                TimeUnit.SECONDS,
-                false
+                CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS, false
             )
             if (isConnectionEstablished == false) {
                 throw TimeoutException("adb connection timeout")
@@ -57,7 +56,7 @@ class RemoteAdbShell private constructor(
         execute("pm grant ${BuildConfig.APPLICATION_ID} $permission")
         while (true) {
             delay(50)
-            if (appContext.hasPermission(permission)) {
+            if (context.hasPermission(permission)) {
                 // added extra time to permissions handling
                 delay(200)
                 Timber.d("$permission granted")
@@ -66,25 +65,15 @@ class RemoteAdbShell private constructor(
         }
     }
 
-    suspend fun captureScreen(screenshotsDirPath: String) = withContext(IO) {
-        if (!appContext.hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            grantPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-        }
-        val saveDir = File(screenshotsDirPath)
-        if (!saveDir.exists()) {
-            if (!appContext.hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                grantPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            }
-            saveDir.mkdirs()
-        }
+    suspend fun captureScreen(saveDir: File) = withContext(IO) {
         val currentTime = LocalDateTime.now().format(
             DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss_SSS")
         )
-        val waitForScreenshotFileCreationJob = launch(start = CoroutineStart.UNDISPATCHED) {
+        val waitForFileCreationJob = launch(start = CoroutineStart.UNDISPATCHED) {
             saveDir.waitForFileEvent(CREATE)
         }
-        execute("screencap -p ${screenshotsDirPath}/screenshot$currentTime.png")
-        waitForScreenshotFileCreationJob.join()
+        execute("screencap -p ${saveDir.path}/screenshot$currentTime.png")
+        waitForFileCreationJob.join()
     }
 
     private fun openShell(): AdbStream? {
@@ -113,7 +102,7 @@ class RemoteAdbShell private constructor(
     }
 
     private fun createConnection(): AdbConnection {
-        val path = appContext.cacheDir.absolutePath
+        val path = context.cacheDir.absolutePath
         val crypto = setupCrypto("$path/pub.key", "$path/priv.key")
         val socket = Socket(host, port)
         return AdbConnection.create(socket, crypto)
@@ -125,17 +114,5 @@ class RemoteAdbShell private constructor(
             isConnected = false
             Timber.d("disconnected")
         }
-    }
-
-    companion object {
-        const val CONNECTION_TIMEOUT_SECONDS = 25L
-
-        @Volatile
-        private var INSTANCE: RemoteAdbShell? = null
-
-        fun getInstance(context: Context): RemoteAdbShell =
-            INSTANCE ?: synchronized(this) {
-                INSTANCE ?: RemoteAdbShell(context).also { INSTANCE = it }
-            }
     }
 }

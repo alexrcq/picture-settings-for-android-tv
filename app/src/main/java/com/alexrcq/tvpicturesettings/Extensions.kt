@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.FileObserver
 import android.provider.Settings
 import android.widget.Button
-import com.alexrcq.tvpicturesettings.helper.DarkModeManager
 import com.alexrcq.tvpicturesettings.storage.PictureSettingsImpl
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
@@ -45,7 +44,7 @@ val Context.hasActiveTvSource: Boolean
         return currentSourceName != "Null"
     }
 
-val Context.isDebuggingEnabled: Boolean
+val Context.isAdbEnabled: Boolean
     get() = Settings.Global.getInt(contentResolver, Settings.Global.ADB_ENABLED, 0) == 1
 
 val Context.isCurrentTvSupported: Boolean
@@ -59,18 +58,17 @@ val Context.isCurrentTvSupported: Boolean
         }
     }
 
-val isCurrentTvModelP1Croods: Boolean
-    get() = Build.MODEL.contains(TvConstants.TV_MODEL_CROODS, true)
+fun isModelName(modelName: String): Boolean {
+    return Build.MODEL.contains(modelName, true)
+}
 
-val Context.isDarkModeManagerEnabled: Boolean
-    get() {
-        val allEnabledServices = Settings.Secure.getString(
-            contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        )
-        return allEnabledServices != null &&
-                allEnabledServices.contains(packageName + "/" + DarkModeManager::class.java.name)
-    }
+fun Context.isAccessibilityServiceEnabled(cls: Class<out AccessibilityService>): Boolean {
+    val allEnabledServices = Settings.Secure.getString(
+        contentResolver,
+        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+    )
+    return allEnabledServices != null && allEnabledServices.contains(packageName + "/" + cls.name)
+}
 
 fun Context.enableAccessibilityService(cls: Class<out AccessibilityService>) {
     Timber.d("enabling the ${cls.name} service...")
