@@ -8,7 +8,7 @@ import android.os.Build
 import android.os.FileObserver
 import android.provider.Settings
 import android.widget.Button
-import com.alexrcq.tvpicturesettings.storage.PictureSettingsImpl
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_ADAPTIVE_LUMA_CONTROL
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import java.io.File
@@ -51,7 +51,7 @@ val Context.isCurrentTvSupported: Boolean
     get() {
         return try {
             // just trying to take a random setting
-            PictureSettingsImpl(this).isAdaptiveLumaEnabled
+            Settings.Global.getInt(contentResolver, PICTURE_ADAPTIVE_LUMA_CONTROL, 0)
             true
         } catch (e: Settings.SettingNotFoundException) {
             false

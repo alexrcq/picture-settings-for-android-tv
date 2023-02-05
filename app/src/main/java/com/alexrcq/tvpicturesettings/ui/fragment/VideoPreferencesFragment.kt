@@ -1,154 +1,100 @@
 package com.alexrcq.tvpicturesettings.ui.fragment
 
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
-import androidx.preference.ListPreference
 import androidx.preference.Preference
-import androidx.preference.SeekBarPreference
 import androidx.preference.SwitchPreference
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.helper.GlobalSettingsObserver
-import com.alexrcq.tvpicturesettings.helper.GlobalSettingsObserverImpl
-import com.alexrcq.tvpicturesettings.storage.AppPreferences
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.ADAPTIVE_LUMA_CONTROL
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BRIGHTNESS
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.CONTRAST
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.HDR
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.HUE
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.LOCAL_CONTRAST_CONTROL
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.NOISE_REDUCTION
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.PICTURE_MODE
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.SATURATION
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.SHARPNESS
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TEMPERATURE
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings
-import com.alexrcq.tvpicturesettings.storage.PictureSettings
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.RESET_TO_DEFAULT
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_ADAPTIVE_LUMA_CONTROL
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_BRIGHTNESS
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_CONTRAST
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_HUE
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_LIST_HDR
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_LOCAL_CONTRAST
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_MODE
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_SATURATION
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_SHARPNESS
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_TEMPERATURE
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_MODE_BRIGHT
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_MODE_DEFAULT
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_MODE_MOVIE
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_MODE_SPORT
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_MODE_USER
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_TEMPERATURE_COLD
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_TEMPERATURE_DEFAULT
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_TEMPERATURE_WARM
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.ResetToDefaultDialog
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
-
-@AndroidEntryPoint
-class VideoPreferencesFragment : BasePreferenceFragment(R.xml.video_prefs),
-    GlobalSettingsObserver by GlobalSettingsObserverImpl(),
-    GlobalSettingsObserver.OnGlobalSettingChangedCallback {
-
-    private lateinit var pictureModePref: ListPreference
-    private lateinit var brightnessPref: SeekBarPreference
-    private lateinit var contrastPref: SeekBarPreference
-    private lateinit var saturationPref: SeekBarPreference
-    private lateinit var huePref: SeekBarPreference
-    private lateinit var sharpnessPref: SeekBarPreference
-    private lateinit var temperaturePref: ListPreference
-    private lateinit var noiseReductionPref: ListPreference
-    private lateinit var adaptiveLumaPref: SwitchPreference
-    private lateinit var localContrastPref: SwitchPreference
-    private lateinit var hdrPref: SwitchPreference
-
-    @Inject
-    lateinit var pictureSettings: PictureSettings
+class VideoPreferencesFragment : GlobalSettingsFragment(R.xml.video_prefs) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        iniPreferences()
-        registerGlobalSettingsObserver(viewLifecycleOwner, requireContext().contentResolver, this)
-    }
-
-    private fun iniPreferences() {
-        pictureModePref = requirePreference(PICTURE_MODE)
-        brightnessPref = requirePreference(BRIGHTNESS)
-        contrastPref = requirePreference(CONTRAST)
-        saturationPref = requirePreference(SATURATION)
-        huePref = requirePreference(HUE)
-        sharpnessPref = requirePreference(SHARPNESS)
-        noiseReductionPref = requirePreference(NOISE_REDUCTION)
-        adaptiveLumaPref = requirePreference(ADAPTIVE_LUMA_CONTROL)
-        localContrastPref = requirePreference(LOCAL_CONTRAST_CONTROL)
-        hdrPref = requirePreference(HDR)
-        temperaturePref = requirePreference(TEMPERATURE)
-        findPreference<Preference>(AppPreferences.Keys.RESET_TO_DEFAULT)?.setOnPreferenceClickListener {
-            onResetToDefaultClicked()
+        findPreference<Preference>(RESET_TO_DEFAULT)?.setOnPreferenceClickListener {
+            ResetToDefaultDialog().show(childFragmentManager, ResetToDefaultDialog.TAG)
             true
         }
     }
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
+        super.onPreferenceChange(preference, newValue)
         when (preference.key) {
-            PICTURE_MODE -> pictureSettings.pictureMode = (newValue as String).toInt()
-            BRIGHTNESS -> {
-                pictureSettings.brightness = newValue as Int
-                setupUserMode()
+            PICTURE_MODE -> setPictureTemperature(pictureMode = (newValue as String).toInt())
+            PICTURE_BRIGHTNESS, PICTURE_CONTRAST, PICTURE_SATURATION, PICTURE_HUE, PICTURE_SHARPNESS -> {
+                globalSettings.putInt(PICTURE_MODE, PICTURE_MODE_USER)
             }
-            CONTRAST -> {
-                pictureSettings.contrast = newValue as Int
-                setupUserMode()
+            PICTURE_LOCAL_CONTRAST -> {
+                val enabled = newValue as Boolean
+                val isLocalContrastEnabled = if (enabled) 0 else 2
+                globalSettings.putInt(preference.key, isLocalContrastEnabled)
             }
-            SATURATION -> {
-                pictureSettings.saturation = newValue as Int
-                setupUserMode()
+            PICTURE_ADAPTIVE_LUMA_CONTROL -> {
+                val enabled = newValue as Boolean
+                val isAdaptiveLumaEnabled = if (enabled) 0 else 2
+                globalSettings.putInt(preference.key, isAdaptiveLumaEnabled)
             }
-            HUE -> {
-                pictureSettings.hue = newValue as Int
-                setupUserMode()
-            }
-            SHARPNESS -> {
-                pictureSettings.sharpness = newValue as Int
-                setupUserMode()
-            }
-            TEMPERATURE -> pictureSettings.temperature = (newValue as String).toInt()
-            ADAPTIVE_LUMA_CONTROL -> pictureSettings.isAdaptiveLumaEnabled = newValue as Boolean
-            LOCAL_CONTRAST_CONTROL -> pictureSettings.isLocalContrastEnabled = newValue as Boolean
-            NOISE_REDUCTION -> pictureSettings.noiseReduction = (newValue as String).toInt()
-            HDR -> pictureSettings.isHdrEnabled = newValue as Boolean
         }
         return true
     }
 
-    private fun setupUserMode() {
-        if (pictureSettings.pictureMode != PictureSettings.PICTURE_MODE_USER) {
-            pictureSettings.pictureMode = PictureSettings.PICTURE_MODE_USER
+    private fun setPictureTemperature(pictureMode: Int) {
+        val temperature: Int? = when (pictureMode) {
+            PICTURE_MODE_DEFAULT -> PICTURE_TEMPERATURE_DEFAULT
+            PICTURE_MODE_BRIGHT -> PICTURE_TEMPERATURE_WARM
+            PICTURE_MODE_SPORT -> PICTURE_TEMPERATURE_DEFAULT
+            PICTURE_MODE_MOVIE -> PICTURE_TEMPERATURE_COLD
+            else -> null
+        }
+        if (temperature != null) {
+            globalSettings.putInt(PICTURE_TEMPERATURE, temperature)
         }
     }
 
-    override fun onGlobalSettingChanged(key: String) {
-        val value = Settings.Global.getInt(requireContext().contentResolver, key)
-        when (key) {
-            GlobalSettings.Keys.PICTURE_MODE -> pictureModePref.value = value.toString()
-            GlobalSettings.Keys.PICTURE_TEMPERATURE -> temperaturePref.value = value.toString()
-            GlobalSettings.Keys.PICTURE_SATURATION -> saturationPref.value = value
-            GlobalSettings.Keys.PICTURE_SHARPNESS -> sharpnessPref.value = value
-            GlobalSettings.Keys.PICTURE_CONTRAST -> contrastPref.value = value
-            GlobalSettings.Keys.PICTURE_BRIGHTNESS -> brightnessPref.value = value
-            GlobalSettings.Keys.PICTURE_HUE -> huePref.value = value
-            GlobalSettings.Keys.PICTURE_LOCAL_CONTRAST -> localContrastPref.isChecked =
-                pictureSettings.isLocalContrastEnabled
-            GlobalSettings.Keys.PICTURE_ADAPTIVE_LUMA_CONTROL -> adaptiveLumaPref.isChecked =
-                pictureSettings.isAdaptiveLumaEnabled
-            GlobalSettings.Keys.PICTURE_LIST_HDR -> hdrPref.isChecked = pictureSettings.isHdrEnabled
+    override fun updatePreference(preference: Preference) {
+        super.updatePreference(preference)
+        when (preference.key) {
+            PICTURE_LOCAL_CONTRAST -> {
+                val localContrastPref = preference as SwitchPreference
+                localContrastPref.isChecked = when (globalSettings.getInt(PICTURE_LOCAL_CONTRAST)) {
+                    0 -> true
+                    else -> false
+                }
+            }
+            PICTURE_ADAPTIVE_LUMA_CONTROL -> {
+                val adaptiveLumaPref = preference as SwitchPreference
+                adaptiveLumaPref.isChecked =
+                    when (globalSettings.getInt(PICTURE_ADAPTIVE_LUMA_CONTROL)) {
+                        0 -> true
+                        else -> false
+                    }
+            }
+            PICTURE_LIST_HDR -> {
+                val hdrPref = preference as SwitchPreference
+                hdrPref.isChecked = when (globalSettings.getInt(PICTURE_LIST_HDR)) {
+                    1 -> true
+                    else -> false
+                }
+            }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        updateUi()
-    }
-
-    private fun updateUi() {
-        pictureModePref.value = pictureSettings.pictureMode.toString()
-        brightnessPref.value = pictureSettings.brightness
-        contrastPref.value = pictureSettings.contrast
-        saturationPref.value = pictureSettings.saturation
-        huePref.value = pictureSettings.hue
-        sharpnessPref.value = pictureSettings.sharpness
-        temperaturePref.value = pictureSettings.temperature.toString()
-        noiseReductionPref.value = pictureSettings.noiseReduction.toString()
-        localContrastPref.isChecked = pictureSettings.isLocalContrastEnabled
-        adaptiveLumaPref.isChecked = pictureSettings.isAdaptiveLumaEnabled
-        hdrPref.isChecked = pictureSettings.isHdrEnabled
-    }
-
-    private fun onResetToDefaultClicked() {
-        ResetToDefaultDialog().show(childFragmentManager, ResetToDefaultDialog.TAG)
     }
 }

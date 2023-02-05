@@ -14,16 +14,10 @@ import com.alexrcq.tvpicturesettings.adblib.AdbShell
 import com.alexrcq.tvpicturesettings.enableAccessibilityService
 import com.alexrcq.tvpicturesettings.helper.DarkModeManager
 import com.alexrcq.tvpicturesettings.requestFocusForced
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class AcceptDebuggingDialog : DialogFragment(), DialogInterface.OnShowListener {
-
-    @Inject
-    lateinit var adbShell: AdbShell
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val alertDialog =
@@ -38,6 +32,7 @@ class AcceptDebuggingDialog : DialogFragment(), DialogInterface.OnShowListener {
     private fun onOkClicked() {
         dialog?.hide()
         lifecycleScope.launch {
+            val adbShell = AdbShell(requireContext())
             try {
                 adbShell.connect()
             } catch (e: Exception) {

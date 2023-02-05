@@ -2,74 +2,66 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/video_preferences">
-    <ListPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalListPreferences
         app:entries="@array/picture_mode"
         app:entryValues="@array/picture_mode_values"
         app:key="picture_mode"
-        app:persistent="false"
         app:title="@string/picture_mode"
         app:useSimpleSummaryProvider="true" />
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:key="brightness"
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
+        app:key="picture_brightness"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:persistent="false"
         app:title="@string/brightness" />
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:key="contrast"
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
+        app:key="picture_contrast"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:persistent="false"
         app:title="@string/contrast" />
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:key="saturation"
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
+        app:key="picture_saturation"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:persistent="false"
         app:title="@string/saturation" />
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:key="hue"
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
+        app:key="picture_hue"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:persistent="false"
         app:title="@string/hue"
         app:min="-50"
         android:max="50"/>
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:key="sharpness"
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
+        app:key="picture_sharpness"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:persistent="false"
         app:title="@string/sharpness"
         android:max="20" />
-    <ListPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalListPreferences
         app:entries="@array/picture_temperature"
         app:entryValues="@array/picture_temperature_values"
-        app:key="temperature"
-        app:persistent="false"
+        app:key="picture_color_temperature"
         app:title="@string/color_temperature"
         app:useSimpleSummaryProvider="true" />
-    <ListPreference
-        app:persistent="false"
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalListPreferences
         app:title="@string/noise_reduction"
-        app:key="noise_reduction"
+        app:key="tv_picture_advance_video_dnr"
         app:entries="@array/picture_advanced_video_noise_reduction_entries"
         app:entryValues="@array/picture_advanced_video_noise_reduction_values"
         app:useSimpleSummaryProvider="true"/>
     <SwitchPreference
         app:persistent="false"
         app:title="@string/adaptive_luma_control"
-        app:key="adaptive_luma_control" />
+        app:key="tv_picture_video_adaptive_luma_control" />
     <SwitchPreference
         app:persistent="false"
         app:title="@string/local_contrast_control"
-        app:key="local_contrast_control" />
+        app:key="tv_picture_video_local_contrast_control" />
     <SwitchPreference
-        android:key="hdr"
+        android:key="picture_list_hdr"
         android:persistent="false"
         android:title="HDR" />
     <Preference
-        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerPreferenceFragment"
+        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerFragment"
         app:key="color_tuner"
         app:title="@string/color_tuner"/>
     <Preference

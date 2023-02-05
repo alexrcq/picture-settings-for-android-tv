@@ -17,9 +17,4 @@ abstract class BasePreferenceFragment(@XmlRes private val preferencesResId: Int)
             preference.onPreferenceChangeListener = this
         }
     }
-
-    fun <T: Preference> requirePreference(key: String): T {
-        val preference = findPreference<T>(key)
-        return checkNotNull(preference) { "Preference $key not found" }
-    }
 }

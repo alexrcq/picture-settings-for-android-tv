@@ -21,7 +21,6 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-
 private const val CONNECTION_TIMEOUT_SECONDS = 25L
 
 class AdbShell(

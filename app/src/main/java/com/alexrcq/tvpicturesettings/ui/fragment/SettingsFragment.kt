@@ -16,7 +16,7 @@ import com.alexrcq.tvpicturesettings.ui.preference.TimePickerPreference
 class SettingsFragment : LeanbackSettingsFragmentCompat() {
 
     override fun onPreferenceStartInitialScreen() {
-        startPreferenceFragment(PicturePreferenceFragment())
+        startPreferenceFragment(PictureFragment())
     }
 
     override fun onPreferenceStartFragment(
@@ -25,12 +25,12 @@ class SettingsFragment : LeanbackSettingsFragmentCompat() {
     ): Boolean {
         when (pref.key) {
             VIDEO_PREFERENCES -> startPreferenceFragment(VideoPreferencesFragment())
-            COLOR_TUNER -> startPreferenceFragment(ColorTunerPreferenceFragment())
-            SATURATION_TUNE -> startPreferenceFragment(SaturationTunePreferenceFragment())
-            HUE_TUNE -> startPreferenceFragment(HueTunePreferenceFragment())
-            BRIGHTNESS_TUNE -> startPreferenceFragment(BrightnessTunePreferenceFragment())
-            OFFSET_TUNE -> startPreferenceFragment(OffsetTunePreferenceFragment())
-            SCHEDULED_DARK_MODE -> startPreferenceFragment(ScheduledDarkModePreferenceFragment())
+            COLOR_TUNER -> startPreferenceFragment(ColorTunerFragment())
+            SATURATION_TUNE -> startPreferenceFragment(SaturationTuneFragment())
+            HUE_TUNE -> startPreferenceFragment(HueTuneFragment())
+            BRIGHTNESS_TUNE -> startPreferenceFragment(BrightnessTuneFragment())
+            OFFSET_TUNE -> startPreferenceFragment(OffsetTuneFragment())
+            SCHEDULED_DARK_MODE -> startPreferenceFragment(ScheduledDarkModeFragment())
         }
         return true
     }

@@ -3,9 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     app:title="@string/picture">
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:key="backlight"
-        app:persistent="false"
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
+        app:key="picture_backlight"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/backlight" />

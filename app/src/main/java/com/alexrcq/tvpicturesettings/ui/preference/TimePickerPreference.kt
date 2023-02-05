@@ -11,7 +11,6 @@ import timber.log.Timber
 import java.time.LocalTime
 import java.time.format.DateTimeParseException
 
-
 class TimePickerPreference @JvmOverloads constructor(
     context: Context,
     attributeSet: AttributeSet? = null,

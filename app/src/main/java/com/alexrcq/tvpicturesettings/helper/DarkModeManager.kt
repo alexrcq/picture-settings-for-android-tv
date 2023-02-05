@@ -6,24 +6,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_SCREEN_ON
 import android.content.IntentFilter
+import android.provider.Settings
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.storage.AppPreferences
-import com.alexrcq.tvpicturesettings.storage.PictureSettings
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_BACKLIGHT
+import com.alexrcq.tvpicturesettings.storage.appPreferences
 import com.alexrcq.tvpicturesettings.ui.FullScreenDarkFilter
-import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class DarkModeManager : AccessibilityService() {
-
-    @Inject
-    lateinit var pictureSettings: PictureSettings
-
-    @Inject
-    lateinit var appPreferences: AppPreferences
 
     lateinit var darkFilter: FullScreenDarkFilter
 
@@ -46,11 +38,12 @@ class DarkModeManager : AccessibilityService() {
         }
 
     private fun handleBacklight() {
-        pictureSettings.backlight = if (isDarkModeEnabled) {
+        val backlight = if (isDarkModeEnabled) {
             appPreferences.nightBacklight
         } else {
             appPreferences.dayBacklight
         }
+        Settings.Global.putInt(contentResolver, PICTURE_BACKLIGHT, backlight)
     }
 
     private fun handleBroadcastAction(action: String?) {

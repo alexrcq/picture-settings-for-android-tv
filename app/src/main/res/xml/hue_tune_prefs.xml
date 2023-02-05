@@ -1,62 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/hue">
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:defaultValue="50"
-        app:key="tuner_hue_blue"
-        app:persistent="false"
+    <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
+        app:key="tv_picture_color_tune_hue_blue"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/blue" />
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:defaultValue="50"
-        app:key="tuner_hue_cvan"
-        app:persistent="false"
+    <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
+        app:key="tv_picture_color_tune_hue_cvan"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/cvan" />
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:defaultValue="50"
-        app:key="tuner_hue_flesh_tone"
-        app:persistent="false"
+    <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
+        app:key="tv_picture_color_tune_hue_flesh_tone"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/flesh_tone" />
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:defaultValue="50"
-        app:key="tuner_hue_green"
-        app:persistent="false"
+    <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
+        app:key="tv_picture_color_tune_hue_green"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/green" />
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:defaultValue="50"
-        app:key="tuner_hue_magenta"
-        app:persistent="false"
+    <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
+        app:key="tv_picture_color_tune_hue_megenta"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/magenta" />
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:key="tuner_hue_red"
-        app:defaultValue="50"
-        app:persistent="false"
+    <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
+        app:key="tv_picture_color_tune_hue_red"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/red" />
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:defaultValue="50"
-        app:key="tuner_hue_yellow"
-        app:persistent="false"
+    <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
+        app:key="tv_picture_color_tune_hue_yellow"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/yellow" />
     <PreferenceCategory app:title="@string/advanced"/>
     <Preference
-        app:key="tuner_hue_reset"
+        app:key="reset_tuner_values"
         app:title="@string/reset_values"/>
 </PreferenceScreen>

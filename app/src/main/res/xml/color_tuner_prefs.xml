@@ -2,58 +2,55 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/color_tuner">
     <SwitchPreference
-        app:key="color_tuner_enabled"
+        app:key="tv_picture_color_tune_enable"
         app:persistent="false"
         app:title="@string/enable" />
     <PreferenceCategory
         app:title="@string/color_gain"
-        app:dependency="color_tuner_enabled"/>
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:key="color_tuner_red_gain"
-        app:persistent="false"
+        app:dependency="tv_picture_color_tune_enable"/>
+    <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
+        app:dependency="tv_picture_color_tune_enable"
+        app:key="tv_picture_color_tune_gain_red"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:dependency="color_tuner_enabled"
         app:title="@string/red" />
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:key="color_tuner_green_gain"
-        app:persistent="false"
+    <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
+        app:dependency="tv_picture_color_tune_enable"
+        app:key="tv_picture_color_tune_gain_green"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:dependency="color_tuner_enabled"
         app:title="@string/green" />
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        app:key="color_tuner_blue_gain"
-        app:persistent="false"
+    <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
+        app:dependency="tv_picture_color_tune_enable"
+        app:key="tv_picture_color_tune_gain_blue"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:thumbTint="@color/default_background"
-        app:dependency="color_tuner_enabled"
         app:title="@string/blue" />
     <Preference
         app:key="color_tuner_gain_reset"
         app:title="@string/reset_values"/>
     <PreferenceCategory
         app:title="@string/advanced"
-        app:dependency="color_tuner_enabled"/>
+        app:dependency="tv_picture_color_tune_enable"/>
     <Preference
         app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.SaturationTunePreferenceFragment"
         app:key="saturation_tune"
         app:title="@string/saturation"
-        app:dependency="color_tuner_enabled"/>
+        app:dependency="tv_picture_color_tune_enable"/>
     <Preference
         app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.HueTunePreferenceFragment"
         app:key="hue_tune"
         app:title="@string/hue"
-        app:dependency="color_tuner_enabled"/>
+        app:dependency="tv_picture_color_tune_enable"/>
     <Preference
         app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.BrightnessTunePreferenceFragment"
         app:key="brightness_tune"
         app:title="@string/brightness"
-        app:dependency="color_tuner_enabled"/>
+        app:dependency="tv_picture_color_tune_enable"/>
     <Preference
         app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.OffsetTunePreferenceFragment"
         app:key="offset_tune"
         app:title="@string/offset"
-        app:dependency="color_tuner_enabled"/>
+        app:dependency="tv_picture_color_tune_enable"/>
 </PreferenceScreen>
