@@ -74,7 +74,6 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
             }
         }
         backlightPref = findPreference<SeekBarPreference>(PICTURE_BACKLIGHT)?.apply {
-            onPreferenceChangeListener = this@PictureFragment
             setOnPreferenceClickListener {
                 onBacklightPreferenceClicked()
                 true
@@ -153,15 +152,15 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
         return screenshotsDir
     }
 
-    private var showScreenCaptureMessageJob: Job? = null
+    private var delayJob: Job? = null
 
     private fun showScreenCaptureResultMessage(@StringRes message: Int) {
-        showScreenCaptureMessageJob?.cancel()
+        delayJob?.cancel()
         takeScreenshotPref?.summary = getString(message)
-        showScreenCaptureMessageJob = viewLifecycleOwner.lifecycleScope.launch {
+        delayJob = viewLifecycleOwner.lifecycleScope.launch {
             delay(3500)
         }
-        showScreenCaptureMessageJob?.invokeOnCompletion {
+        delayJob?.invokeOnCompletion {
             takeScreenshotPref?.summary = ""
         }
     }

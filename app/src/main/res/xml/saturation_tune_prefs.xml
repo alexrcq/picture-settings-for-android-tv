@@ -1,48 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/saturation">
     <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
-        app:key="tuner_saturation_blue"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
+        app:key="tv_picture_color_tune_saturation_blue"
         app:title="@string/blue" />
     <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
-        app:key="tuner_saturation_cvan"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
+        app:key="tv_picture_color_tune_saturation_cvan"
         app:title="@string/cvan" />
     <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
-        app:key="tuner_saturation_flesh_tone"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
+        app:key="tv_picture_color_tune_saturation_flesh_tone"
         app:title="@string/flesh_tone" />
     <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
-        app:key="tuner_saturation_green"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
+        app:key="tv_picture_color_tune_saturation_green"
         app:title="@string/green" />
     <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
-        app:key="tuner_saturation_magenta"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
+        app:key="tv_picture_color_tune_saturation_megenta"
         app:title="@string/magenta" />
     <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:key="tuner_saturation_red"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
+        app:key="tv_picture_color_tune_saturation_red"
         app:title="@string/red" />
     <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:key="tuner_saturation_yellow"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
+        app:key="tv_picture_color_tune_saturation_yellow"
         app:title="@string/yellow" />
     <PreferenceCategory app:title="@string/advanced"/>
     <Preference
-        app:key="tuner_saturation_reset"
+        app:key="reset_tuner_values"
         app:title="@string/reset_values"/>
 </PreferenceScreen>

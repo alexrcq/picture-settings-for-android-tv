@@ -17,11 +17,10 @@ import com.alexrcq.tvpicturesettings.storage.GlobalSettingsWrapper
 import com.alexrcq.tvpicturesettings.ui.preference.GlobalListPreferences
 import com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
 
-abstract class GlobalSettingsFragment(@XmlRes private val preferencesResId: Int) :
+open class GlobalSettingsFragment(@XmlRes private val preferencesResId: Int) :
     BasePreferenceFragment(preferencesResId) {
 
-    lateinit var contentResolver: ContentResolver
-    lateinit var globalSettings: GlobalSettings
+    private lateinit var contentResolver: ContentResolver
 
     private val contentObserver: ContentObserver =
         object : ContentObserver(Handler(Looper.getMainLooper())) {
@@ -32,6 +31,8 @@ abstract class GlobalSettingsFragment(@XmlRes private val preferencesResId: Int)
                 }
             }
         }
+
+    lateinit var globalSettings: GlobalSettings
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,7 +48,7 @@ abstract class GlobalSettingsFragment(@XmlRes private val preferencesResId: Int)
     override fun onStart() {
         super.onStart()
         preferenceScreen.forEach { preference ->
-           updatePreference(preference)
+            updatePreference(preference)
         }
     }
 

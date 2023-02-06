@@ -1,23 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+<PreferenceScreen
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/offset">
     <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:key="tuner_offset_red"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
+        app:key="tv_picture_color_tune_offset_red"
         app:title="@string/red" />
     <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
-        app:key="tuner_offset_green"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
+        app:key="tv_picture_color_tune_offset_green"
         app:title="@string/green" />
     <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
-        app:key="tuner_offset_blue"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
+        app:key="tv_picture_color_tune_offset_blue"
         app:title="@string/blue" />
     <PreferenceCategory app:title="@string/advanced"/>
     <Preference

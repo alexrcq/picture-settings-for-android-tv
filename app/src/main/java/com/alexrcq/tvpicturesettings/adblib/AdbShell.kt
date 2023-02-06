@@ -47,6 +47,7 @@ class AdbShell(
     }
 
     private suspend fun execute(command: String) = withContext(IO) {
+        if (!isConnected) throw IllegalStateException("connect() first")
         Timber.d(command)
         openShell()?.write("$command\n")
     }

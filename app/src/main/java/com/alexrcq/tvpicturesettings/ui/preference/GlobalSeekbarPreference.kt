@@ -9,5 +9,9 @@ open class GlobalSeekbarPreference @JvmOverloads constructor(
     defStyleAttr: Int = android.R.attr.seekBarStyle
 ) : LeanbackSeekbarPreference(context, attributeSet, defStyleAttr) {
 
-    final override fun isPersistent() = false
+    init {
+        seekBarIncrement = 1
+        isPersistent = false
+        showSeekBarValue = true
+    }
 }

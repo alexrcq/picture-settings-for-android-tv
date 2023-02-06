@@ -10,30 +10,20 @@
         app:useSimpleSummaryProvider="true" />
     <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
         app:key="picture_brightness"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
         app:title="@string/brightness" />
     <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
         app:key="picture_contrast"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
         app:title="@string/contrast" />
     <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
         app:key="picture_saturation"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
         app:title="@string/saturation" />
     <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
         app:key="picture_hue"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
         app:title="@string/hue"
         app:min="-50"
         android:max="50"/>
     <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
         app:key="picture_sharpness"
-        app:seekBarIncrement="1"
-        app:showSeekBarValue="true"
         app:title="@string/sharpness"
         android:max="20" />
     <com.alexrcq.tvpicturesettings.ui.preference.GlobalListPreferences

@@ -96,3 +96,7 @@ suspend fun File.waitForFileEvent(mask: Int) = suspendCancellableCoroutine { con
         fileObserver.stopWatching()
     }
 }
+
+fun Boolean.toInt(): Int = if (this) 1 else 0
+
+fun Int.toBoolean(): Boolean = this == 1
