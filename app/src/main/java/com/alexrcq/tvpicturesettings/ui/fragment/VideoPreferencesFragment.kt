@@ -24,6 +24,8 @@ import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_MODE_
 import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_TEMPERATURE_COLD
 import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_TEMPERATURE_DEFAULT
 import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_TEMPERATURE_WARM
+import com.alexrcq.tvpicturesettings.toBoolean
+import com.alexrcq.tvpicturesettings.toInt
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.ResetToDefaultDialog
 
 class VideoPreferencesFragment : GlobalSettingsFragment(R.xml.video_prefs) {
@@ -52,6 +54,10 @@ class VideoPreferencesFragment : GlobalSettingsFragment(R.xml.video_prefs) {
                 val enabled = newValue as Boolean
                 val isAdaptiveLumaEnabled = if (enabled) 0 else 2
                 globalSettings.putInt(preference.key, isAdaptiveLumaEnabled)
+            }
+            PICTURE_LIST_HDR -> {
+                val isHdrEnabled = newValue as Boolean
+                globalSettings.putInt(preference.key, isHdrEnabled.toInt())
             }
         }
         return true
@@ -90,10 +96,7 @@ class VideoPreferencesFragment : GlobalSettingsFragment(R.xml.video_prefs) {
             }
             PICTURE_LIST_HDR -> {
                 val hdrPref = preference as SwitchPreference
-                hdrPref.isChecked = when (globalSettings.getInt(PICTURE_LIST_HDR)) {
-                    1 -> true
-                    else -> false
-                }
+                hdrPref.isChecked = globalSettings.getInt(PICTURE_LIST_HDR).toBoolean()
             }
         }
     }
