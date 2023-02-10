@@ -36,6 +36,7 @@ import java.io.File
 
 private const val SCREENSHOTS_FOLDER_NAME = "Screenshots"
 private const val SCREEN_CAPTURE_TIMEOUT = 7500L
+private const val SCREEN_CAPTURE_MESSAGE_DURATION = 3500L
 
 class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
 
@@ -158,7 +159,7 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
         delayJob?.cancel()
         takeScreenshotPref?.summary = getString(message)
         delayJob = viewLifecycleOwner.lifecycleScope.launch {
-            delay(3500)
+            delay(SCREEN_CAPTURE_MESSAGE_DURATION)
         }
         delayJob?.invokeOnCompletion {
             takeScreenshotPref?.summary = ""
@@ -176,13 +177,10 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
             PICTURE_BACKLIGHT -> onBacklightPreferenceChange(newValue)
             IS_DARK_FILTER_ENABLED -> onDarkFilterPreferenceChange(newValue)
             NIGHT_BACKLIGHT -> onNightBacklightPreferenceChange(newValue)
-            DARK_FILTER_POWER -> onDarkFilterPowerPreferenceChange(newValue)
+            DARK_FILTER_POWER -> DarkModeManager.requireInstance().darkFilter.alpha =
+                (newValue as Int) / 100f
         }
         return true
-    }
-
-    private fun onDarkFilterPowerPreferenceChange(newValue: Any) {
-        DarkModeManager.requireInstance().darkFilter.alpha = (newValue as Int) / 100f
     }
 
     private fun onNightBacklightPreferenceChange(newValue: Any) {

@@ -7,7 +7,6 @@ import com.alexrcq.tvpicturesettings.hasPermission
 import com.alexrcq.tvpicturesettings.waitForFileEvent
 import com.tananaev.adblib.AdbConnection
 import com.tananaev.adblib.AdbCrypto
-import com.tananaev.adblib.AdbStream
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
@@ -49,7 +48,7 @@ class AdbShell(
     private suspend fun execute(command: String) = withContext(IO) {
         if (!isConnected) throw IllegalStateException("connect() first")
         Timber.d(command)
-        openShell()?.write("$command\n")
+        adbConnection?.open("shell:")?.write("$command\n")
     }
 
     suspend fun grantPermission(permission: String) {
@@ -57,7 +56,7 @@ class AdbShell(
         while (true) {
             delay(50)
             if (context.hasPermission(permission)) {
-                // added extra time to permissions handling
+                // the permission is actually not granted yet, waiting
                 delay(200)
                 Timber.d("$permission granted")
                 break
@@ -74,10 +73,6 @@ class AdbShell(
         }
         execute("screencap -p ${saveDir.path}/screenshot$currentTime.png")
         waitForFileCreationJob.join()
-    }
-
-    private fun openShell(): AdbStream? {
-        return adbConnection?.open("shell:")
     }
 
     private fun setupCrypto(pubKeyFile: String, privKeyFile: String): AdbCrypto? {
