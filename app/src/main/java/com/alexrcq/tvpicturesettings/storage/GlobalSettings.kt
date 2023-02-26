@@ -22,6 +22,9 @@ interface GlobalSettings {
         const val PICTURE_AUTO_BACKLIGHT = "picture_auto_backlight"
         const val POWER_PICTURE_OFF = "power_picture_off"
         const val TV_PICTURE_COLOR_TUNE_ENABLE = "tv_picture_color_tune_enable"
+        const val PICTURE_RED_GAIN = "picture_red_gain"
+        const val PICTURE_GREEN_GAIN = "picture_green_gain"
+        const val PICTURE_BLUE_GAIN = "picture_blue_gain"
     }
 
     object Values {

@@ -51,6 +51,10 @@
         android:persistent="false"
         android:title="HDR" />
     <Preference
+        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.WhiteBalanceFragment"
+        app:key="white_balance"
+        app:title="@string/white_balance"/>
+    <Preference
         app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.ColorTunerFragment"
         app:key="color_tuner"
         app:title="@string/color_tuner"/>

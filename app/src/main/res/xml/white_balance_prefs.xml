@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/white_balance">
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
+        android:key="picture_red_gain"
+        android:max="2047"
+        android:title="@string/red" />
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
+        android:key="picture_green_gain"
+        android:max="2047"
+        android:title="@string/green" />
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
+        android:key="picture_blue_gain"
+        android:max="2047"
+        android:title="@string/blue" />
+    <Preference
+        android:key="reset_values"
+        android:title="@string/reset_values" />
+</PreferenceScreen>

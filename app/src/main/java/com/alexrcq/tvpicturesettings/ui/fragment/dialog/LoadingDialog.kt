@@ -2,6 +2,7 @@ package com.alexrcq.tvpicturesettings.ui.fragment.dialog
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import com.alexrcq.tvpicturesettings.R
@@ -13,9 +14,8 @@ class LoadingDialog: DialogFragment() {
             .create()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        isCancelable = false
+    override fun onCancel(dialog: DialogInterface) {
+        requireActivity().finish()
     }
 
     companion object {

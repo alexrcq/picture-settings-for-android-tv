@@ -56,4 +56,5 @@
     <string name="screen_capture_error_try_again">Screen capture error. Please try again</string>
     <string name="dark_mode_service">Dark mode service</string>
     <string name="open_picture_settings">Open picture settings</string>
+    <string name="white_balance">White balance</string>
 </resources>

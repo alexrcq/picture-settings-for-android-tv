@@ -71,7 +71,7 @@ class AppPreferences(context: Context) {
         const val BRIGHTNESS_TUNE = "brightness_tune"
         const val OFFSET_TUNE = "offset_tune"
         const val SCHEDULED_DARK_MODE = "scheduled_dark_mode"
-
-        const val RESET_TUNER_VALUES = "reset_tuner_values"
+        const val WHITE_BALANCE = "white_balance"
+        const val RESET_VALUES = "reset_values"
     }
 }

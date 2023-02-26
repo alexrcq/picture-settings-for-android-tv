@@ -23,8 +23,7 @@
     <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
         app:key="tv_picture_color_tune_saturation_yellow"
         app:title="@string/yellow" />
-    <PreferenceCategory app:title="@string/advanced"/>
     <Preference
-        app:key="reset_tuner_values"
+        app:key="reset_values"
         app:title="@string/reset_values"/>
 </PreferenceScreen>
