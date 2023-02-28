@@ -21,7 +21,6 @@
     <string name="hue">HUE</string>
     <string name="sharpness">Sharpness</string>
     <string name="extra_dimming">Extra dimming</string>
-    <string name="make_it_even_darker_summary">The enabled preference overlays a non-interactive transparent dark rectangle on top of the TV picture in the dark mode</string>
     <string name="open_settings">Open settings</string>
     <string name="power_picture_off">Turn off the screen</string>
     <string name="adb_debugging_required">You need to enable USB debugging in developer options.</string>
@@ -37,7 +36,7 @@
     <string name="click_to_dark_mode">Click to dark mode</string>
     <string name="click_to_day_mode">Click to day mode</string>
     <string name="take_screenshot">Take a screenshot</string>
-    <string name="day_mode_after_screen_on">Turn off Dark Mode after turning on the TV</string>
+    <string name="day_mode_after_screen_on">Turn off Dark Mode every time you turn on the TV</string>
     <string name="dimming_power">Dimming power</string>
     <string name="dark_mode_preferences">Dark mode backlight preferences</string>
     <string name="screenshot_saved">The screenshot has been saved in /Screenshots</string>
@@ -57,4 +56,9 @@
     <string name="dark_mode_service">Dark mode service</string>
     <string name="open_picture_settings">Open picture settings</string>
     <string name="white_balance">White balance</string>
+    <string name="app_description">Version: %1s</string>
+    <string name="color_gain_hint">The color gain may be unstable. The best way to adjust the white balance is to use the corresponding settings in Video preferences</string>
+    <string name="white_balance_hint">Default value – 1024</string>
+    <string name="reset_to_default_1024">Reset to default</string>
+    <string name="extra_dimm_hint">* To forcibly switch the dark filter, in the main menu, press and hold the backlight slider for one second.</string>
 </resources>

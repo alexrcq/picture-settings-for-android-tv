@@ -52,6 +52,9 @@ class DarkModeManager : AccessibilityService() {
             ACTION_TOGGLE_MODE -> toggleDarkmode()
             ACTION_ENABLE_MODE -> isDarkModeEnabled = true
             ACTION_DISABLE_MODE -> isDarkModeEnabled = false
+            ACTION_TOGGLE_FILTER -> darkFilter.toggle()
+            ACTION_ENABLE_FILTER -> darkFilter.isEnabled = true
+            ACTION_DISABLE_FILTER -> darkFilter.isEnabled = false
         }
     }
 
@@ -76,6 +79,9 @@ class DarkModeManager : AccessibilityService() {
             addAction(ACTION_TOGGLE_MODE)
             addAction(ACTION_ENABLE_MODE)
             addAction(ACTION_DISABLE_MODE)
+            addAction(ACTION_TOGGLE_FILTER)
+            addAction(ACTION_ENABLE_FILTER)
+            addAction(ACTION_DISABLE_FILTER)
         })
         sharedInstance = this
         application.sendBroadcast(
@@ -106,11 +112,17 @@ class DarkModeManager : AccessibilityService() {
     }
 
     companion object {
+
         const val ACTION_SERVICE_CONNECTED =
             "com.alexrcq.tvpicturesettings.ACTION_DARK_MODE_MANAGER_CONNECTED"
+
         const val ACTION_TOGGLE_MODE = "com.alexrcq.tvpicturesettings.ACTION_TOGGLE_DARK_MODE"
         const val ACTION_ENABLE_MODE = "com.alexrcq.tvpicturesettings.ACTION_ENABLE_DARK_MODE"
         const val ACTION_DISABLE_MODE = "com.alexrcq.tvpicturesettings.ACTION_DISABLE_DARK_MODE"
+
+        const val ACTION_TOGGLE_FILTER = "com.alexrcq.tvpicturesettings.ACTION_TOGGLE_FILTER"
+        const val ACTION_ENABLE_FILTER = "com.alexrcq.tvpicturesettings.ACTION_ENABLE_FILTER"
+        const val ACTION_DISABLE_FILTER = "com.alexrcq.tvpicturesettings.ACTION_DISABLE_FILTER"
 
         var sharedInstance: DarkModeManager? = null
 

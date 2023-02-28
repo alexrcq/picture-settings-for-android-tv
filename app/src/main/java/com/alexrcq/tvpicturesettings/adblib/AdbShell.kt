@@ -52,6 +52,7 @@ class AdbShell(
     }
 
     suspend fun grantPermission(permission: String) {
+        if (context.hasPermission(permission)) return
         execute("pm grant ${BuildConfig.APPLICATION_ID} $permission")
         while (true) {
             delay(50)

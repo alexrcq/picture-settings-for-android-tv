@@ -63,8 +63,10 @@ class AppPreferences(context: Context) {
             "is_enable_day_mode_after_screen_on_enabled"
         const val IS_DARK_MODE_ENABLED = "is_dark_mode_enabled"
         const val OPEN_PICTURE_SETTINGS = "open_picture_settings"
+        const val APP_DESCRIPTION = "app_description"
 
         const val VIDEO_PREFERENCES = "video_preferences"
+        const val DARK_MODE_PREFERENCES = "dark_mode_preferences"
         const val COLOR_TUNER = "color_tuner"
         const val SATURATION_TUNE = "saturation_tune"
         const val HUE_TUNE = "hue_tune"

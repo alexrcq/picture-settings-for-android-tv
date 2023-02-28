@@ -29,6 +29,10 @@ class FullScreenDarkFilter(val context: AccessibilityService) {
             darkFilterView.alpha = value
         }
 
+    fun toggle() {
+        isEnabled = !isEnabled
+    }
+
     private fun enable() {
         val layoutParams = WindowManager.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,

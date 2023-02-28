@@ -17,9 +17,7 @@ import com.alexrcq.tvpicturesettings.TvConstants.TV_MODEL_CROODS
 import com.alexrcq.tvpicturesettings.adblib.AdbShell
 import com.alexrcq.tvpicturesettings.helper.DarkModeManager
 import com.alexrcq.tvpicturesettings.storage.AppPreferences
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_FILTER_POWER
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.IS_DARK_FILTER_ENABLED
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.NIGHT_BACKLIGHT
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.APP_DESCRIPTION
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.OPEN_PICTURE_SETTINGS
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TAKE_SCREENSHOT
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.VIDEO_PREFERENCES
@@ -28,6 +26,7 @@ import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.POWER_PICTURE_O
 import com.alexrcq.tvpicturesettings.storage.appPreferences
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AdbRequiredDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.LoadingDialog
+import com.alexrcq.tvpicturesettings.ui.preference.LongPressGlobalSeekbarPreference
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -74,9 +73,17 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
                 dayBacklight = globalSettings.getInt(PICTURE_BACKLIGHT)
             }
         }
-        backlightPref = findPreference<SeekBarPreference>(PICTURE_BACKLIGHT)?.apply {
+        backlightPref = findPreference<LongPressGlobalSeekbarPreference>(PICTURE_BACKLIGHT)?.apply {
             setOnPreferenceClickListener {
-                onBacklightPreferenceClicked()
+                onBacklightPreferenceClick()
+                true
+            }
+            onPreferenceLongClickListener = {
+                onBacklightPreferenceLongClick()
+                true
+            }
+            setOnPreferenceChangeListener { _, newValue ->
+                onBacklightPreferenceChange(newValue)
                 true
             }
         }
@@ -98,6 +105,8 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
             }
         }
         findPreference<Preference>(VIDEO_PREFERENCES)?.isVisible = !isModelName(TV_MODEL_CROODS)
+        findPreference<Preference>(APP_DESCRIPTION)?.summary =
+            getString(R.string.app_description, BuildConfig.VERSION_NAME)
     }
 
     private fun openPictureSettings() {
@@ -117,32 +126,19 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
             AdbRequiredDialog().show(childFragmentManager, AdbRequiredDialog.TAG)
             return
         }
-        val windowView = requireActivity().window.decorView
-        windowView.isVisible = false
+        requireActivity().window.decorView.isVisible = false
         takeScreenshotJob = viewLifecycleOwner.lifecycleScope.launch {
             withTimeout(SCREEN_CAPTURE_TIMEOUT) {
                 adbShell.connect()
+                adbShell.grantPermission(READ_EXTERNAL_STORAGE)
+                adbShell.grantPermission(WRITE_EXTERNAL_STORAGE)
                 adbShell.captureScreen(saveDir = prepareScreenshotsDir())
             }
         }
-        takeScreenshotJob?.invokeOnCompletion { cause ->
-            windowView.isVisible = true
-            when (cause) {
-                null -> showScreenCaptureResultMessage(R.string.screenshot_saved)
-                else -> showScreenCaptureResultMessage(
-                    R.string.screen_capture_error_try_again
-                )
-            }
-        }
+        takeScreenshotJob?.invokeOnCompletion(::onScreenshotJobCompleted)
     }
 
-    private suspend fun prepareScreenshotsDir(): File {
-        if (!requireContext().hasPermission(READ_EXTERNAL_STORAGE)) {
-            adbShell.grantPermission(READ_EXTERNAL_STORAGE)
-        }
-        if (!requireContext().hasPermission(WRITE_EXTERNAL_STORAGE)) {
-            adbShell.grantPermission(WRITE_EXTERNAL_STORAGE)
-        }
+    private fun prepareScreenshotsDir(): File {
         val fullPath =
             Environment.getExternalStorageDirectory().path + "/" + SCREENSHOTS_FOLDER_NAME
         val screenshotsDir = File(fullPath)
@@ -151,6 +147,14 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
         }
         screenshotsDir.mkdirs()
         return screenshotsDir
+    }
+
+    private fun onScreenshotJobCompleted(cause: Throwable?) {
+        requireActivity().window.decorView.isVisible = true
+        when (cause) {
+            null -> showScreenCaptureResultMessage(R.string.screenshot_saved)
+            else -> showScreenCaptureResultMessage(R.string.screen_capture_error_try_again)
+        }
     }
 
     private var delayJob: Job? = null
@@ -166,34 +170,19 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
         }
     }
 
-    private fun onBacklightPreferenceClicked() {
+    private fun onBacklightPreferenceClick() {
         DarkModeManager.requireInstance().toggleDarkmode()
         updateBacklightPreferenceSummary()
     }
 
-    override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
-        super.onPreferenceChange(preference, newValue)
-        when (preference.key) {
-            PICTURE_BACKLIGHT -> onBacklightPreferenceChange(newValue)
-            IS_DARK_FILTER_ENABLED -> onDarkFilterPreferenceChange(newValue)
-            NIGHT_BACKLIGHT -> onNightBacklightPreferenceChange(newValue)
-            DARK_FILTER_POWER -> DarkModeManager.requireInstance().darkFilter.alpha =
-                (newValue as Int) / 100f
-        }
-        return true
-    }
-
-    private fun onNightBacklightPreferenceChange(newValue: Any) {
-        if (DarkModeManager.requireInstance().isDarkModeEnabled) {
-            globalSettings.putInt(PICTURE_BACKLIGHT, newValue as Int)
-        }
-    }
-
-    private fun onDarkFilterPreferenceChange(newValue: Any) {
+    private fun onBacklightPreferenceLongClick() {
         with(DarkModeManager.requireInstance()) {
-            if (isDarkModeEnabled) {
-                darkFilter.isEnabled = newValue as Boolean
+            if (!isDarkModeEnabled) {
+                isDarkModeEnabled = true
+                updateBacklightPreferenceSummary()
+                if (darkFilter.isEnabled) return
             }
+            darkFilter.toggle()
         }
     }
 

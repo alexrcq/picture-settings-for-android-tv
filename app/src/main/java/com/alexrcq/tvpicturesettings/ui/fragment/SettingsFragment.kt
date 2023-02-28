@@ -6,6 +6,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BRIGHTNESS_TUNE
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER
+import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_MODE_PREFERENCES
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.HUE_TUNE
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.OFFSET_TUNE
 import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.SATURATION_TUNE
@@ -33,6 +34,7 @@ class SettingsFragment : LeanbackSettingsFragmentCompat() {
             OFFSET_TUNE -> startPreferenceFragment(OffsetTuneFragment())
             WHITE_BALANCE -> startPreferenceFragment(WhiteBalanceFragment())
             SCHEDULED_DARK_MODE -> startPreferenceFragment(ScheduledDarkModeFragment())
+            DARK_MODE_PREFERENCES -> startPreferenceFragment(DarkModePreferencesFragment())
         }
         return true
     }

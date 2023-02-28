@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:title="@string/white_balance">
     <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
         android:key="picture_red_gain"
@@ -15,5 +16,8 @@
         android:title="@string/blue" />
     <Preference
         android:key="reset_values"
-        android:title="@string/reset_values" />
+        android:title="@string/reset_to_default_1024"/>
+    <Preference
+        android:selectable="false"
+        app:summary="@string/white_balance_hint"/>
 </PreferenceScreen>

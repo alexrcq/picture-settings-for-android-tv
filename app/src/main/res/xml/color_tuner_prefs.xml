@@ -5,7 +5,11 @@
         app:key="tv_picture_color_tune_enable"
         app:persistent="false"
         app:title="@string/enable"/>
-    <PreferenceCategory app:title="@string/color_gain"/>
+    <PreferenceCategory
+        app:title="@string/color_gain"/>
+    <Preference
+        app:selectable="false"
+        app:summary="@string/color_gain_hint"/>
     <com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
         app:dependency="tv_picture_color_tune_enable"
         app:key="tv_picture_color_tune_gain_red"
@@ -22,7 +26,8 @@
         app:key="reset_values"
         app:title="@string/reset_values"
         app:dependency="tv_picture_color_tune_enable"/>
-    <PreferenceCategory app:title="@string/advanced"/>
+    <PreferenceCategory
+        app:title="@string/advanced"/>
     <Preference
         app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.SaturationTunePreferenceFragment"
         app:key="saturation_tune"
