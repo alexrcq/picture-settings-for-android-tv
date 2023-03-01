@@ -82,10 +82,6 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
                 onBacklightPreferenceLongClick()
                 true
             }
-            setOnPreferenceChangeListener { _, newValue ->
-                onBacklightPreferenceChange(newValue)
-                true
-            }
         }
         takeScreenshotPref = findPreference<Preference>(TAKE_SCREENSHOT)?.apply {
             setOnPreferenceClickListener {
@@ -184,6 +180,14 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
             }
             darkFilter.toggle()
         }
+    }
+
+    override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
+        super.onPreferenceChange(preference, newValue)
+        if (preference.key == PICTURE_BACKLIGHT) {
+            onBacklightPreferenceChange(newValue)
+        }
+        return true
     }
 
     private fun onBacklightPreferenceChange(newValue: Any) {
