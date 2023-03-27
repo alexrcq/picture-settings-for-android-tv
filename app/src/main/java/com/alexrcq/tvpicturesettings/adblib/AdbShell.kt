@@ -3,8 +3,8 @@ package com.alexrcq.tvpicturesettings.adblib
 import android.content.Context
 import android.os.FileObserver.CREATE
 import com.alexrcq.tvpicturesettings.BuildConfig
+import com.alexrcq.tvpicturesettings.FileUtils.waitForFileEvent
 import com.alexrcq.tvpicturesettings.hasPermission
-import com.alexrcq.tvpicturesettings.waitForFileEvent
 import com.tananaev.adblib.AdbConnection
 import com.tananaev.adblib.AdbCrypto
 import kotlinx.coroutines.CoroutineStart

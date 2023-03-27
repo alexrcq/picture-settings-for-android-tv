@@ -6,6 +6,8 @@ import android.graphics.PixelFormat
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Toast
+import com.alexrcq.tvpicturesettings.R
 
 class FullScreenDarkFilter(val context: AccessibilityService) {
 
@@ -31,6 +33,11 @@ class FullScreenDarkFilter(val context: AccessibilityService) {
 
     fun toggle() {
         isEnabled = !isEnabled
+        val resId = if (isEnabled)
+            R.string.dark_filter_turning_on
+        else
+            R.string.dark_filter_turning_off
+        Toast.makeText(context, resId, Toast.LENGTH_SHORT).show()
     }
 
     private fun enable() {

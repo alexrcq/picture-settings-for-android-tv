@@ -1,7 +1,7 @@
 package com.alexrcq.tvpicturesettings
 
 object TvConstants {
-    const val TV_MODEL_CROODS = "MOOQ0"
+    const val TV_MODEL_PREFIX_MSSP = "MSSP"
     const val TV_SETTINGS_PACKAGE = "com.android.tv.settings"
     const val TV_PICTURE_ACTIVITY_NAME =
         "com.android.tv.settings.partnercustomizer.picture.PictureActivity"

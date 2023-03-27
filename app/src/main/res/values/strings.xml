@@ -61,4 +61,7 @@
     <string name="white_balance_hint">Default value – 1024</string>
     <string name="reset_to_default_1024">Reset to default</string>
     <string name="extra_dimming_summary">Works only in dark mode</string>
+    <string name="hold_to_toggle_extra_dimm_hint">Press and hold to toggle the additional dimming</string>
+    <string name="dark_filter_turning_on">Turning on the extra dimming…</string>
+    <string name="dark_filter_turning_off">Additional dimming disabled</string>
 </resources>
