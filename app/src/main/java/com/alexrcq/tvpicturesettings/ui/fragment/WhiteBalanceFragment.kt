@@ -3,27 +3,46 @@ package com.alexrcq.tvpicturesettings.ui.fragment
 import android.os.Bundle
 import android.view.View
 import androidx.preference.Preference
+import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.RESET_VALUES
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_BLUE_GAIN
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_GREEN_GAIN
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_RED_GAIN
-
-private const val WB_STANDARD_VALUE = 1024
+import com.alexrcq.tvpicturesettings.helper.WhiteBalanceHelper
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.FIX_WB_VALUES
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.RESET_VALUES
 
 class WhiteBalanceFragment : GlobalSettingsFragment(R.xml.white_balance_prefs) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         findPreference<Preference>(RESET_VALUES)?.setOnPreferenceClickListener {
-            resetWhiteBalance()
+            WhiteBalanceHelper(requireContext()).resetWhiteBalance()
             true
+        }
+        if (appSettings.isWhiteBalanceFixed) {
+            setWhiteBalancePrefsEnabled(false)
+            scrollToPreference(FIX_WB_VALUES)
         }
     }
 
-    private fun resetWhiteBalance() {
-        globalSettings.putInt(PICTURE_RED_GAIN, WB_STANDARD_VALUE)
-        globalSettings.putInt(PICTURE_GREEN_GAIN, WB_STANDARD_VALUE)
-        globalSettings.putInt(PICTURE_BLUE_GAIN, WB_STANDARD_VALUE)
+    override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
+        if (preference.key == FIX_WB_VALUES) {
+            val isWhiteBalanceFixed = newValue as Boolean
+            setWhiteBalancePrefsEnabled(!isWhiteBalanceFixed)
+        }
+        return super.onPreferenceChange(preference, newValue)
+    }
+
+    override fun updatePreference(preference: Preference) {
+        if (appSettings.isWhiteBalanceFixed) {
+            return
+        }
+        super.updatePreference(preference)
+    }
+
+    private fun setWhiteBalancePrefsEnabled(isEnabled: Boolean) {
+        preferenceScreen.forEach { preference ->
+            if (preference.key != FIX_WB_VALUES) {
+                preference.isEnabled = isEnabled
+            }
+        }
     }
 }

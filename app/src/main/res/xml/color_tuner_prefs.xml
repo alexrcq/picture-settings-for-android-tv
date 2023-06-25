@@ -6,6 +6,7 @@
         app:persistent="false"
         app:title="@string/enable"/>
     <PreferenceCategory
+        app:key="color_gain"
         app:title="@string/color_gain"/>
     <Preference
         app:selectable="false"

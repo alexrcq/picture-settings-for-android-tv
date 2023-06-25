@@ -6,21 +6,20 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.Settings
 import android.view.View
 import androidx.annotation.CallSuper
 import androidx.annotation.XmlRes
 import androidx.preference.Preference
 import androidx.preference.forEach
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings
-import com.alexrcq.tvpicturesettings.storage.GlobalSettingsWrapper
+import com.alexrcq.tvpicturesettings.App
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings
 import com.alexrcq.tvpicturesettings.ui.preference.GlobalListPreferences
 import com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekbarPreference
 
 open class GlobalSettingsFragment(@XmlRes private val preferencesResId: Int) :
     BasePreferenceFragment(preferencesResId) {
 
-    private lateinit var contentResolver: ContentResolver
+    lateinit var contentResolver: ContentResolver
 
     private val contentObserver: ContentObserver =
         object : ContentObserver(Handler(Looper.getMainLooper())) {
@@ -37,12 +36,8 @@ open class GlobalSettingsFragment(@XmlRes private val preferencesResId: Int) :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         contentResolver = requireContext().contentResolver
-        globalSettings = GlobalSettingsWrapper(contentResolver)
-        contentResolver.registerContentObserver(
-            Settings.Global.CONTENT_URI,
-            true,
-            contentObserver
-        )
+        globalSettings = (requireActivity().application as App).globalSettings
+        globalSettings.registerContentObserver(contentObserver)
     }
 
     override fun onStart() {

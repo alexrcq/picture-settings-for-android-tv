@@ -4,15 +4,15 @@ import androidx.leanback.preference.LeanbackSettingsFragmentCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.BRIGHTNESS_TUNE
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.COLOR_TUNER
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_MODE_PREFERENCES
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.HUE_TUNE
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.OFFSET_TUNE
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.SATURATION_TUNE
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.SCHEDULED_DARK_MODE
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.VIDEO_PREFERENCES
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.WHITE_BALANCE
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.BRIGHTNESS_TUNE
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.COLOR_TUNER
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.DARK_MODE_PREFERENCES
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.HUE_TUNE
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.OFFSET_TUNE
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.SATURATION_TUNE
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.SCHEDULED_DARK_MODE
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.VIDEO_PREFERENCES
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.WHITE_BALANCE
 import com.alexrcq.tvpicturesettings.ui.preference.TimePickerPreference
 
 class SettingsFragment : LeanbackSettingsFragmentCompat() {

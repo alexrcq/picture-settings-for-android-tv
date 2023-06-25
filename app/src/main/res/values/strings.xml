@@ -26,7 +26,7 @@
     <string name="adb_debugging_required">You need to enable USB debugging in developer options.</string>
     <string name="wait_for_debug_window">In the next window, check the "Always allow from this computer" checkbox, then click OK.</string>
     <string name="dark_mode_activated">Switching to night mode…</string>
-    <string name="day_mode_activated">Switching to day mode…</string>
+    <string name="dark_mode_deactivated">Switching to day mode…</string>
     <string name="red">Red</string>
     <string name="green">Green</string>
     <string name="blue">Blue</string>
@@ -53,7 +53,7 @@
     <string name="reset_values">Reset to default</string>
     <string name="equalizer_detail">Equalizer Detail</string>
     <string name="screen_capture_error_try_again">Screen capture error. Please try again</string>
-    <string name="dark_mode_service">Dark mode service</string>
+    <string name="dark_filter_service">Dark filter</string>
     <string name="open_picture_settings">Open picture settings</string>
     <string name="white_balance">White balance</string>
     <string name="app_description">Version: %1s</string>
@@ -64,4 +64,7 @@
     <string name="hold_to_toggle_extra_dimm_hint">Press and hold to toggle the additional dimming</string>
     <string name="dark_filter_turning_on">Turning on the extra dimming…</string>
     <string name="dark_filter_turning_off">Additional dimming disabled</string>
+    <string name="fix_values">Fix values</string>
+    <string name="custom_see_wb_settings">Custom (see the white balance settings)</string>
+    <string name="fixed_see_wb_settings">Fixed (see the white balance settings)</string>
 </resources>

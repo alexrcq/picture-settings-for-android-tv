@@ -5,7 +5,7 @@ import android.view.View
 import androidx.annotation.XmlRes
 import androidx.preference.Preference
 import androidx.preference.forEach
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.RESET_VALUES
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.RESET_VALUES
 import com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekbarPreference
 
 private const val DEFAULT_TUNER_VALUE = 50

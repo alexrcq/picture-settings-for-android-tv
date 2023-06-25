@@ -30,8 +30,7 @@
         app:entries="@array/picture_temperature"
         app:entryValues="@array/picture_temperature_values"
         app:key="picture_color_temperature"
-        app:title="@string/color_temperature"
-        app:useSimpleSummaryProvider="true" />
+        app:title="@string/color_temperature" />
     <com.alexrcq.tvpicturesettings.ui.preference.GlobalListPreferences
         app:title="@string/noise_reduction"
         app:key="tv_picture_advance_video_dnr"

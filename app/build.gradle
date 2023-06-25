@@ -11,8 +11,8 @@ android {
         applicationId "com.alexrcq.tvpicturesettings"
         minSdkVersion 26
         targetSdkVersion 32
-        versionCode 26
-        versionName "1.0.71"
+        versionCode 28
+        versionName "1.0.73 beta"
     }
 
     compileOptions {
@@ -40,6 +40,23 @@ android {
             outputFileName = "tvpicturesettings${defaultConfig.versionName}.apk"
         }
     }
+
+    task createDebugKeystoreFromEnvironment {
+        doLast {
+            def keystoreBase64 = System.getenv("DEBUG_KEYSTORE_BASE64")
+            if (keystoreBase64 != null) {
+                def keystoreBytes = Base64.getDecoder().decode(keystoreBase64)
+                def keystoreFile = file("$System.env.HOME/.android/debug.keystore")
+                def outputStream = new FileOutputStream(keystoreFile)
+                outputStream.write(keystoreBytes)
+                outputStream.close()
+            } else {
+                println("DEBUG_KEYSTORE_BASE64 is not set. Creation cancelled.")
+            }
+        }
+    }
+
+    preBuild.dependsOn createDebugKeystoreFromEnvironment
 }
 
 dependencies {

@@ -6,7 +6,7 @@ import android.view.Gravity
 import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
 import com.alexrcq.tvpicturesettings.*
-import com.alexrcq.tvpicturesettings.helper.DarkModeManager
+import com.alexrcq.tvpicturesettings.service.PictureSettingsService
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AcceptDebuggingDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AdbRequiredDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.NotSupportedTVDialog
@@ -30,9 +30,7 @@ class MainActivity : FragmentActivity() {
             AcceptDebuggingDialog().show(supportFragmentManager, AcceptDebuggingDialog.TAG)
             return
         }
-        if (!isAccessibilityServiceEnabled(DarkModeManager::class.java)) {
-            enableAccessibilityService(DarkModeManager::class.java)
-        }
+        PictureSettingsService.start(this)
     }
 
     override fun onAttachedToWindow() {

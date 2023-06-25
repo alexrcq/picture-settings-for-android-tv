@@ -26,7 +26,7 @@
     <string name="adb_debugging_required">Необходимо включить отладку по USB в настройках для разработчиков</string>
     <string name="wait_for_debug_window">В следующем окне отметьте галочкой \"Всегда разрешать отладку с этого компьютера\" и нажмите ОК.</string>
     <string name="dark_mode_activated">Переход в ночной режим…</string>
-    <string name="day_mode_activated">Переход в дневной режим…</string>
+    <string name="dark_mode_deactivated">Переход в дневной режим…</string>
     <string name="red">Красный</string>
     <string name="green">Зелёный</string>
     <string name="blue">Синий</string>
@@ -45,7 +45,7 @@
     <string name="flesh_tone">Телесный цветовой тон</string>
     <string name="cvan">Сине-зелёный</string>
     <string name="color_gain">Усиление цвета</string>
-    <string name="offset">Цветовой сдвиг</string>
+    <string name="offset">Смещение цвета</string>
     <string name="сonnection_timeout">Время подключения истекло</string>
     <string name="scheduled_dark_mode">Ночной режим по расписанию</string>
     <string name="dark_mode_enable_time">Время перехода в ночной режим</string>
@@ -53,15 +53,18 @@
     <string name="reset_values">Сбросить значения</string>
     <string name="equalizer_detail">Эквалайзер</string>
     <string name="screen_capture_error_try_again">Ошибка захвата изображения. Пожалуйста, попробуйте снова</string>
-    <string name="dark_mode_service">Служба ночного режима</string>
+    <string name="dark_filter_service">Тёмный фильтр</string>
     <string name="open_picture_settings">Открыть настройки изображения</string>
     <string name="white_balance">Баланс белого</string>
     <string name="app_description">Версия приложения: %1$s</string>
-    <string name="color_gain_hint">Усиление цвета может работать нестабильно. Для регулировки баланса белого лучше всего возпользоваться соответсвующими настройками в разделе \"Настройки видео\"</string>
+    <string name="color_gain_hint">Усиление цвета может работать нестабильно. Для регулировки баланса белого лучше всего воспользоваться соответсвующими настройками в разделе \"Настройки видео\"</string>
     <string name="white_balance_hint">Стандартное значение – 1024</string>
     <string name="reset_to_default_1024">Сбросить значения до стандартного</string>
     <string name="extra_dimming_summary">Действует только при ночном режиме подсветки</string>
     <string name="hold_to_toggle_extra_dimm_hint">Удерживайте для переключения доп. затемнения</string>
     <string name="dark_filter_turning_on">Включение дополнительного затемнения…</string>
     <string name="dark_filter_turning_off">Дополнительное затемнение отключено</string>
+    <string name="fix_values">Фиксировать значения</string>
+    <string name="custom_see_wb_settings">Пользовательская (см. настройки баланса белого)</string>
+    <string name="fixed_see_wb_settings">Фиксированная (см. настройки баланса белого)</string>
 </resources>

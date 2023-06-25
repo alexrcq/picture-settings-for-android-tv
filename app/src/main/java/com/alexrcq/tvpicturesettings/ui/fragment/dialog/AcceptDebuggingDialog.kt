@@ -11,9 +11,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.adblib.AdbShell
-import com.alexrcq.tvpicturesettings.enableAccessibilityService
-import com.alexrcq.tvpicturesettings.helper.DarkModeManager
 import com.alexrcq.tvpicturesettings.requestFocusForced
+import com.alexrcq.tvpicturesettings.service.PictureSettingsService
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -35,15 +34,16 @@ class AcceptDebuggingDialog : DialogFragment(), DialogInterface.OnShowListener {
             val adbShell = AdbShell(requireContext())
             try {
                 adbShell.connect()
+                adbShell.grantPermission(WRITE_SECURE_SETTINGS)
             } catch (e: Exception) {
                 Timber.e(e)
                 Toast.makeText(context, e.localizedMessage, Toast.LENGTH_LONG).show()
                 requireActivity().finish()
                 return@launch
+            } finally {
+                adbShell.disconnect()
             }
-            adbShell.grantPermission(WRITE_SECURE_SETTINGS)
-            adbShell.disconnect()
-            requireActivity().enableAccessibilityService(DarkModeManager::class.java)
+            PictureSettingsService.start(requireContext())
             dismiss()
         }
     }
