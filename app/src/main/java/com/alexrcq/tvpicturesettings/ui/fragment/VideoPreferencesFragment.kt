@@ -2,28 +2,30 @@ package com.alexrcq.tvpicturesettings.ui.fragment
 
 import android.os.Bundle
 import android.view.View
+import androidx.preference.ListPreference
 import androidx.preference.Preference
+import androidx.preference.Preference.SummaryProvider
 import androidx.preference.SwitchPreference
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.RESET_TO_DEFAULT
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_ADAPTIVE_LUMA_CONTROL
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_BRIGHTNESS
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_CONTRAST
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_HUE
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_LIST_HDR
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_LOCAL_CONTRAST
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_MODE
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_SATURATION
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_SHARPNESS
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_TEMPERATURE
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_MODE_BRIGHT
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_MODE_DEFAULT
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_MODE_MOVIE
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_MODE_SPORT
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_MODE_USER
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_TEMPERATURE_COLD
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_TEMPERATURE_DEFAULT
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Values.PICTURE_TEMPERATURE_WARM
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.RESET_TO_DEFAULT
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_ADAPTIVE_LUMA_CONTROL
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_BRIGHTNESS
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_CONTRAST
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_HUE
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_LIST_HDR
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_LOCAL_CONTRAST
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_MODE
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_SATURATION
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_SHARPNESS
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_TEMPERATURE
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Values.PICTURE_MODE_BRIGHT
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Values.PICTURE_MODE_DEFAULT
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Values.PICTURE_MODE_MOVIE
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Values.PICTURE_MODE_SPORT
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Values.PICTURE_MODE_USER
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Values.PICTURE_TEMPERATURE_COLD
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Values.PICTURE_TEMPERATURE_DEFAULT
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Values.PICTURE_TEMPERATURE_WARM
 import com.alexrcq.tvpicturesettings.toBoolean
 import com.alexrcq.tvpicturesettings.toInt
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.ResetToDefaultDialog
@@ -35,6 +37,18 @@ class VideoPreferencesFragment : GlobalSettingsFragment(R.xml.video_prefs) {
         findPreference<Preference>(RESET_TO_DEFAULT)?.setOnPreferenceClickListener {
             ResetToDefaultDialog().show(childFragmentManager, ResetToDefaultDialog.TAG)
             true
+        }
+        findPreference<ListPreference>(PICTURE_TEMPERATURE)?.apply {
+            isEnabled = !appSettings.isWhiteBalanceFixed
+            summaryProvider = SummaryProvider<ListPreference> { preference ->
+                if (appSettings.isWhiteBalanceFixed) {
+                    getString(R.string.fixed_see_wb_settings)
+                } else if (preference.entry.isNullOrEmpty()) {
+                    getString(R.string.custom_see_wb_settings)
+                } else {
+                    preference.entry
+                }
+            }
         }
     }
 

@@ -5,10 +5,9 @@ import android.view.View
 import androidx.preference.Preference
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.helper.AlarmScheduler
-import com.alexrcq.tvpicturesettings.storage.AppPreferences
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_MODE_TIME
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DAY_MODE_TIME
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.IS_AUTO_DARK_MODE_ENABLED
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.DARK_MODE_TIME
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.DAY_MODE_TIME
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.IS_AUTO_DARK_MODE_ENABLED
 
 class ScheduledDarkModeFragment : GlobalSettingsFragment(R.xml.scheduled_dark_mode_prefs) {
 
@@ -43,8 +42,7 @@ class ScheduledDarkModeFragment : GlobalSettingsFragment(R.xml.scheduled_dark_mo
             alarmScheduler.cancelAlarm(AlarmScheduler.AlarmType.DARK_MODE_ALARM)
             return
         }
-        val appPreferences = AppPreferences(requireContext())
-        scheduleDayMode(appPreferences.dayModeTime)
-        scheduleDarkMode(appPreferences.darkModeTime)
+        scheduleDayMode(appSettings.dayModeTime)
+        scheduleDarkMode(appSettings.darkModeTime)
     }
 }

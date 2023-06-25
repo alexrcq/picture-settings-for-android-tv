@@ -1,10 +1,18 @@
-package com.alexrcq.tvpicturesettings.storage
+package com.alexrcq.tvpicturesettings.helper
+
+import android.database.ContentObserver
 
 interface GlobalSettings {
 
     fun putInt(key: String, value: Int)
 
     fun getInt(key: String): Int
+
+    fun getInt(key: String, def: Int): Int
+
+    fun registerContentObserver(observer: ContentObserver)
+
+    fun unregisterContentObserver(observer: ContentObserver)
 
     object Keys {
         const val PICTURE_BACKLIGHT = "picture_backlight"

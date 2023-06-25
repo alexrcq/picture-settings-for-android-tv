@@ -2,35 +2,42 @@ package com.alexrcq.tvpicturesettings.ui.fragment
 
 import androidx.preference.Preference
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.helper.DarkModeManager
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.DARK_FILTER_POWER
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.IS_DARK_FILTER_ENABLED
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.NIGHT_BACKLIGHT
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings
+import com.alexrcq.tvpicturesettings.ensureAccessibilityServiceEnabled
+import com.alexrcq.tvpicturesettings.service.DarkFilterService
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.DARK_FILTER_POWER
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.IS_ADDITIONAL_DIMMING_ENABLED
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.NIGHT_BACKLIGHT
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings
 
 class DarkModePreferencesFragment : GlobalSettingsFragment(R.xml.dark_mode_prefs) {
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         super.onPreferenceChange(preference, newValue)
         when (preference.key) {
-            IS_DARK_FILTER_ENABLED -> onDarkFilterPreferenceChange(newValue)
-            NIGHT_BACKLIGHT -> onNightBacklightPreferenceChange(newValue)
-            DARK_FILTER_POWER -> DarkModeManager.requireInstance().darkFilter.alpha =
-                (newValue as Int) / 100f
+            IS_ADDITIONAL_DIMMING_ENABLED -> onAdditionalDimmingChange(newValue as Boolean)
+            NIGHT_BACKLIGHT -> onNightBacklightChange(newValue as Int)
+            DARK_FILTER_POWER -> onDarkFilterPowerChange(newValue as Int)
         }
         return true
     }
 
-    private fun onNightBacklightPreferenceChange(newValue: Any) {
-        if (DarkModeManager.requireInstance().isDarkModeEnabled) {
-            globalSettings.putInt(GlobalSettings.Keys.PICTURE_BACKLIGHT, newValue as Int)
+    private fun onDarkFilterPowerChange(newValue: Int) {
+        if (DarkFilterService.sharedInstance == null) {
+            requireContext().ensureAccessibilityServiceEnabled(DarkFilterService::class.java)
+        }
+        DarkFilterService.sharedInstance?.darkFilter?.alpha = newValue / 100f
+    }
+
+    private fun onNightBacklightChange(newValue: Int) {
+        if (appSettings.isDarkModeEnabled) {
+            globalSettings.putInt(GlobalSettings.Keys.PICTURE_BACKLIGHT, newValue)
         }
     }
 
-    private fun onDarkFilterPreferenceChange(newValue: Any) {
-        with(DarkModeManager.requireInstance()) {
+    private fun onAdditionalDimmingChange(isEnabled: Boolean) {
+        with(appSettings) {
             if (isDarkModeEnabled) {
-                darkFilter.isEnabled = newValue as Boolean
+                isDarkFilterEnabled = isEnabled
             }
         }
     }

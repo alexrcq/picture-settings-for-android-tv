@@ -4,7 +4,7 @@ import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.SwitchPreference
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.TV_PICTURE_COLOR_TUNE_ENABLE
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.TV_PICTURE_COLOR_TUNE_ENABLE
 import com.alexrcq.tvpicturesettings.toBoolean
 import com.alexrcq.tvpicturesettings.toInt
 

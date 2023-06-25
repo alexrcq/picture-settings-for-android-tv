@@ -1,215 +1,172 @@
 package com.alexrcq.tvpicturesettings.ui.fragment
 
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.*
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.view.View
-import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
 import com.alexrcq.tvpicturesettings.*
-import com.alexrcq.tvpicturesettings.TvConstants.TV_MODEL_PREFIX_MSSP
-import com.alexrcq.tvpicturesettings.adblib.AdbShell
-import com.alexrcq.tvpicturesettings.helper.DarkModeManager
-import com.alexrcq.tvpicturesettings.storage.AppPreferences
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.APP_DESCRIPTION
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.OPEN_PICTURE_SETTINGS
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.TAKE_SCREENSHOT
-import com.alexrcq.tvpicturesettings.storage.AppPreferences.Keys.VIDEO_PREFERENCES
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_BACKLIGHT
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.POWER_PICTURE_OFF
-import com.alexrcq.tvpicturesettings.storage.appPreferences
+import com.alexrcq.tvpicturesettings.service.DarkFilterService
+import com.alexrcq.tvpicturesettings.helper.AppSettings
+import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.TAKE_SCREENSHOT
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_BACKLIGHT
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AdbRequiredDialog
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.LoadingDialog
 import com.alexrcq.tvpicturesettings.ui.preference.LongPressGlobalSeekbarPreference
-import kotlinx.coroutines.*
-
-private const val SCREENSHOTS_FOLDER_NAME = "Screenshots"
-private const val SCREEN_CAPTURE_TIMEOUT = 7500L
-private const val DARK_FILTER_HINT_INTERVAL = 7000L
-private const val HINT_DURATION = 3500L
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
 
-    private lateinit var appPreferences: AppPreferences
-    private lateinit var adbShell: AdbShell
+    private lateinit var backlightPref: SeekBarPreference
+    private lateinit var takeScreenshotPref: Preference
 
-    private var backlightPref: SeekBarPreference? = null
-    private var takeScreenshotPref: Preference? = null
+    private val viewModel: PictureViewModel by viewModels()
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == DarkModeManager.ACTION_SERVICE_CONNECTED) {
-                viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-                    val loadingDialog =
-                        childFragmentManager.findFragmentByTag(LoadingDialog.TAG) as DialogFragment?
-                    loadingDialog?.dismiss()
-                }
+            if (intent.action == DarkFilterService.ACTION_SERVICE_CONNECTED) {
+                viewModel.processIntent(MenuIntent.ChangeMenuState(MenuState.Idle))
             }
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        appPreferences = requireContext().appPreferences
-        adbShell = AdbShell(requireContext())
         iniPreferences()
         requireContext().registerReceiver(
-            broadcastReceiver, IntentFilter(DarkModeManager.ACTION_SERVICE_CONNECTED)
+            broadcastReceiver, IntentFilter(DarkFilterService.ACTION_SERVICE_CONNECTED)
         )
+        viewModel.menuState.onEach(::render).launchIn(lifecycleScope)
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            while (true) {
-                backlightPref?.summary = getString(R.string.hold_to_toggle_extra_dimm_hint)
-                delay(HINT_DURATION)
-                backlightPref?.summary = getRelevantDarkModeHint()
-                delay(DARK_FILTER_HINT_INTERVAL)
+            viewModel.isDarkModeEnabledFlow.collect { isDarkModeEnabled ->
+                backlightPref.summary = if (isDarkModeEnabled) {
+                    getString(R.string.click_to_day_mode)
+                } else {
+                    getString(R.string.click_to_dark_mode)
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
+            viewModel.darkModeHintFlow.collect { hintResId ->
+                backlightPref.summary = getString(hintResId)
             }
         }
     }
 
     private fun iniPreferences() {
-        with(appPreferences) {
-            if (dayBacklight !in 0..100) {
-                dayBacklight = globalSettings.getInt(PICTURE_BACKLIGHT)
+        backlightPref =
+            requirePreference<LongPressGlobalSeekbarPreference>(PICTURE_BACKLIGHT).apply {
+                setOnPreferenceClickListener {
+                    appSettings.toggleDarkMode()
+                    true
+                }
+                onPreferenceLongClickListener = {
+                    onBacklightPreferenceLongClick()
+                    true
+                }
             }
-        }
-        backlightPref = findPreference<LongPressGlobalSeekbarPreference>(PICTURE_BACKLIGHT)?.apply {
+        takeScreenshotPref = requirePreference<Preference>(TAKE_SCREENSHOT).apply {
             setOnPreferenceClickListener {
-                onBacklightPreferenceClick()
-                true
-            }
-            onPreferenceLongClickListener = {
-                onBacklightPreferenceLongClick()
-                true
-            }
-        }
-        takeScreenshotPref = findPreference<Preference>(TAKE_SCREENSHOT)?.apply {
-            setOnPreferenceClickListener {
-                onTakeScreenshotClicked()
+                if (!requireContext().isAdbEnabled) {
+                    AdbRequiredDialog().show(childFragmentManager, AdbRequiredDialog.TAG)
+                    return@setOnPreferenceClickListener true
+                }
+                viewModel.processIntent(MenuIntent.CaptureScreenshot)
                 true
             }
         }
-        findPreference<Preference>(POWER_PICTURE_OFF)?.setOnPreferenceClickListener {
-            globalSettings.putInt(POWER_PICTURE_OFF, 0)
+        findPreference<Preference>(GlobalSettings.Keys.POWER_PICTURE_OFF)?.setOnPreferenceClickListener {
+            globalSettings.putInt(GlobalSettings.Keys.POWER_PICTURE_OFF, 0)
             true
         }
-        findPreference<Preference>(OPEN_PICTURE_SETTINGS)?.apply {
-            isVisible = !Build.MODEL.contains(TV_MODEL_PREFIX_MSSP, true)
+        findPreference<Preference>(AppSettings.Keys.OPEN_PICTURE_SETTINGS)?.apply {
+            isVisible = !Build.MODEL.contains(TvConstants.TV_MODEL_MSSP_PREFIX, true)
             setOnPreferenceClickListener {
                 openPictureSettings()
                 true
             }
         }
-        findPreference<Preference>(VIDEO_PREFERENCES)?.isVisible =
-            Build.MODEL.contains(TV_MODEL_PREFIX_MSSP, true)
-        findPreference<Preference>(APP_DESCRIPTION)?.summary =
+        findPreference<Preference>(AppSettings.Keys.VIDEO_PREFERENCES)?.isVisible =
+            Build.MODEL.contains(TvConstants.TV_MODEL_MSSP_PREFIX, true)
+        findPreference<Preference>(AppSettings.Keys.APP_DESCRIPTION)?.summary =
             getString(R.string.app_description, BuildConfig.VERSION_NAME)
     }
 
-    private fun openPictureSettings() {
-        val pictureSettingsIntent = Intent().apply {
-            component = ComponentName(
-                TvConstants.TV_SETTINGS_PACKAGE, TvConstants.TV_PICTURE_ACTIVITY_NAME
-            )
-        }
-        startActivity(pictureSettingsIntent)
+    override fun onStart() {
+        super.onStart()
+        takeScreenshotPref.isEnabled = !hasActiveTvSource(contentResolver)
     }
 
-    private var takeScreenshotJob: Job? = null
-
-    private fun onTakeScreenshotClicked() {
-        takeScreenshotJob?.cancel()
-        if (!requireContext().isAdbEnabled) {
-            AdbRequiredDialog().show(childFragmentManager, AdbRequiredDialog.TAG)
-            return
-        }
-        requireActivity().window.decorView.isVisible = false
-        takeScreenshotJob = viewLifecycleOwner.lifecycleScope.launch {
-            withTimeout(SCREEN_CAPTURE_TIMEOUT) {
-                adbShell.connect()
-                adbShell.grantPermission(READ_EXTERNAL_STORAGE)
-                adbShell.grantPermission(WRITE_EXTERNAL_STORAGE)
-                adbShell.captureScreen(
-                    saveDir = FileUtils.prepareFolder(
-                        "${Environment.getExternalStorageDirectory().path}/$SCREENSHOTS_FOLDER_NAME"
-                    )
-                )
+    private fun render(state: MenuState) {
+        when (state) {
+            is MenuState.Idle -> {
+                takeScreenshotPref.summary = ""
+                val loadingDialog =
+                    childFragmentManager.findFragmentByTag(LoadingDialog.TAG) as DialogFragment?
+                loadingDialog?.dismiss()
+            }
+            is MenuState.Loading -> {
+                LoadingDialog().show(childFragmentManager, LoadingDialog.TAG)
+            }
+            is MenuState.ScreenCapturing -> {
+                requireActivity().isWindowVisible = false
+            }
+            is MenuState.ScreenCaptureFinished -> {
+                requireActivity().isWindowVisible = true
+                takeScreenshotPref.summary = if (state.isSuccess) {
+                    getString(R.string.screenshot_saved)
+                } else {
+                    getString(R.string.screen_capture_error_try_again)
+                }
             }
         }
-        takeScreenshotJob?.invokeOnCompletion(::onScreenshotJobCompleted)
-    }
-
-    private fun onScreenshotJobCompleted(cause: Throwable?) {
-        requireActivity().window.decorView.isVisible = true
-        val resultMessage = when (cause) {
-            null -> getString(R.string.screenshot_saved)
-            else -> getString(R.string.screen_capture_error_try_again)
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            takeScreenshotPref?.summary = resultMessage
-            delay(HINT_DURATION)
-            takeScreenshotPref?.summary = ""
-        }
-    }
-
-    private fun onBacklightPreferenceClick() {
-        DarkModeManager.requireInstance().toggleDarkmode()
-        backlightPref?.summary = getRelevantDarkModeHint()
     }
 
     private fun onBacklightPreferenceLongClick() {
-        with(DarkModeManager.requireInstance()) {
-            if (!isDarkModeEnabled) {
-                isDarkModeEnabled = true
-                backlightPref?.summary = getRelevantDarkModeHint()
-                if (darkFilter.isEnabled) return
-            }
-            darkFilter.toggle()
+        if (DarkFilterService.sharedInstance == null) {
+            viewModel.processIntent(MenuIntent.ChangeMenuState(MenuState.Loading))
         }
+        with(appSettings) {
+            isDarkModeEnabled = true
+            toggleDarkFilter()
+        }
+        requireContext().showActivationToast(
+            isActivated = appSettings.isDarkFilterEnabled,
+            activationMessage = R.string.dark_filter_turning_on,
+            deactivationMessage = R.string.dark_filter_turning_off
+        )
     }
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         super.onPreferenceChange(preference, newValue)
         if (preference.key == PICTURE_BACKLIGHT) {
-            onBacklightPreferenceChange(newValue)
+            with(appSettings) {
+                if (!isDarkModeEnabled) {
+                    dayBacklight = newValue as Int
+                }
+            }
         }
         return true
     }
 
-    private fun onBacklightPreferenceChange(newValue: Any) {
-        if (!DarkModeManager.requireInstance().isDarkModeEnabled) {
-            appPreferences.dayBacklight = newValue as Int
+    private fun openPictureSettings() {
+        val intent = Intent().apply {
+            component = ComponentName(
+                TvConstants.TV_SETTINGS_PACKAGE, TvConstants.TV_PICTURE_ACTIVITY_NAME
+            )
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (DarkModeManager.sharedInstance == null) {
-            LoadingDialog().show(childFragmentManager, LoadingDialog.TAG)
-        }
-        if (requireContext().hasActiveTvSource) {
-            takeScreenshotPref?.isEnabled = false
-        }
-        backlightPref?.summary = getRelevantDarkModeHint()
-        takeScreenshotPref?.summary = ""
-    }
-
-    private fun getRelevantDarkModeHint(): String {
-        return if (appPreferences.isDarkModeEnabled) {
-            getString(R.string.click_to_day_mode)
-        } else {
-            getString(R.string.click_to_dark_mode)
-        }
+        startActivity(intent)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         requireContext().unregisterReceiver(broadcastReceiver)
-        adbShell.disconnect()
     }
 }

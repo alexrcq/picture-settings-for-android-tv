@@ -1,22 +1,26 @@
-package com.alexrcq.tvpicturesettings.helper
+package com.alexrcq.tvpicturesettings.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.alexrcq.tvpicturesettings.App.Companion.applicationScope
+import com.alexrcq.tvpicturesettings.helper.AlarmScheduler
 import com.alexrcq.tvpicturesettings.helper.AlarmScheduler.Companion.ACTION_ALARM_TRIGGERED
 import com.alexrcq.tvpicturesettings.helper.AlarmScheduler.Companion.EXTRA_ALARM_TYPE
+import com.alexrcq.tvpicturesettings.helper.AppSettings
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 
-
 class AlarmBroadcastReceiver : BroadcastReceiver() {
+
+    private lateinit var appSettings: AppSettings
 
     override fun onReceive(context: Context, intent: Intent) {
         Timber.d("intent action: ${intent.action}")
+        appSettings = AppSettings(context)
         if (intent.action == ACTION_ALARM_TRIGGERED) {
             val alarmType =
                 intent.getSerializableExtra(EXTRA_ALARM_TYPE) as AlarmScheduler.AlarmType?
@@ -36,7 +40,7 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
     private fun onDarkModeAlarmTriggered() {
         applicationScope.launch {
             mutex.withLock {
-                DarkModeManager.requireInstance().isDarkModeEnabled = true
+                appSettings.isDarkModeEnabled = true
             }
         }
     }
@@ -46,7 +50,7 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
             mutex.withLock {
                 // waiting for the system settings service wake up
                 delay(DAY_MODE_DELAY)
-                DarkModeManager.requireInstance().isDarkModeEnabled = false
+                appSettings.isDarkModeEnabled = false
             }
         }
     }

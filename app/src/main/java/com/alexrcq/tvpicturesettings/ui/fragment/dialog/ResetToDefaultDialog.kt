@@ -10,9 +10,9 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.requestFocusForced
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_AUTO_BACKLIGHT
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings.Keys.PICTURE_RESET_TO_DEFAULT
-import com.alexrcq.tvpicturesettings.storage.GlobalSettingsWrapper
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_AUTO_BACKLIGHT
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_RESET_TO_DEFAULT
+import com.alexrcq.tvpicturesettings.helper.GlobalSettingsWrapper
 
 class ResetToDefaultDialog : DialogFragment(), DialogInterface.OnShowListener {
 
