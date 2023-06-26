@@ -21,6 +21,8 @@ class AppSettings(private val context: Context) {
     var isDarkModeEnabled: Boolean
         get() = preferences.getBoolean(Keys.IS_DARK_MODE_ENABLED, false)
         set(isDarkModeEnabled) {
+            val oldValue = preferences.getBoolean(Keys.IS_DARK_MODE_ENABLED, false)
+            if (isDarkModeEnabled == oldValue) return
             preferences.edit {
                 putBoolean(Keys.IS_DARK_MODE_ENABLED, isDarkModeEnabled)
             }
@@ -36,6 +38,8 @@ class AppSettings(private val context: Context) {
     var isDarkFilterEnabled: Boolean
         get() = preferences.getBoolean(Keys.IS_DARK_FILTER_ENABLED, false)
         set(isDarkFilterEnabled) {
+            val oldValue = preferences.getBoolean(Keys.IS_DARK_FILTER_ENABLED, false)
+            if (isDarkFilterEnabled == oldValue) return
             preferences.edit {
                 putBoolean(Keys.IS_DARK_FILTER_ENABLED, isDarkFilterEnabled)
             }
