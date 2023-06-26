@@ -11,8 +11,8 @@ android {
         applicationId "com.alexrcq.tvpicturesettings"
         minSdkVersion 26
         targetSdkVersion 32
-        versionCode 28
-        versionName "1.0.73 beta"
+        versionCode 29
+        versionName "1.0.73 beta2"
     }
 
     compileOptions {
