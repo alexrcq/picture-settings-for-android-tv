@@ -26,6 +26,7 @@ import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Values.PICTURE_MODE_U
 import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Values.PICTURE_TEMPERATURE_COLD
 import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Values.PICTURE_TEMPERATURE_DEFAULT
 import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Values.PICTURE_TEMPERATURE_WARM
+import com.alexrcq.tvpicturesettings.onClick
 import com.alexrcq.tvpicturesettings.toBoolean
 import com.alexrcq.tvpicturesettings.toInt
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.ResetToDefaultDialog
@@ -34,9 +35,8 @@ class VideoPreferencesFragment : GlobalSettingsFragment(R.xml.video_prefs) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        findPreference<Preference>(RESET_TO_DEFAULT)?.setOnPreferenceClickListener {
+        findPreference<Preference>(RESET_TO_DEFAULT)?.onClick {
             ResetToDefaultDialog().show(childFragmentManager, ResetToDefaultDialog.TAG)
-            true
         }
         findPreference<ListPreference>(PICTURE_TEMPERATURE)?.apply {
             isEnabled = !appSettings.isWhiteBalanceFixed

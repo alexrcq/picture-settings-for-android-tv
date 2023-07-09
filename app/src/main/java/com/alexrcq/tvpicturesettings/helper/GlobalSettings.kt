@@ -4,6 +4,8 @@ import android.database.ContentObserver
 
 interface GlobalSettings {
 
+    val isAdbEnabled: Boolean
+
     fun putInt(key: String, value: Int)
 
     fun getInt(key: String): Int
