@@ -10,4 +10,13 @@ sealed class MenuState {
 sealed class MenuIntent {
     class ChangeMenuState(val menuState: MenuState) : MenuIntent()
     object CaptureScreenshot : MenuIntent()
+    object EnableDarkModeAndToggleFilter : MenuIntent()
+    object ToggleDarkMode : MenuIntent()
+    object TurnOffScreen : MenuIntent()
+}
+
+sealed class MenuSideEffect {
+    object ShowAdbRequiredMessage : MenuSideEffect()
+    class ShowDarkFilterEnabledMessage(val isDarkFilterEnabled: Boolean) : MenuSideEffect()
+    class ShowDarkModeStateChanged(val isDarkModeEnabled: Boolean) : MenuSideEffect()
 }

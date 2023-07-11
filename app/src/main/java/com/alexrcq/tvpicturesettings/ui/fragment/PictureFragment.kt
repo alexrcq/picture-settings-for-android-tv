@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.SeekBarPreference
 import com.alexrcq.tvpicturesettings.*
+import com.alexrcq.tvpicturesettings.adblib.AdbShell
 import com.alexrcq.tvpicturesettings.service.DarkFilterService
 import com.alexrcq.tvpicturesettings.helper.AppSettings
 import com.alexrcq.tvpicturesettings.helper.AppSettings.Keys.TAKE_SCREENSHOT
@@ -27,7 +28,15 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
     private lateinit var backlightPref: SeekBarPreference
     private lateinit var takeScreenshotPref: Preference
 
-    private val viewModel: PictureViewModel by viewModels()
+    private val viewModel: PictureViewModel by viewModels {
+        val adbShell = AdbShell(requireContext())
+        PictureViewModel.Factory(
+            adbShell,
+            appSettings,
+            globalSettings,
+            CaptureScreenUseCase(adbShell)
+        )
+    }
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -43,16 +52,8 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
         requireContext().registerReceiver(
             broadcastReceiver, IntentFilter(DarkFilterService.ACTION_SERVICE_CONNECTED)
         )
-        viewModel.menuState.onEach(::render).launchIn(lifecycleScope)
-        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
-            viewModel.isDarkModeEnabledFlow.collect { isDarkModeEnabled ->
-                backlightPref.summary = if (isDarkModeEnabled) {
-                    getString(R.string.click_to_day_mode)
-                } else {
-                    getString(R.string.click_to_dark_mode)
-                }
-            }
-        }
+        viewModel.menuState.onEach(::render).launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.menuSideEffect.onEach(::handleEffect).launchIn(viewLifecycleOwner.lifecycleScope)
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.darkModeHintFlow.collect { hintResId ->
                 backlightPref.summary = getString(hintResId)
@@ -63,40 +64,30 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
     private fun iniPreferences() {
         backlightPref =
             requirePreference<LongPressGlobalSeekbarPreference>(PICTURE_BACKLIGHT).apply {
-                setOnPreferenceClickListener {
-                    appSettings.toggleDarkMode()
-                    true
-                }
-                onPreferenceLongClickListener = {
-                    onBacklightPreferenceLongClick()
-                    true
-                }
+                onClick { viewModel.processIntent(MenuIntent.ToggleDarkMode) }
+                onLongClick(::onBacklightPreferenceLongClick)
             }
         takeScreenshotPref = requirePreference<Preference>(TAKE_SCREENSHOT).apply {
-            setOnPreferenceClickListener {
-                if (!requireContext().isAdbEnabled) {
-                    AdbRequiredDialog().show(childFragmentManager, AdbRequiredDialog.TAG)
-                    return@setOnPreferenceClickListener true
-                }
-                viewModel.processIntent(MenuIntent.CaptureScreenshot)
-                true
-            }
+            onClick { viewModel.processIntent(MenuIntent.CaptureScreenshot) }
         }
-        findPreference<Preference>(GlobalSettings.Keys.POWER_PICTURE_OFF)?.setOnPreferenceClickListener {
-            globalSettings.putInt(GlobalSettings.Keys.POWER_PICTURE_OFF, 0)
-            true
+        findPreference<Preference>(GlobalSettings.Keys.POWER_PICTURE_OFF)?.apply {
+            onClick { viewModel.processIntent(MenuIntent.TurnOffScreen) }
         }
         findPreference<Preference>(AppSettings.Keys.OPEN_PICTURE_SETTINGS)?.apply {
             isVisible = !Build.MODEL.contains(TvConstants.TV_MODEL_MSSP_PREFIX, true)
-            setOnPreferenceClickListener {
-                openPictureSettings()
-                true
-            }
+            onClick(::openPictureSettings)
         }
         findPreference<Preference>(AppSettings.Keys.VIDEO_PREFERENCES)?.isVisible =
             Build.MODEL.contains(TvConstants.TV_MODEL_MSSP_PREFIX, true)
         findPreference<Preference>(AppSettings.Keys.APP_DESCRIPTION)?.summary =
             getString(R.string.app_description, BuildConfig.VERSION_NAME)
+    }
+
+    private fun onBacklightPreferenceLongClick() {
+        if (DarkFilterService.sharedInstance == null) {
+            viewModel.processIntent(MenuIntent.ChangeMenuState(MenuState.Loading))
+        }
+        viewModel.processIntent(MenuIntent.EnableDarkModeAndToggleFilter)
     }
 
     override fun onStart() {
@@ -129,31 +120,26 @@ class PictureFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
         }
     }
 
-    private fun onBacklightPreferenceLongClick() {
-        if (DarkFilterService.sharedInstance == null) {
-            viewModel.processIntent(MenuIntent.ChangeMenuState(MenuState.Loading))
-        }
-        with(appSettings) {
-            isDarkModeEnabled = true
-            toggleDarkFilter()
-        }
-        requireContext().showActivationToast(
-            isActivated = appSettings.isDarkFilterEnabled,
-            activationMessage = R.string.dark_filter_turning_on,
-            deactivationMessage = R.string.dark_filter_turning_off
-        )
-    }
-
-    override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
-        super.onPreferenceChange(preference, newValue)
-        if (preference.key == PICTURE_BACKLIGHT) {
-            with(appSettings) {
-                if (!isDarkModeEnabled) {
-                    dayBacklight = newValue as Int
+    private fun handleEffect(effect: MenuSideEffect) {
+        when (effect) {
+            is MenuSideEffect.ShowAdbRequiredMessage -> {
+                AdbRequiredDialog().show(childFragmentManager, AdbRequiredDialog.TAG)
+            }
+            is MenuSideEffect.ShowDarkFilterEnabledMessage -> {
+                requireContext().showActivationToast(
+                    isActivated = effect.isDarkFilterEnabled,
+                    activationMessage = R.string.dark_filter_turning_on,
+                    deactivationMessage = R.string.dark_filter_turning_off
+                )
+            }
+            is MenuSideEffect.ShowDarkModeStateChanged -> {
+                backlightPref.summary = if (effect.isDarkModeEnabled) {
+                    getString(R.string.click_to_day_mode)
+                } else {
+                    getString(R.string.click_to_dark_mode)
                 }
             }
         }
-        return true
     }
 
     private fun openPictureSettings() {

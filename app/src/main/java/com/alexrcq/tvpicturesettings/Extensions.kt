@@ -4,7 +4,6 @@ import android.accessibilityservice.AccessibilityService
 import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.FileObserver
@@ -13,12 +12,8 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.core.view.isVisible
+import androidx.preference.Preference
 import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_ADAPTIVE_LUMA_CONTROL
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import java.io.File
@@ -34,7 +29,7 @@ fun Context.hasPermission(permission: String): Boolean =
     checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 
 val Context.isAdbEnabled: Boolean
-    get() = Settings.Global.getInt(contentResolver, Settings.Global.ADB_ENABLED, 0) == 1
+    get() = Settings.Global.getInt(contentResolver, Settings.Global.ADB_ENABLED, 0).toBoolean()
 
 val Context.isCurrentTvSupported: Boolean
     get() {
@@ -83,20 +78,6 @@ var Activity.isWindowVisible: Boolean
     }
     get() = window.decorView.isVisible
 
-@OptIn(ExperimentalCoroutinesApi::class)
-fun SharedPreferences.getBooleanFlow(preferenceKey: String) = callbackFlow {
-    val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-        if (key == preferenceKey) {
-            trySend(getBoolean(key, false))
-        }
-    }
-    registerOnSharedPreferenceChangeListener(listener)
-    if (contains(preferenceKey)) {
-        send(getBoolean(preferenceKey, false))
-    }
-    awaitClose { unregisterOnSharedPreferenceChangeListener(listener) }
-}.buffer(Channel.UNLIMITED)
-
 suspend fun File.waitForFileEvent(mask: Int) = suspendCancellableCoroutine { continuation ->
     @Suppress("DEPRECATION")
     val fileObserver = object : FileObserver(this.path, mask) {
@@ -140,4 +121,11 @@ fun hasActiveTvSource(contentResolver: ContentResolver): Boolean {
     }
     Timber.d("currentSource: $currentSourceName")
     return currentSourceName != "Null"
+}
+
+fun Preference.onClick(onClick: () -> Unit) {
+    setOnPreferenceClickListener {
+        onClick.invoke()
+        true
+    }
 }

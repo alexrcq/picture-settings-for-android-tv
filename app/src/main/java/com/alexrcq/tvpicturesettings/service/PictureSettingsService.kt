@@ -25,6 +25,10 @@ import com.alexrcq.tvpicturesettings.helper.WhiteBalanceHelper
 import com.alexrcq.tvpicturesettings.showActivationToast
 import com.alexrcq.tvpicturesettings.helper.AppSettings
 import com.alexrcq.tvpicturesettings.helper.GlobalSettings
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_BACKLIGHT
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_BLUE_GAIN
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_GREEN_GAIN
+import com.alexrcq.tvpicturesettings.helper.GlobalSettings.Keys.PICTURE_RED_GAIN
 
 class PictureSettingsService : Service() {
 
@@ -107,9 +111,16 @@ class PictureSettingsService : Service() {
         when (key) {
             AppSettings.Keys.IS_DARK_MODE_ENABLED -> onDarkModeEnabled(appSettings.isDarkModeEnabled)
             AppSettings.Keys.IS_DARK_FILTER_ENABLED -> onDarkFilterEnabled(appSettings.isDarkFilterEnabled)
-            GlobalSettings.Keys.PICTURE_RED_GAIN,
-            GlobalSettings.Keys.PICTURE_GREEN_GAIN,
-            GlobalSettings.Keys.PICTURE_BLUE_GAIN -> onPictureGainChanged(key)
+            PICTURE_RED_GAIN, PICTURE_GREEN_GAIN, PICTURE_BLUE_GAIN -> onPictureGainChanged(key)
+            PICTURE_BACKLIGHT -> onBacklightChanged(globalSettings.getInt(PICTURE_BACKLIGHT))
+        }
+    }
+
+    private fun onBacklightChanged(backlight: Int) {
+        with(appSettings) {
+            if (!isDarkModeEnabled) {
+                dayBacklight = backlight
+            }
         }
     }
 

@@ -53,7 +53,7 @@
     <string name="reset_values">Сбросить значения</string>
     <string name="equalizer_detail">Эквалайзер</string>
     <string name="screen_capture_error_try_again">Ошибка захвата изображения. Пожалуйста, попробуйте снова</string>
-    <string name="dark_filter_service">Тёмный фильтр</string>
+    <string name="dark_filter_service">Сервис доп. затемнения экрана</string>
     <string name="open_picture_settings">Открыть настройки изображения</string>
     <string name="white_balance">Баланс белого</string>
     <string name="app_description">Версия приложения: %1$s</string>
