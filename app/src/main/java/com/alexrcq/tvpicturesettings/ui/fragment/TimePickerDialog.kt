@@ -18,16 +18,8 @@ class TimePickerDialog private constructor() : LeanbackPreferenceDialogFragmentC
 
     private lateinit var timePicker: TimePicker
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(
-            R.layout.preference_dialog_timepicker,
-            container, false
-        )
-    }
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.preference_dialog_timepicker, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         timePicker = view.findViewById(R.id.time_picker)

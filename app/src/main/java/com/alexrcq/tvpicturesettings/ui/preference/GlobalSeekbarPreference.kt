@@ -14,7 +14,5 @@ open class GlobalSeekbarPreference @JvmOverloads constructor(
         showSeekBarValue = true
     }
 
-    override fun isPersistent(): Boolean {
-        return false
-    }
+    override fun isPersistent(): Boolean = false
 }

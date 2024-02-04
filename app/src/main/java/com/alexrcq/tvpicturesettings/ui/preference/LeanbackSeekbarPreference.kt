@@ -5,10 +5,8 @@ import android.util.AttributeSet
 import androidx.preference.SeekBarPreference
 import com.alexrcq.tvpicturesettings.R
 
-open class LeanbackSeekbarPreference  @JvmOverloads constructor(
-    context: Context,
-    attributeSet: AttributeSet? = null,
-    defStyleAttr: Int = android.R.attr.seekBarStyle
+open class LeanbackSeekbarPreference @JvmOverloads constructor(
+    context: Context, attributeSet: AttributeSet? = null, defStyleAttr: Int = android.R.attr.seekBarStyle
 ) : SeekBarPreference(context, attributeSet, defStyleAttr) {
 
     init {

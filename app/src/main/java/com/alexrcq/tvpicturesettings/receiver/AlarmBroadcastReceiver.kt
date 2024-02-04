@@ -3,11 +3,13 @@ package com.alexrcq.tvpicturesettings.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.alexrcq.tvpicturesettings.App
 import com.alexrcq.tvpicturesettings.App.Companion.applicationScope
-import com.alexrcq.tvpicturesettings.helper.AlarmScheduler
-import com.alexrcq.tvpicturesettings.helper.AlarmScheduler.Companion.ACTION_ALARM_TRIGGERED
-import com.alexrcq.tvpicturesettings.helper.AlarmScheduler.Companion.EXTRA_ALARM_TYPE
-import com.alexrcq.tvpicturesettings.helper.AppSettings
+import com.alexrcq.tvpicturesettings.helper.DarkModeManager
+import com.alexrcq.tvpicturesettings.storage.DarkModePreferences
+import com.alexrcq.tvpicturesettings.util.AlarmScheduler
+import com.alexrcq.tvpicturesettings.util.AlarmScheduler.ACTION_ALARM_TRIGGERED
+import com.alexrcq.tvpicturesettings.util.AlarmScheduler.EXTRA_ALARM_TYPE
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -16,14 +18,16 @@ import timber.log.Timber
 
 class AlarmBroadcastReceiver : BroadcastReceiver() {
 
-    private lateinit var appSettings: AppSettings
+    private lateinit var darkModeManager: DarkModeManager
+    private lateinit var darkModePreferences: DarkModePreferences
 
     override fun onReceive(context: Context, intent: Intent) {
         Timber.d("intent action: ${intent.action}")
-        appSettings = AppSettings(context)
+        val application = (context.applicationContext as App)
+        darkModeManager = application.darkModeManager
+        darkModePreferences = application.darkModePreferences
         if (intent.action == ACTION_ALARM_TRIGGERED) {
-            val alarmType =
-                intent.getSerializableExtra(EXTRA_ALARM_TYPE) as AlarmScheduler.AlarmType?
+            val alarmType = intent.getSerializableExtra(EXTRA_ALARM_TYPE) as AlarmScheduler.AlarmType?
             handleAlarm(alarmType)
         }
     }
@@ -40,7 +44,11 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
     private fun onDarkModeAlarmTriggered() {
         applicationScope.launch {
             mutex.withLock {
-                appSettings.isDarkModeEnabled = true
+                if (darkModePreferences.isAdditionalDimmingEnabled) {
+                    darkModeManager.setMode(DarkModeManager.Mode.FULL)
+                } else {
+                    darkModeManager.setMode(DarkModeManager.Mode.ONLY_BACKLIGHT)
+                }
             }
         }
     }
@@ -50,7 +58,7 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
             mutex.withLock {
                 // waiting for the system settings service wake up
                 delay(DAY_MODE_DELAY)
-                appSettings.isDarkModeEnabled = false
+                darkModeManager.setMode(DarkModeManager.Mode.OFF)
             }
         }
     }

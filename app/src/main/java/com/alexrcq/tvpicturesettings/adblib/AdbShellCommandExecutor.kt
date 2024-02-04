@@ -3,8 +3,8 @@ package com.alexrcq.tvpicturesettings.adblib
 import android.content.Context
 import android.os.FileObserver.CREATE
 import com.alexrcq.tvpicturesettings.BuildConfig
-import com.alexrcq.tvpicturesettings.hasPermission
-import com.alexrcq.tvpicturesettings.waitForFileEvent
+import com.alexrcq.tvpicturesettings.util.hasPermission
+import com.alexrcq.tvpicturesettings.util.waitForFileEvent
 import com.tananaev.adblib.AdbConnection
 import com.tananaev.adblib.AdbCrypto
 import kotlinx.coroutines.CoroutineStart
@@ -21,18 +21,17 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
 private const val CONNECTION_TIMEOUT_SECONDS = 25L
+private const val PERMISSION_CHECK_INTERVAL = 50L
+private const val ENSURE_PERMISSION_GRANTED_DELAY = 200L
 
-class AdbShell(
-    private val context: Context,
-    private val host: String = "127.0.0.1",
-    private val port: Int = 5555
-) {
+class AdbShellCommandExecutor(private val context: Context) : AdbClient {
+
     private var adbConnection: AdbConnection? = null
     private var isConnected = false
 
-    suspend fun connect() = withContext(IO) {
+    override suspend fun connect(host: String, port: Int) = withContext(IO) {
         if (!isConnected) {
-            adbConnection = createConnection()
+            adbConnection = createConnection(host, port)
             Timber.d("connecting...")
             val isConnectionEstablished = adbConnection?.connect(
                 CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS, false
@@ -45,27 +44,27 @@ class AdbShell(
         }
     }
 
-    private suspend fun execute(command: String) = withContext(IO) {
-        if (!isConnected) throw IllegalStateException("connect() first")
+    override suspend fun execute(command: String): Unit = withContext(IO) {
+        if (!isConnected) connect()
         Timber.d(command)
         adbConnection?.open("shell:")?.write("$command\n")
     }
 
-    suspend fun grantPermission(permission: String) {
+    override suspend fun grantPermission(permission: String) {
         if (context.hasPermission(permission)) return
         execute("pm grant ${BuildConfig.APPLICATION_ID} $permission")
         while (true) {
-            delay(50)
+            delay(PERMISSION_CHECK_INTERVAL)
             if (context.hasPermission(permission)) {
                 // the permission is actually not granted yet, waiting
-                delay(200)
+                delay(ENSURE_PERMISSION_GRANTED_DELAY)
                 Timber.d("$permission granted")
                 break
             }
         }
     }
 
-    suspend fun captureScreen(saveDir: File) = withContext(IO) {
+    override suspend fun captureScreen(saveDir: File) = withContext(IO) {
         val currentTime = LocalDateTime.now().format(
             DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss_SSS")
         )
@@ -97,14 +96,14 @@ class AdbShell(
         return crypto
     }
 
-    private fun createConnection(): AdbConnection {
+    private fun createConnection(host: String, port: Int): AdbConnection {
         val path = context.cacheDir.absolutePath
         val crypto = setupCrypto("$path/pub.key", "$path/priv.key")
         val socket = Socket(host, port)
         return AdbConnection.create(socket, crypto)
     }
 
-    fun disconnect() {
+    override fun disconnect() {
         if (isConnected) {
             adbConnection?.close()
             isConnected = false

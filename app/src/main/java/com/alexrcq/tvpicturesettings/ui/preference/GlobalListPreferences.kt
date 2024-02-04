@@ -12,9 +12,7 @@ open class GlobalListPreferences @JvmOverloads constructor(
     defStyleAttr: Int = android.R.attr.dialogPreferenceStyle
 ) : ListPreference(context, attributeSet, defStyleAttr) {
 
-    init {
-        isPersistent = false
-    }
+    override fun isPersistent(): Boolean = false
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)

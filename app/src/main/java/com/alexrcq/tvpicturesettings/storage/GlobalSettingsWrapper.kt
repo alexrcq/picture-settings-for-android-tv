@@ -1,14 +1,11 @@
-package com.alexrcq.tvpicturesettings.helper
+package com.alexrcq.tvpicturesettings.storage
 
 import android.content.ContentResolver
 import android.database.ContentObserver
 import android.provider.Settings
-import com.alexrcq.tvpicturesettings.toBoolean
 import timber.log.Timber
 
 open class GlobalSettingsWrapper(private val contentResolver: ContentResolver) : GlobalSettings {
-
-    override val isAdbEnabled: Boolean get() = getInt(Settings.Global.ADB_ENABLED, 0).toBoolean()
 
     override fun putInt(key: String, value: Int) {
         Timber.d("putInt : key = $key, value = $value")
@@ -17,12 +14,6 @@ open class GlobalSettingsWrapper(private val contentResolver: ContentResolver) :
 
     override fun getInt(key: String): Int {
         val value = Settings.Global.getInt(contentResolver, key)
-        Timber.d("getInt : key = $key, value = $value")
-        return value
-    }
-
-    override fun getInt(key: String, def: Int): Int {
-        val value = Settings.Global.getInt(contentResolver, key, def)
         Timber.d("getInt : key = $key, value = $value")
         return value
     }

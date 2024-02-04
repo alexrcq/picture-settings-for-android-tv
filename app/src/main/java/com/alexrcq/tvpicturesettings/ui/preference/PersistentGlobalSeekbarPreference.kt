@@ -9,7 +9,5 @@ class PersistentGlobalSeekbarPreference @JvmOverloads constructor(
     defStyleAttr: Int = android.R.attr.seekBarStyle
 ) : GlobalSeekbarPreference(context, attributeSet, defStyleAttr) {
 
-    override fun isPersistent(): Boolean {
-        return true
-    }
+    override fun isPersistent(): Boolean = true
 }

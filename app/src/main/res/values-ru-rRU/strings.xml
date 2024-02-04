@@ -23,8 +23,8 @@
     <string name="power_picture_off">Выключить экран</string>
     <string name="adb_debugging_required">Необходимо включить отладку по USB в настройках для разработчиков</string>
     <string name="wait_for_debug_window">В следующем окне отметьте галочкой \"Всегда разрешать отладку с этого компьютера\" и нажмите ОК.</string>
-    <string name="dark_mode_activated">Переход в ночной режим…</string>
-    <string name="dark_mode_deactivated">Переход в дневной режим…</string>
+    <string name="dark_mode_full">Ночной режим (снижение подсветки + затемнение)</string>
+    <string name="dark_mode_off">Переход в дневной режим…</string>
     <string name="red">Красный</string>
     <string name="green">Зелёный</string>
     <string name="blue">Синий</string>
@@ -49,7 +49,7 @@
     <string name="dark_mode_disable_time">Время выхода из ночного режима</string>
     <string name="reset_values">Сбросить значения</string>
     <string name="screen_capture_error_try_again">Ошибка захвата изображения. Пожалуйста, попробуйте снова</string>
-    <string name="dark_filter_service">Сервис доп. затемнения экрана</string>
+    <string name="screen_filter_service">Сервис экранного фильтра</string>
     <string name="open_picture_settings">Открыть настройки изображения</string>
     <string name="white_balance">Баланс белого</string>
     <string name="app_description">Версия приложения: %1$s</string>
@@ -57,9 +57,11 @@
     <string name="white_balance_hint">Стандартное значение – 1024</string>
     <string name="reset_to_default_1024">Сбросить значения до стандартного</string>
     <string name="hold_to_toggle_extra_dimm_hint">Удерживайте для переключения доп. затемнения</string>
-    <string name="dark_filter_turning_on">Включение дополнительного затемнения…</string>
-    <string name="dark_filter_turning_off">Дополнительное затемнение отключено</string>
     <string name="fix_values">Фиксировать значения</string>
     <string name="custom_see_wb_settings">Пользовательская (см. настройки баланса белого)</string>
     <string name="fixed_see_wb_settings">Фиксированная (см. настройки баланса белого)</string>
+    <string name="activity_not_found">%1$s не найдена</string>
+    <string name="step_by_step_dark_mode">Трехшаговое переключение ночного режима</string>
+    <string name="click_to_turn_on_the_dark_filter">Нажмите для включения доп. затемнения</string>
+    <string name="dark_mode_only_backlight">Ночной режим (снижение подсветки)</string>
 </resources>
