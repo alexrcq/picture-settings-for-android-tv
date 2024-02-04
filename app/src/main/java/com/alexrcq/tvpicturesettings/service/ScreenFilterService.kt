@@ -2,7 +2,6 @@ package com.alexrcq.tvpicturesettings.service
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.PixelFormat
 import android.view.View
 import android.view.ViewGroup
@@ -10,31 +9,31 @@ import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import timber.log.Timber
 
-class DarkFilterService : AccessibilityService() {
+private const val MAX_SCREEN_FILTER_POWER = 100
 
-    lateinit var darkFilter: DarkFilter
+class ScreenFilterService : AccessibilityService() {
+
+    lateinit var screenFilter: ScreenFilter
 
     override fun onServiceConnected() {
         Timber.d("onServiceConnected")
-        darkFilter = DarkFilter()
+        screenFilter = ScreenFilter()
         sharedInstance = this
         sendBroadcast(Intent(ACTION_SERVICE_CONNECTED))
     }
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) {}
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
 
-    override fun onInterrupt() {}
+    override fun onInterrupt() = Unit
 
     override fun onUnbind(intent: Intent?): Boolean {
         sharedInstance = null
         return super.onUnbind(intent)
     }
 
-    inner class DarkFilter {
+    inner class ScreenFilter {
 
-        private val view = View(applicationContext).apply {
-            setBackgroundColor(Color.BLACK)
-        }
+        private val view = View(applicationContext)
 
         var isEnabled = false
             set(enabled) {
@@ -46,11 +45,13 @@ class DarkFilterService : AccessibilityService() {
                 disable()
             }
 
-        var alpha: Float
-            get() = view.alpha
-            set(value) {
-                view.alpha = value
-            }
+        fun setColor(color: Int) {
+            view.setBackgroundColor(color)
+        }
+
+        fun setPower(power: Int) {
+            view.alpha = power / MAX_SCREEN_FILTER_POWER.toFloat()
+        }
 
         private fun enable() {
             val layoutParams = WindowManager.LayoutParams(
@@ -75,9 +76,10 @@ class DarkFilterService : AccessibilityService() {
     }
 
     companion object {
-        const val ACTION_SERVICE_CONNECTED =
-            "com.alexrcq.tvpicturesettings.ACTION_DARK_FILTER_SERVICE_CONNECTED"
+        const val ACTION_SERVICE_CONNECTED = "com.alexrcq.tvpicturesettings.ACTION_SCREEN_FILTER_SERVICE_CONNECTED"
 
-        var sharedInstance: DarkFilterService? = null
+        var sharedInstance: ScreenFilterService? = null
+
+        fun isServiceConnected(): Boolean = sharedInstance != null
     }
 }

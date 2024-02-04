@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="picture_mode">
+        <item>Standart</item>
+        <item>Parlak</item>
+        <item>Spor</item>
+        <item>Sinema</item>
+        <item>Özel</item>
+    </array>
+    <array name="picture_temperature">
+        <item>Sıcak</item>
+        <item>Havalı</item>
+        <item>Standart</item>
+    </array>
+    <array name="picture_advanced_video_noise_reduction_entries">
+        <item>Kapalı</item>
+        <item>Düşük</item>
+        <item>Orta</item>
+        <item>Güçlü</item>
+    </array>
+</resources>

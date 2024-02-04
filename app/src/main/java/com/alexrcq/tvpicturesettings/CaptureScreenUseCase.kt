@@ -2,26 +2,30 @@ package com.alexrcq.tvpicturesettings
 
 import android.Manifest
 import android.os.Environment
-import com.alexrcq.tvpicturesettings.adblib.AdbShell
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.alexrcq.tvpicturesettings.adblib.AdbClient
 import timber.log.Timber
+import java.io.File
 
-private const val DEFAULT_SCREENSHOTS_FOLDER = "Screenshots"
+private const val DEFAULT_SCREENSHOTS_PATH = "/Screenshots"
 
-class CaptureScreenUseCase(private val adbShell: AdbShell) {
+class CaptureScreenUseCase(private val adb: AdbClient) {
+    suspend operator fun invoke(savePath: String = getDefaultPath()): Boolean = try {
+        adb.grantPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+        adb.grantPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        adb.captureScreen(saveDir = createDirectoryIfNotExists(savePath))
+        true
+    } catch (e: Exception) {
+        Timber.e(e, "Screen capture failed")
+        false
+    }
 
-    suspend operator fun invoke(savePath: String = "${Environment.getExternalStorageDirectory().path}/$DEFAULT_SCREENSHOTS_FOLDER"): Boolean =
-        try {
-            withContext(Dispatchers.IO) {
-                adbShell.connect()
-                adbShell.grantPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-                adbShell.grantPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                adbShell.captureScreen(saveDir = prepareDir(savePath))
-            }
-            true
-        } catch (e: Exception) {
-            Timber.e(e, "Screen capture failed")
-            false
-        }
+    private fun getDefaultPath(): String = "${Environment.getExternalStorageDirectory().path}$DEFAULT_SCREENSHOTS_PATH"
+}
+
+private fun createDirectoryIfNotExists(path: String): File {
+    val directory = File(path)
+    if (!directory.exists()) {
+        directory.mkdirs()
+    }
+    return directory
 }

@@ -7,7 +7,7 @@
         app:key="picture_backlight"
         app:title="@string/backlight" />
     <Preference
-        app:key="power_picture_off"
+        app:key="toggle_screen_power"
         app:title="@string/power_picture_off" />
     <Preference
         app:key="take_screenshot"

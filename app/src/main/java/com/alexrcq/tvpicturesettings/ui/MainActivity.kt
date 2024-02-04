@@ -1,36 +1,26 @@
 package com.alexrcq.tvpicturesettings.ui
 
-import android.Manifest
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
-import com.alexrcq.tvpicturesettings.*
-import com.alexrcq.tvpicturesettings.service.PictureSettingsService
-import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AcceptDebuggingDialog
-import com.alexrcq.tvpicturesettings.ui.fragment.dialog.AdbRequiredDialog
-import com.alexrcq.tvpicturesettings.ui.fragment.dialog.NotSupportedTVDialog
+import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.service.DarkModeService
+import com.alexrcq.tvpicturesettings.util.DeviceUtils
+import com.alexrcq.tvpicturesettings.util.requestFocusForced
 
 class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!isCurrentTvSupported) {
-            NotSupportedTVDialog().show(supportFragmentManager, NotSupportedTVDialog.TAG)
-            return
-        }
-        if (!isAdbEnabled && !hasPermission(Manifest.permission.WRITE_SECURE_SETTINGS)) {
-            AdbRequiredDialog().show(
-                supportFragmentManager, AdbRequiredDialog.TAG
-            )
+        if (!DeviceUtils.isCurrentTvSupported(this)) {
+            showTvNotSupported()
             return
         }
         setContentView(R.layout.activity_main)
-        if (!hasPermission(Manifest.permission.WRITE_SECURE_SETTINGS)) {
-            AcceptDebuggingDialog().show(supportFragmentManager, AcceptDebuggingDialog.TAG)
-            return
-        }
-        PictureSettingsService.start(this)
+        DarkModeService.startForeground(this)
     }
 
     override fun onAttachedToWindow() {
@@ -43,5 +33,15 @@ class MainActivity : FragmentActivity() {
             gravity = Gravity.END
         }
         windowManager.updateViewLayout(view, layoutParams)
+    }
+
+    private fun showTvNotSupported() {
+        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+            .setMessage(R.string.not_supported_tv)
+            .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
+            .setOnCancelListener { finish() }
+            .create().apply {
+                setOnShowListener { getButton(DialogInterface.BUTTON_POSITIVE).requestFocusForced() }
+            }.show()
     }
 }
