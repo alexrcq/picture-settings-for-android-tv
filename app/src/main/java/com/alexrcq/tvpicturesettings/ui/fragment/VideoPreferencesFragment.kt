@@ -15,7 +15,6 @@ import com.alexrcq.tvpicturesettings.storage.TvSettings
 import com.alexrcq.tvpicturesettings.storage.MtkGlobalKeys
 import com.alexrcq.tvpicturesettings.storage.MtkPictureSettings.Companion.PICTURE_MODE_USER
 import com.alexrcq.tvpicturesettings.util.onClick
-import com.alexrcq.tvpicturesettings.util.requestFocusForced
 import com.alexrcq.tvpicturesettings.util.showToast
 
 class VideoPreferencesFragment : GlobalSettingsFragment(R.xml.video_prefs) {
@@ -88,15 +87,15 @@ class VideoPreferencesFragment : GlobalSettingsFragment(R.xml.video_prefs) {
     }
 
     private fun showResetToDefaultDialog() {
-        AlertDialog.Builder(requireContext(), android.R.style.Theme_Material_Dialog_Alert)
+        val dialog = AlertDialog.Builder(context)
             .setMessage(R.string.reset_to_default_message)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 showToast(getString(R.string.please_wait))
                 pictureSettings.resetToDefault()
             }
             .setNegativeButton(android.R.string.cancel, null)
-            .create().apply {
-                setOnShowListener { getButton(Dialog.BUTTON_NEGATIVE).requestFocusForced() }
-            }.show()
+            .create()
+        dialog.show()
+        dialog.getButton(Dialog.BUTTON_NEGATIVE).requestFocus()
     }
 }

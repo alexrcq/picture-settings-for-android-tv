@@ -3,7 +3,6 @@ package com.alexrcq.tvpicturesettings.util
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.FileObserver
-import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -11,12 +10,6 @@ import androidx.preference.Preference
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.File
 import kotlin.coroutines.resume
-
-fun View.requestFocusForced() {
-    isFocusable = true
-    isFocusableInTouchMode = true
-    requestFocus()
-}
 
 fun Context.hasPermission(permission: String): Boolean =
     checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED

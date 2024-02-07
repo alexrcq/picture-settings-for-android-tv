@@ -34,7 +34,6 @@ import com.alexrcq.tvpicturesettings.ui.preference.LongPressGlobalSeekbarPrefere
 import com.alexrcq.tvpicturesettings.util.DeviceUtils
 import com.alexrcq.tvpicturesettings.util.hasPermission
 import com.alexrcq.tvpicturesettings.util.onClick
-import com.alexrcq.tvpicturesettings.util.requestFocusForced
 import com.alexrcq.tvpicturesettings.util.setWindowVisible
 import com.alexrcq.tvpicturesettings.util.showToast
 import kotlinx.coroutines.flow.launchIn
@@ -137,7 +136,7 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
     }
 
     private fun showAdbRequired() {
-        AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert)
+        val dialog = AlertDialog.Builder(context)
             .setMessage(R.string.adb_debugging_required)
             .setPositiveButton(R.string.open_settings) { _, _ ->
                 startActivity(Intent(Settings.ACTION_SETTINGS))
@@ -145,21 +144,21 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
             }
             .setNegativeButton(android.R.string.cancel) { _, _ -> requireActivity().finish() }
             .setOnCancelListener { requireActivity().finish() }
-            .create().apply {
-                setOnShowListener { getButton(BUTTON_POSITIVE).requestFocusForced() }
-            }.show()
+            .create()
+        dialog.show()
+        dialog.getButton(BUTTON_POSITIVE).requestFocus()
     }
 
     private fun showAcceptAdbForPermissions() {
-        AlertDialog.Builder(requireActivity(), android.R.style.Theme_Material_Dialog_Alert)
+        val dialog = AlertDialog.Builder(context)
             .setMessage(R.string.wait_for_debug_window)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 viewModel.processIntent(MainIntent.GrantPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS))
             }
             .setOnCancelListener { requireActivity().finish() }
-            .create().apply {
-                setOnShowListener { getButton(Dialog.BUTTON_POSITIVE).requestFocusForced() }
-            }.show()
+            .create()
+        dialog.show()
+        dialog.getButton(Dialog.BUTTON_POSITIVE).requestFocus()
     }
 
 
