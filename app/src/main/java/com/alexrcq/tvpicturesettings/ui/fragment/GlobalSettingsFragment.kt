@@ -32,7 +32,7 @@ abstract class GlobalSettingsFragment(@XmlRes private val prefsResId: Int) : Bas
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        globalSettings = (requireActivity().application as App).tvSettings.global
+        globalSettings = (requireActivity().application as App).tvSettingsRepository.getGlobalSettings()
         globalSettings.registerContentObserver(contentObserver)
         preferenceScreen.forEach { preference -> preference.onPreferenceChangeListener = this }
     }

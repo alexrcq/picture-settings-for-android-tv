@@ -31,4 +31,5 @@ object PreferencesKeys {
     const val TOGGLE_SCREEN_POWER = "toggle_screen_power"
     const val STEP_BY_STEP_DARK_MODE_ENABLED = "step_by_step_dark_mode_enabled"
     const val CURRENT_MODE_NAME = "mode_name"
+    const val SHOW_ABOUT_VIDEO_PREFS_RU_LOCALIZATION = "show_about_video_prefs_ru_localization"
 }

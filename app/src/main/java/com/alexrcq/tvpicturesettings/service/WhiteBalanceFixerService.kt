@@ -14,15 +14,13 @@ import android.os.Looper
 import androidx.core.app.NotificationCompat
 import com.alexrcq.tvpicturesettings.App
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.storage.TvSettings
-import com.alexrcq.tvpicturesettings.storage.GlobalSettings
+import com.alexrcq.tvpicturesettings.TvSettingsRepository
 import com.alexrcq.tvpicturesettings.storage.MtkGlobalKeys
 import com.alexrcq.tvpicturesettings.storage.PicturePreferences
 
 class WhiteBalanceFixerService : Service() {
 
-    private lateinit var pictureSettings: TvSettings.Picture
-    private lateinit var globalSettings: GlobalSettings
+    private lateinit var tvSettingsRepository: TvSettingsRepository
     private lateinit var preferences: PicturePreferences
 
     private val globalSettingsObserver = object : ContentObserver(Handler(Looper.getMainLooper())) {
@@ -37,12 +35,11 @@ class WhiteBalanceFixerService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        val app = application as App
-        pictureSettings = app.tvSettings.picture
-        globalSettings = app.tvSettings.global
-        preferences = app.picturePreferences
+        val application = application as App
+        tvSettingsRepository = application.tvSettingsRepository
+        preferences = application.picturePreferences
         restorePictureGainIfFixed()
-        globalSettings.registerContentObserver(globalSettingsObserver)
+        tvSettingsRepository.getGlobalSettings().registerContentObserver(globalSettingsObserver)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -54,7 +51,7 @@ class WhiteBalanceFixerService : Service() {
     override fun onBind(intent: Intent): IBinder? = null
 
     override fun onDestroy() {
-        globalSettings.unregisterContentObserver(globalSettingsObserver)
+        tvSettingsRepository.getGlobalSettings().unregisterContentObserver(globalSettingsObserver)
     }
 
     private fun createNotificationChannel() {
@@ -75,7 +72,7 @@ class WhiteBalanceFixerService : Service() {
 
     private fun restorePictureGainIfFixed() {
         if (preferences.isWhiteBalanceFixed) {
-            pictureSettings.setWhiteBalance(
+            tvSettingsRepository.getPictureSettings().setWhiteBalance(
                 redGain = preferences.redGain,
                 greenGain = preferences.greenGain,
                 blueGain = preferences.blueGain

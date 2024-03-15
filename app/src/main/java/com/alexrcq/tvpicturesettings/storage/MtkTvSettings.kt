@@ -15,23 +15,22 @@ class MtkTvSettings(
     override val picture: TvSettings.Picture
 ) : TvSettings {
 
-    override val isTvSourceActive: Boolean
-        get() {
-            val currentSourceNameUri = Uri.parse(TV_SOURCE_NAME_URI)
-            val cursor = contentResolver.query(
-                currentSourceNameUri, null, null, null
-            ) ?: return false
-            cursor.moveToFirst()
-            val currentSourceName = try {
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_VALUE))
-            } catch (e: Exception) {
-                return false
-            } finally {
-                cursor.close()
-            }
-            Timber.d("currentSource: $currentSourceName")
-            return currentSourceName != TV_SOURCE_INACTIVE
+    override fun isTvSourceInactive(): Boolean {
+        val currentSourceNameUri = Uri.parse(TV_SOURCE_NAME_URI)
+        val cursor = contentResolver.query(
+            currentSourceNameUri, null, null, null
+        ) ?: return true
+        cursor.moveToFirst()
+        val currentSourceName = try {
+            cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_VALUE))
+        } catch (e: Exception) {
+            return true
+        } finally {
+            cursor.close()
         }
+        Timber.d("currentSource: $currentSourceName")
+        return currentSourceName == TV_SOURCE_INACTIVE
+    }
 
     private var isScreenPowerOn: Boolean by global.booleanSetting(MtkGlobalKeys.POWER_PICTURE_OFF)
 

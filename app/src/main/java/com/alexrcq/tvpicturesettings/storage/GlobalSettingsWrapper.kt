@@ -18,6 +18,12 @@ open class GlobalSettingsWrapper(private val contentResolver: ContentResolver) :
         return value
     }
 
+    override fun getInt(key: String, defValue: Int): Int {
+        val value = Settings.Global.getInt(contentResolver, key, defValue)
+        Timber.d("getInt : key = $key, value = $value, def = $defValue")
+        return value
+    }
+
     override fun registerContentObserver(observer: ContentObserver) {
         contentResolver.registerContentObserver(Settings.Global.CONTENT_URI, true, observer)
     }

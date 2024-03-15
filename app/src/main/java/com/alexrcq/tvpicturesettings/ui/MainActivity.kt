@@ -6,19 +6,19 @@ import android.view.Gravity
 import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.service.DarkModeService
-import com.alexrcq.tvpicturesettings.util.DeviceUtils
+import com.alexrcq.tvpicturesettings.service.DarkModeManager
+import com.alexrcq.tvpicturesettings.util.TvUtils
 
 class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!DeviceUtils.isCurrentTvSupported(this)) {
+        if (!TvUtils.isCurrentTvSupported(this)) {
             showTvNotSupported()
             return
         }
         setContentView(R.layout.activity_main)
-        DarkModeService.startForeground(this)
+        DarkModeManager.startForeground(this)
     }
 
     override fun onAttachedToWindow() {

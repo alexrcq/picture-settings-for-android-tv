@@ -23,7 +23,8 @@ class VideoPreferencesFragment : GlobalSettingsFragment(R.xml.video_prefs) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        pictureSettings = (requireActivity().application as App).tvSettings.picture
+        pictureSettings = (requireActivity().application as App).tvSettingsRepository.getPictureSettings()
+        handleLocaleSpecifics()
         findPreference<Preference>(PreferencesKeys.RESET_TO_DEFAULT)?.onClick {
             showResetToDefaultDialog()
         }
@@ -86,16 +87,40 @@ class VideoPreferencesFragment : GlobalSettingsFragment(R.xml.video_prefs) {
         }
     }
 
+    private fun handleLocaleSpecifics() {
+        val currentLocale = resources.configuration.locales[0].toLanguageTag()
+        if (currentLocale == "ru-RU") {
+            val preferences = (requireActivity().application as App).picturePreferences
+            if (preferences.showAboutVideoPrefsRuLocalization) {
+                showAboutRuLocalizationFix()
+                preferences.showAboutVideoPrefsRuLocalization = false
+            }
+        }
+    }
+
     private fun showResetToDefaultDialog() {
         val dialog = AlertDialog.Builder(context)
             .setMessage(R.string.reset_to_default_message)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
+            .setPositiveButton(android.R.string.ok) { dialog, _ ->
                 showToast(getString(R.string.please_wait))
                 pictureSettings.resetToDefault()
+                dialog.dismiss()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .create()
         dialog.show()
         dialog.getButton(Dialog.BUTTON_NEGATIVE).requestFocus()
+    }
+
+    private fun showAboutRuLocalizationFix() {
+        val dialog = AlertDialog.Builder(context)
+            .setTitle(android.R.string.dialog_alert_title)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .setMessage("Исправлены опции ‘Локальный контраст’ и ‘Адаптивная подсветка’. " +
+                    "В системных настройках 'Вкл' и 'Выкл' перепутаны местами (в русской локализации).")
+            .setPositiveButton(android.R.string.ok, null)
+            .create()
+        dialog.show()
+        dialog.getButton(Dialog.BUTTON_POSITIVE).requestFocus()
     }
 }

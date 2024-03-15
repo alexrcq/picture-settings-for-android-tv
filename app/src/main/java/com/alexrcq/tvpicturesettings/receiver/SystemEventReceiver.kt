@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.alexrcq.tvpicturesettings.App
-import com.alexrcq.tvpicturesettings.service.DarkModeService
+import com.alexrcq.tvpicturesettings.service.DarkModeManager
 import com.alexrcq.tvpicturesettings.service.WhiteBalanceFixerService
 
 class SystemEventReceiver : BroadcastReceiver() {
@@ -18,7 +18,7 @@ class SystemEventReceiver : BroadcastReceiver() {
     }
 
     private fun onSystemAction(context: Context, action: String) {
-        DarkModeService.startForeground(context, action == Intent.ACTION_BOOT_COMPLETED)
+        DarkModeManager.startForeground(context, action == Intent.ACTION_BOOT_COMPLETED)
         val isWhiteBalanceFixed = (context.applicationContext as App).picturePreferences.isWhiteBalanceFixed
         if (isWhiteBalanceFixed) {
             WhiteBalanceFixerService.startForeground(context)

@@ -11,7 +11,7 @@ import com.alexrcq.tvpicturesettings.util.showToast
 class MainColorTunerFragment : ColorTunerFragment(R.xml.color_tuner_prefs) {
 
     private val pictureSettings: TvSettings.Picture
-        get() = (requireActivity().application as App).tvSettings.picture
+        get() = (requireActivity().application as App).tvSettingsRepository.getPictureSettings()
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         if (preference.key == MtkGlobalKeys.TV_PICTURE_COLOR_TUNE_ENABLE) {
