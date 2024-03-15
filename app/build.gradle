@@ -11,8 +11,8 @@ android {
         minSdkVersion 26
         compileSdk 32
         targetSdkVersion 32
-        versionCode 34
-        versionName "1.0.75"
+        versionCode 37
+        versionName "1.0.76"
     }
 
     compileOptions {
@@ -37,13 +37,13 @@ android {
         }
     }
 
-    applicationVariants.all { variant ->
-        variant.outputs.all {
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach {
             outputFileName = "tvpicturesettings${defaultConfig.versionName}.apk"
         }
     }
 
-    task createDebugKeystoreFromEnvironment {
+    tasks.register('createDebugKeystoreFromEnvironment') {
         doLast {
             def keystoreBase64 = System.getenv("DEBUG_KEYSTORE_BASE64")
             if (keystoreBase64 != null) {
@@ -59,10 +59,6 @@ android {
     }
 
     preBuild.dependsOn createDebugKeystoreFromEnvironment
-
-    lintOptions {
-        disable 'UnspecifiedRegisterReceiverFlag'
-    }
 }
 
 dependencies {
