@@ -4,101 +4,92 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.alexrcq.tvpicturesettings.CaptureScreenUseCase
-import com.alexrcq.tvpicturesettings.helper.DarkModeManager
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.TvSettingsRepository
 import com.alexrcq.tvpicturesettings.adblib.AdbClient
+import com.alexrcq.tvpicturesettings.service.DarkModeManager
 import com.alexrcq.tvpicturesettings.storage.DarkModePreferences
-import com.alexrcq.tvpicturesettings.storage.TvSettings
-import kotlinx.coroutines.Dispatchers
+import com.alexrcq.tvpicturesettings.util.DarkModeHintProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeoutException
 
 class MainViewModel(
-    private val darkModeManager: DarkModeManager,
     private val darkModePreferences: DarkModePreferences,
+    private val darkModeHintProvider: DarkModeHintProvider,
     private val adbClient: AdbClient,
-    private val tvSettings: TvSettings,
-    private val captureScreen: CaptureScreenUseCase
+    private val captureScreen: CaptureScreenUseCase,
+    private val tvSettingsRepository: TvSettingsRepository
 ) : ViewModel() {
 
-    private val _mainState = MutableStateFlow<MainState>(MainState.Idle)
-    val mainState = _mainState.asStateFlow()
+    private val _uiStateFlow = MutableStateFlow<MainUiState>(MainUiState.Idle)
+    val uiStateFlow = _uiStateFlow.asStateFlow()
 
-    private val _mainSideEffect = Channel<MainSideEffect>()
-    val mainSideEffect = _mainSideEffect.receiveAsFlow()
+    private val _sideEffectChannel = Channel<MainSideEffect>()
+    val sideEffectFlow = _sideEffectChannel.receiveAsFlow()
 
-    private val darkModeStateHintFlow: Flow<Int> = darkModePreferences.modeFlow.map { currentMode ->
-        when (currentMode) {
-            DarkModeManager.Mode.OFF -> R.string.click_to_dark_mode
-            DarkModeManager.Mode.ONLY_BACKLIGHT -> {
-                if (darkModePreferences.threeStepsDarkModeEnabled) {
-                    R.string.click_to_turn_on_the_dark_filter
-                } else {
-                    R.string.click_to_day_mode
-                }
-            }
-            DarkModeManager.Mode.FULL -> R.string.click_to_day_mode
-        }
-    }
+    private val clickToNextModeHintFlow: StateFlow<Int> =
+        darkModePreferences.modeFlow.map { mode -> darkModeHintProvider.getClickToNextModeHint(mode) }.stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(),
+            initialValue = darkModeHintProvider.getClickToNextModeHint(darkModePreferences.currentMode)
+        )
 
-    private val periodicDarkModeHintFlow: Flow<Int> = flow {
+    private val holdToToggleDimmingPeriodicHintFlow: Flow<Int> = flow {
         while (true) {
-            emit(darkModeStateHintFlow.first())
-            delay(CLICK_TO_CHANGE_MODE_HINT_DURATION)
+            emit(darkModeHintProvider.getClickToNextModeHint(darkModePreferences.currentMode))
+            delay(HOW_TO_SWITCH_MODE_HINT_DURATION)
             emit(R.string.hold_to_toggle_extra_dimm_hint)
             delay(HOLD_TO_DIMMING_HINT_DURATION)
         }
     }
 
-    val darkModeHints: Flow<Int> = merge(darkModeStateHintFlow, periodicDarkModeHintFlow)
+    val darkModeHints: Flow<Int> = merge(clickToNextModeHintFlow, holdToToggleDimmingPeriodicHintFlow)
 
-    val isTvSourceActiveFlow: StateFlow<Boolean> = flow {
-        while (true) {
-            emit(tvSettings.isTvSourceActive)
-            delay(TV_SOURCE_CHECK_INTERVAL)
-        }
-    }.flowOn(Dispatchers.IO).stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+    val isTvSourceInactiveFlow: SharedFlow<Boolean> =
+        tvSettingsRepository.isTvSourceInactiveFlow.shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
-    val isAdbEnabled: Boolean get() = tvSettings.isAdbEnabled
+    val isAdbEnabled: Boolean get() = tvSettingsRepository.isAdbEnabled()
+
+    val isBacklightAdjustAllowedFlow: SharedFlow<Boolean> = tvSettingsRepository.isBacklightAdjustAllowedStateFlow
 
     fun processIntent(intent: MainIntent) {
         when (intent) {
-            is MainIntent.ToggleDarkMode -> darkModeManager.toggleMode()
+            is MainIntent.ToggleDarkMode -> darkModePreferences.toggleMode()
             is MainIntent.EnableDarkModeAndToggleFilter -> enableDarkModeAndToggleFilter()
-            is MainIntent.ToggleScreenPower -> tvSettings.toggleScreenPower()
+            is MainIntent.ToggleScreenPower -> tvSettingsRepository.toggleScreenPower()
             is MainIntent.CaptureScreenshot -> captureScreenshot()
-            is MainIntent.GrantPermission -> grantPermission(intent.permission)
+            is MainIntent.GrantPermissions -> grantPermissions(intent.permissions)
             is MainIntent.ChangeBacklight -> setBacklight(intent.value)
         }
     }
 
     private fun setBacklight(value: Int) {
-        tvSettings.picture.backlight = value
-        if (darkModeManager.currentMode == DarkModeManager.Mode.OFF) {
-            darkModeManager.setDayBacklight(value)
+        tvSettingsRepository.getPictureSettings().backlight = value
+        if (darkModePreferences.currentMode == DarkModeManager.Mode.OFF) {
+            darkModePreferences.dayBacklight = value
         }
     }
 
-    private fun enableDarkModeAndToggleFilter() = with(darkModeManager) {
+    private fun enableDarkModeAndToggleFilter() = with(darkModePreferences) {
         if (currentMode == DarkModeManager.Mode.FULL) {
-            toggleScreenFilter()
+            toggleFilter()
         } else {
-            setMode(DarkModeManager.Mode.FULL)
+            currentMode = DarkModeManager.Mode.FULL
         }
     }
 
@@ -107,27 +98,28 @@ class MainViewModel(
     private fun captureScreenshot() {
         captureScreenJob?.cancel()
         captureScreenJob = viewModelScope.launch {
-            if (!tvSettings.isAdbEnabled) {
-                _mainSideEffect.send(MainSideEffect.ShowAdbRequired)
+            if (!tvSettingsRepository.isAdbEnabled()) {
+                _sideEffectChannel.send(MainSideEffect.ShowAdbRequired)
                 return@launch
             }
-            _mainState.value = MainState.ScreenCapturing
-            _mainState.value = MainState.ScreenCaptureFinished(isSuccess = captureScreen())
-            delay(CAPTURE_FINISHED_STATE_DURATION)
-            _mainState.value = MainState.Idle
+            _uiStateFlow.value = MainUiState.ScreenCapturing
+            _uiStateFlow.value = MainUiState.ScreenCaptureFinished(isSuccess = captureScreen())
+            delay(SCREEN_CAPTURE_FINISHED_STATE_DURATION)
+            _uiStateFlow.value = MainUiState.Idle
         }
     }
 
-    private fun grantPermission(permission: String) {
-        _mainState.value = MainState.Loading
+    private fun grantPermissions(permissions: List<String>) {
+        _uiStateFlow.value = MainUiState.Loading
         viewModelScope.launch {
             try {
-                adbClient.grantPermission(permission)
-                _mainState.value = MainState.Idle
+                adbClient.grantPermissions(permissions)
+                _sideEffectChannel.send(MainSideEffect.ShowPermissionsGranted)
+                _uiStateFlow.value = MainUiState.Idle
             } catch (e: TimeoutException) {
-                _mainSideEffect.send(MainSideEffect.ShowAcceptAdbForPermissions)
+                _sideEffectChannel.send(MainSideEffect.ShowGrantPermissions(permissions))
             } catch (e: Exception) {
-                _mainSideEffect.send(MainSideEffect.ShowError(e.message.toString()))
+                _sideEffectChannel.send(MainSideEffect.ShowError(e.message.toString()))
             }
         }
     }
@@ -138,21 +130,21 @@ class MainViewModel(
     }
 
     companion object {
-        private const val CLICK_TO_CHANGE_MODE_HINT_DURATION = 7000L
+        private const val HOW_TO_SWITCH_MODE_HINT_DURATION = 7000L
         private const val HOLD_TO_DIMMING_HINT_DURATION = 3500L
-        private const val CAPTURE_FINISHED_STATE_DURATION = 3500L
-        private const val TV_SOURCE_CHECK_INTERVAL = 2500L
+        private const val SCREEN_CAPTURE_FINISHED_STATE_DURATION = 3500L
 
         @Suppress("UNCHECKED_CAST")
         fun provideFactory(
-            darkModeManager: DarkModeManager,
             darkModePreferences: DarkModePreferences,
+            darkModeHintProvider: DarkModeHintProvider,
             adbClient: AdbClient,
-            tvSettings: TvSettings,
-            captureScreen: CaptureScreenUseCase
+            captureScreen: CaptureScreenUseCase,
+            tvSettingsRepository: TvSettingsRepository
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                MainViewModel(darkModeManager, darkModePreferences, adbClient, tvSettings, captureScreen) as T
+            override fun <T : ViewModel> create(modelClass: Class<T>): T = MainViewModel(
+                darkModePreferences, darkModeHintProvider, adbClient, captureScreen, tvSettingsRepository
+            ) as T
         }
     }
 }

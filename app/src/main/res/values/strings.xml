@@ -64,4 +64,7 @@
     <string name="step_by_step_dark_mode">Switch dark mode in three steps</string>
     <string name="click_to_turn_on_the_dark_filter">Click to turn on the dark filter</string>
     <string name="dark_mode_only_backlight">Dark mode (backlight reduction)</string>
+    <string name="mode_cannot_be_applied">Backlight mode cannot be applied due to current system configuration</string>
+    <string name="grant_permissions">Grant permissions</string>
+    <string name="permissions_granted">Permissions granted</string>
 </resources>

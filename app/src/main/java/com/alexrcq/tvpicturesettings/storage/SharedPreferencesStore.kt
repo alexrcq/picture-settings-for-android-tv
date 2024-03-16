@@ -9,7 +9,7 @@ import timber.log.Timber
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class SharedPreferencesStore(private val sharedPreferences: SharedPreferences) {
+open class SharedPreferencesStore(private val sharedPreferences: SharedPreferences) {
 
     @Suppress("UNCHECKED_CAST")
     fun <T : Any> get(key: String, defValue: T): T {
@@ -52,10 +52,17 @@ class SharedPreferencesStore(private val sharedPreferences: SharedPreferences) {
                 trySend(get(changedPrefKey, defValue))
             }
         }
-        sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
-        send(get(key, defValue))
+        registerOnSharedPreferenceChangeListener(listener)
         awaitClose {
-            sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener)
+            unregisterOnSharedPreferenceChangeListener(listener)
         }
+    }
+
+    fun registerOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener) {
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
+    }
+
+    fun unregisterOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener) {
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener)
     }
 }

@@ -7,18 +7,19 @@ import androidx.preference.SeekBarPreference
 import androidx.preference.SwitchPreference
 import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.App
-import com.alexrcq.tvpicturesettings.helper.DarkModeManager
-import com.alexrcq.tvpicturesettings.storage.PreferencesKeys
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.service.DarkModeManager
+import com.alexrcq.tvpicturesettings.storage.DarkModePreferences
+import com.alexrcq.tvpicturesettings.storage.PreferencesKeys
 
 class DarkModePreferencesFragment : BasePreferenceFragment(R.xml.dark_mode_prefs),
     Preference.OnPreferenceChangeListener {
 
-    private lateinit var darkModeManager: DarkModeManager
+    private lateinit var preferences: DarkModePreferences
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        darkModeManager = (requireActivity().application as App).darkModeManager
+        preferences = (requireActivity().application as App).darkModePreferences
         updatePreferences()
         preferenceScreen.forEach { preference: Preference ->
             preference.onPreferenceChangeListener = this
@@ -26,7 +27,6 @@ class DarkModePreferencesFragment : BasePreferenceFragment(R.xml.dark_mode_prefs
     }
 
     private fun updatePreferences() {
-        val preferences = (requireActivity().application as App).darkModePreferences
         findPreference<SwitchPreference>(PreferencesKeys.STEP_BY_STEP_DARK_MODE_ENABLED)?.isChecked =
             preferences.threeStepsDarkModeEnabled
         findPreference<SeekBarPreference>(PreferencesKeys.NIGHT_BACKLIGHT)?.value = preferences.nightBacklight
@@ -35,13 +35,13 @@ class DarkModePreferencesFragment : BasePreferenceFragment(R.xml.dark_mode_prefs
 
     override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
         when (preference.key) {
-            PreferencesKeys.NIGHT_BACKLIGHT -> darkModeManager.setNightBacklight(newValue as Int)
-            PreferencesKeys.SCREEN_FILTER_POWER -> darkModeManager.setScreenFilterPower(newValue as Int)
-            PreferencesKeys.STEP_BY_STEP_DARK_MODE_ENABLED ->
-                darkModeManager.setStepByStepDarkModeEnabled(newValue as Boolean)
+            PreferencesKeys.NIGHT_BACKLIGHT -> preferences.nightBacklight = newValue as Int
+            PreferencesKeys.SCREEN_FILTER_POWER -> preferences.screenFilterPower = newValue as Int
+            PreferencesKeys.STEP_BY_STEP_DARK_MODE_ENABLED -> preferences.threeStepsDarkModeEnabled =
+                newValue as Boolean
             PreferencesKeys.IS_ADDITIONAL_DIMMING_ENABLED -> {
-                if (darkModeManager.currentMode != DarkModeManager.Mode.OFF) {
-                    darkModeManager.setScreenFilterEnabled(newValue as Boolean)
+                if (preferences.currentMode != DarkModeManager.Mode.OFF) {
+                    preferences.isScreenFilterEnabled = newValue as Boolean
                 }
             }
         }

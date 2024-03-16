@@ -8,26 +8,25 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.SharedPreferences
 import android.os.IBinder
+import androidx.annotation.StringRes
 import androidx.core.app.NotificationCompat
 import com.alexrcq.tvpicturesettings.App
-import com.alexrcq.tvpicturesettings.App.Companion.applicationScope
-import com.alexrcq.tvpicturesettings.helper.DarkModeManager
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.TvSettingsRepository
 import com.alexrcq.tvpicturesettings.storage.DarkModePreferences
+import com.alexrcq.tvpicturesettings.storage.PreferencesKeys
 import com.alexrcq.tvpicturesettings.storage.TvSettings
 import com.alexrcq.tvpicturesettings.util.AlarmScheduler
+import com.alexrcq.tvpicturesettings.util.ServiceUtils
 import com.alexrcq.tvpicturesettings.util.showToast
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class DarkModeService : Service() {
+class DarkModeManager : Service(), SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private lateinit var darkModeManager: DarkModeManager
     private lateinit var preferences: DarkModePreferences
-    private lateinit var tvSettings: TvSettings
+    private lateinit var tvSettingsRepository: TvSettingsRepository
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -36,18 +35,14 @@ class DarkModeService : Service() {
         }
     }
 
-    private var showModeChangedJob: Job? = null
-
     override fun onCreate() {
         super.onCreate()
         val application = application as App
-        darkModeManager = application.darkModeManager
+        tvSettingsRepository = application.tvSettingsRepository
         preferences = application.darkModePreferences
-        tvSettings = application.tvSettings
-        showModeChangedJob = applicationScope.launch {
-            preferences.modeFlow.drop(1).collect { currentMode ->
-                showToast(getString(currentMode.message))
-            }
+        preferences.registerOnSharedPreferenceChangeListener(this)
+        if (preferences.dayBacklight !in 0..TvSettings.Picture.MAX_BACKLIGHT) {
+            preferences.dayBacklight = tvSettingsRepository.getPictureSettings().backlight
         }
         if (preferences.isAutoDarkModeEnabled) {
             AlarmScheduler.setDailyAlarm(this, AlarmScheduler.AlarmType.DAY_MODE_ALARM, preferences.dayModeTime)
@@ -79,8 +74,8 @@ class DarkModeService : Service() {
     override fun onBind(intent: Intent): IBinder? = null
 
     override fun onDestroy() {
-        showModeChangedJob?.cancel()
         unregisterReceiver(broadcastReceiver)
+        preferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
     private fun createNotificationChannel() {
@@ -99,39 +94,89 @@ class DarkModeService : Service() {
             .setSmallIcon(R.mipmap.ic_launcher)
             .build()
 
-    private fun onScreenOn() {
-        if (preferences.turnOffDarkModeOnScreenOn) {
-            darkModeManager.setMode(DarkModeManager.Mode.OFF)
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+        when (key) {
+            PreferencesKeys.CURRENT_MODE_NAME -> {
+                val modeName = sharedPreferences.getString(PreferencesKeys.CURRENT_MODE_NAME, Mode.OFF.name)!!
+                val mode = DarkModeManager.Mode.valueOf(modeName)
+                if (tvSettingsRepository.isBacklightAdjustAllowed()) {
+                    applyMode(mode)
+                    showToast(getString(mode.message))
+                } else {
+                    showToast(getString(R.string.mode_cannot_be_applied))
+                }
+            }
+            PreferencesKeys.IS_SCREEN_FILTER_ENABLED -> {
+                ensureScreenFilterServiceRunning()
+                val enabled = sharedPreferences.getBoolean(PreferencesKeys.IS_SCREEN_FILTER_ENABLED, false)
+                ScreenFilterService.sharedInstance?.screenFilter?.setEnabled(enabled)
+            }
+            PreferencesKeys.SCREEN_FILTER_POWER -> {
+                ensureScreenFilterServiceRunning()
+                val power = sharedPreferences.getInt(PreferencesKeys.SCREEN_FILTER_POWER, 0)
+                ScreenFilterService.sharedInstance?.screenFilter?.setPower(power)
+            }
+            PreferencesKeys.NIGHT_BACKLIGHT -> {
+                if (preferences.currentMode != Mode.OFF && tvSettingsRepository.isBacklightAdjustAllowed()) {
+                    val nightBacklight = sharedPreferences.getInt(PreferencesKeys.NIGHT_BACKLIGHT, 0)
+                    tvSettingsRepository.getPictureSettings().backlight = nightBacklight
+                }
+            }
         }
     }
 
-    private fun handleIntent(intent: Intent) {
+    private fun applyMode(mode: Mode) {
+        when (mode) {
+            Mode.OFF -> {
+                tvSettingsRepository.getPictureSettings().backlight = preferences.dayBacklight
+                preferences.isScreenFilterEnabled = false
+            }
+            Mode.ONLY_BACKLIGHT -> {
+                tvSettingsRepository.getPictureSettings().backlight = preferences.nightBacklight
+                preferences.isScreenFilterEnabled = false
+            }
+            Mode.FULL -> {
+                tvSettingsRepository.getPictureSettings().backlight = preferences.nightBacklight
+                preferences.isScreenFilterEnabled = true
+            }
+        }
+    }
+
+    private fun onScreenOn() {
+        if (preferences.turnOffDarkModeOnScreenOn) {
+            preferences.currentMode = Mode.OFF
+        }
+    }
+
+    private fun handleIntent(intent: Intent) = with(preferences) {
         when (intent.action) {
-            ACTION_TOGGLE_DARK_MODE -> darkModeManager.toggleMode()
+            ACTION_TOGGLE_DARK_MODE -> toggleMode()
             ACTION_ENABLE_DARK_MODE -> {
-                if (darkModeManager.currentMode != DarkModeManager.Mode.OFF) return
-                if (preferences.isAdditionalDimmingEnabled) {
-                    darkModeManager.setMode(DarkModeManager.Mode.FULL)
-                } else {
-                    darkModeManager.setMode(DarkModeManager.Mode.ONLY_BACKLIGHT)
-                }
+                if (currentMode != Mode.OFF) return
+                currentMode = if (isAdditionalDimmingEnabled) Mode.FULL else Mode.ONLY_BACKLIGHT
             }
-            ACTION_DISABLE_DARK_MODE -> darkModeManager.setMode(DarkModeManager.Mode.OFF)
-            ACTION_TOGGLE_FILTER -> darkModeManager.toggleScreenFilter()
-            ACTION_ENABLE_FILTER -> darkModeManager.setScreenFilterEnabled(true)
-            ACTION_DISABLE_FILTER -> darkModeManager.setScreenFilterEnabled(false)
-            ACTION_CHANGE_FILTER_POWER -> {
-                val filterPower = intent.getIntExtra(EXTRA_FILTER_POWER, 0).coerceAtMost(MAX_FILTER_POWER)
-                darkModeManager.setScreenFilterPower(filterPower)
-            }
-            ACTION_TOGGLE_SCREEN_POWER -> tvSettings.toggleScreenPower()
+            ACTION_DISABLE_DARK_MODE -> currentMode = Mode.OFF
+            ACTION_TOGGLE_FILTER -> toggleFilter()
+            ACTION_ENABLE_FILTER -> isScreenFilterEnabled = true
+            ACTION_DISABLE_FILTER -> isScreenFilterEnabled = false
+            ACTION_CHANGE_FILTER_POWER -> screenFilterPower = intent.getIntExtra(EXTRA_FILTER_POWER, 0)
+            ACTION_TOGGLE_SCREEN_POWER -> tvSettingsRepository.toggleScreenPower()
             Intent.ACTION_SCREEN_ON -> onScreenOn()
         }
     }
 
+    private fun ensureScreenFilterServiceRunning() {
+        if (!ScreenFilterService.isServiceConnected()) {
+            ServiceUtils.ensureAccessibilityServiceEnabled(this, ScreenFilterService::class.java)
+        }
+    }
+
+    enum class Mode(@StringRes val message: Int) {
+        OFF(R.string.dark_mode_off), ONLY_BACKLIGHT(R.string.dark_mode_only_backlight), FULL(R.string.dark_mode_full)
+    }
+
     companion object : ServiceFactory() {
         private const val EXTRA_FILTER_POWER = "filter_power"
-        private const val MAX_FILTER_POWER = 98
 
         private const val ACTION_TOGGLE_DARK_MODE = "com.alexrcq.tvpicturesettings.ACTION_TOGGLE_DARK_MODE"
         private const val ACTION_ENABLE_DARK_MODE = "com.alexrcq.tvpicturesettings.ACTION_ENABLE_DARK_MODE"
@@ -144,15 +189,15 @@ class DarkModeService : Service() {
 
         private const val ACTION_TOGGLE_SCREEN_POWER = "ACTION_TOGGLE_SCREEN_POWER"
 
-        private const val NOTIFICATION_TITLE = "Dark Mode Service"
+        private const val NOTIFICATION_TITLE = "Dark Mode Manager"
         private const val NOTIFICATION_CONTENT = "Service is running"
 
         private const val NOTIFICATION_CHANNEL_ID = "channel_id"
-        private const val NOTIFICATION_CHANNEL_NAME = "Dark Mode Service"
+        private const val NOTIFICATION_CHANNEL_NAME = "Dark Mode Manager"
 
         private const val EXTRA_AFTER_BOOT = "after_boot"
 
-        override fun getIntent(context: Context): Intent = Intent(context, DarkModeService::class.java)
+        override fun getIntent(context: Context): Intent = Intent(context, DarkModeManager::class.java)
 
         fun startForeground(context: Context, afterBoot: Boolean = false) {
             val intent = getIntent(context)

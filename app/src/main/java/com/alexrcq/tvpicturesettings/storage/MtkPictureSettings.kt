@@ -8,6 +8,7 @@ open class MtkPictureSettings(private val global: GlobalSettings) : TvSettings.P
     override var pictureMode: Int by global.intSetting(MtkGlobalKeys.PICTURE_MODE)
     override var isHdrEnabled: Boolean by global.booleanSetting(MtkGlobalKeys.PICTURE_LIST_HDR)
     override var isColorTuneEnabled: Boolean by global.booleanSetting(MtkGlobalKeys.TV_PICTURE_COLOR_TUNE_ENABLE)
+    override var isAutoBacklightEnabled: Boolean by global.booleanSetting(MtkGlobalKeys.PICTURE_AUTO_BACKLIGHT)
 
     override var isLocalContrastEnabled: Boolean
         get() = global.getInt(MtkGlobalKeys.PICTURE_LOCAL_CONTRAST) == 2

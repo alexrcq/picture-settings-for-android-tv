@@ -64,4 +64,7 @@
     <string name="fix_values">Değerleri düzelt</string>
     <string name="custom_see_wb_settings">Özel (beyaz dengesi ayarlarına bakın)</string>
     <string name="fixed_see_wb_settings">Düzeltilmiş (beyaz dengesi ayarlarına bakın)</string>
+    <string name="mode_cannot_be_applied">Mevcut sistem yapılandırması nedeniyle arka ışık modu uygulanamıyor</string>
+    <string name="grant_permissions">İzinleri Ver</string>
+    <string name="permissions_granted">İzinler Başarıyla Verildi</string>
 </resources>

@@ -50,16 +50,18 @@ class AdbShellCommandExecutor(private val context: Context) : AdbClient {
         adbConnection?.open("shell:")?.write("$command\n")
     }
 
-    override suspend fun grantPermission(permission: String) {
-        if (context.hasPermission(permission)) return
-        execute("pm grant ${BuildConfig.APPLICATION_ID} $permission")
-        while (true) {
-            delay(PERMISSION_CHECK_INTERVAL)
-            if (context.hasPermission(permission)) {
-                // the permission is actually not granted yet, waiting
-                delay(ENSURE_PERMISSION_GRANTED_DELAY)
-                Timber.d("$permission granted")
-                break
+    override suspend fun grantPermissions(permissions: List<String>) {
+        for (permission in permissions) {
+            if (context.hasPermission(permission)) continue
+            execute("pm grant ${BuildConfig.APPLICATION_ID} $permission")
+            while (true) {
+                delay(PERMISSION_CHECK_INTERVAL)
+                if (context.hasPermission(permission)) {
+                    // the permission is actually not granted yet, waiting
+                    delay(ENSURE_PERMISSION_GRANTED_DELAY)
+                    Timber.d("$permission granted")
+                    break
+                }
             }
         }
     }

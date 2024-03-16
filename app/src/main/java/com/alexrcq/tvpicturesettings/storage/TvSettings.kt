@@ -5,9 +5,9 @@ import com.alexrcq.tvpicturesettings.util.toBoolean
 
 interface TvSettings {
     val global: GlobalSettings
-    val isAdbEnabled: Boolean get() = global.getInt(Settings.Global.ADB_ENABLED).toBoolean()
-    val isTvSourceActive: Boolean
     val picture: Picture
+    fun isTvSourceInactive(): Boolean
+    fun isAdbEnabled(): Boolean = global.getInt(Settings.Global.ADB_ENABLED).toBoolean()
     fun toggleScreenPower()
 
     interface Picture {
@@ -17,6 +17,7 @@ interface TvSettings {
         var isColorTuneEnabled: Boolean
         var isLocalContrastEnabled: Boolean
         var isAdaptiveLumaEnabled: Boolean
+        var isAutoBacklightEnabled: Boolean
         fun setPictureTemperature(pictureMode: Int)
         fun setWhiteBalance(redGain: Int, greenGain: Int, blueGain: Int)
         fun resetWhiteBalance()

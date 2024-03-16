@@ -9,6 +9,7 @@ import kotlin.reflect.KProperty
 interface GlobalSettings {
     fun putInt(key: String, value: Int)
     fun getInt(key: String): Int
+    fun getInt(key: String, defValue: Int): Int
     fun registerContentObserver(observer: ContentObserver)
     fun unregisterContentObserver(observer: ContentObserver)
 
@@ -19,7 +20,7 @@ interface GlobalSettings {
     }
 
     fun booleanSetting(key: String) = object : ReadWriteProperty<Any?, Boolean> {
-        override fun getValue(thisRef: Any?, property: KProperty<*>): Boolean = getInt(key).toBoolean()
+        override fun getValue(thisRef: Any?, property: KProperty<*>): Boolean = getInt(key, 0).toBoolean()
 
         override fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean): Unit = putInt(key, value.toInt())
     }

@@ -1,26 +1,24 @@
 package com.alexrcq.tvpicturesettings.ui
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.service.DarkModeService
-import com.alexrcq.tvpicturesettings.util.DeviceUtils
-import com.alexrcq.tvpicturesettings.util.requestFocusForced
+import com.alexrcq.tvpicturesettings.service.DarkModeManager
+import com.alexrcq.tvpicturesettings.util.TvUtils
 
 class MainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!DeviceUtils.isCurrentTvSupported(this)) {
+        if (!TvUtils.isCurrentTvSupported(this)) {
             showTvNotSupported()
             return
         }
         setContentView(R.layout.activity_main)
-        DarkModeService.startForeground(this)
+        DarkModeManager.startForeground(this)
     }
 
     override fun onAttachedToWindow() {
@@ -36,12 +34,12 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun showTvNotSupported() {
-        AlertDialog.Builder(this, android.R.style.Theme_Material_Dialog_Alert)
+        val dialog = AlertDialog.Builder(this)
             .setMessage(R.string.not_supported_tv)
             .setPositiveButton(android.R.string.ok) { _, _ -> finish() }
             .setOnCancelListener { finish() }
-            .create().apply {
-                setOnShowListener { getButton(DialogInterface.BUTTON_POSITIVE).requestFocusForced() }
-            }.show()
+            .create()
+        dialog.show()
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).requestFocus()
     }
 }

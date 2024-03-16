@@ -19,9 +19,12 @@ class WhiteBalanceFragment : GlobalSettingsFragment(R.xml.white_balance_prefs) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        pictureSettings = (requireActivity().application as App).tvSettings.picture
-        picturePreferences = (requireActivity().application as App).picturePreferences
-        findPreference<Preference>(PreferencesKeys.RESET_VALUES)?.onClick { pictureSettings.resetWhiteBalance() }
+        val application = (requireActivity().application as App)
+        pictureSettings = application.tvSettingsRepository.getPictureSettings()
+        picturePreferences = application.picturePreferences
+        findPreference<Preference>(PreferencesKeys.RESET_VALUES)?.onClick {
+            pictureSettings.resetWhiteBalance()
+        }
         if (picturePreferences.isWhiteBalanceFixed) {
             setWhiteBalancePrefsEnabled(false)
             scrollToPreference(PreferencesKeys.IS_WHITE_BALANCE_FIXED)

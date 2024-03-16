@@ -9,8 +9,6 @@ import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import timber.log.Timber
 
-private const val MAX_SCREEN_FILTER_POWER = 100
-
 class ScreenFilterService : AccessibilityService() {
 
     lateinit var screenFilter: ScreenFilter
@@ -35,22 +33,16 @@ class ScreenFilterService : AccessibilityService() {
 
         private val view = View(applicationContext)
 
-        var isEnabled = false
-            set(enabled) {
-                field = enabled
-                if (enabled) {
-                    enable()
-                    return
-                }
-                disable()
-            }
+        fun setEnabled(enabled: Boolean) {
+            if (enabled) enable() else disable()
+        }
 
         fun setColor(color: Int) {
             view.setBackgroundColor(color)
         }
 
         fun setPower(power: Int) {
-            view.alpha = power / MAX_SCREEN_FILTER_POWER.toFloat()
+            view.alpha = power.coerceIn(MIN_POWER, MAX_POWER) / SCALE_FACTOR.toFloat()
         }
 
         private fun enable() {
@@ -76,6 +68,10 @@ class ScreenFilterService : AccessibilityService() {
     }
 
     companion object {
+        private const val MIN_POWER = 0
+        private const val MAX_POWER = 98
+        private const val SCALE_FACTOR = 100
+
         const val ACTION_SERVICE_CONNECTED = "com.alexrcq.tvpicturesettings.ACTION_SCREEN_FILTER_SERVICE_CONNECTED"
 
         var sharedInstance: ScreenFilterService? = null

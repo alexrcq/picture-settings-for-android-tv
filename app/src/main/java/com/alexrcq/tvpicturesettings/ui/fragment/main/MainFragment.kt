@@ -20,21 +20,21 @@ import androidx.preference.SeekBarPreference
 import com.alexrcq.tvpicturesettings.App
 import com.alexrcq.tvpicturesettings.BuildConfig
 import com.alexrcq.tvpicturesettings.CaptureScreenUseCase
+import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.TvConstants
+import com.alexrcq.tvpicturesettings.storage.MtkGlobalKeys
 import com.alexrcq.tvpicturesettings.storage.PreferencesKeys.APP_DESCRIPTION
 import com.alexrcq.tvpicturesettings.storage.PreferencesKeys.OPEN_PICTURE_SETTINGS
 import com.alexrcq.tvpicturesettings.storage.PreferencesKeys.TAKE_SCREENSHOT
 import com.alexrcq.tvpicturesettings.storage.PreferencesKeys.TOGGLE_SCREEN_POWER
 import com.alexrcq.tvpicturesettings.storage.PreferencesKeys.VIDEO_PREFERENCES
-import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.TvConstants
-import com.alexrcq.tvpicturesettings.storage.MtkGlobalKeys
 import com.alexrcq.tvpicturesettings.ui.fragment.GlobalSettingsFragment
 import com.alexrcq.tvpicturesettings.ui.fragment.LoadingDialog
 import com.alexrcq.tvpicturesettings.ui.preference.LongPressGlobalSeekbarPreference
-import com.alexrcq.tvpicturesettings.util.DeviceUtils
+import com.alexrcq.tvpicturesettings.util.DarkModeHintProvider
+import com.alexrcq.tvpicturesettings.util.TvUtils
 import com.alexrcq.tvpicturesettings.util.hasPermission
 import com.alexrcq.tvpicturesettings.util.onClick
-import com.alexrcq.tvpicturesettings.util.requestFocusForced
 import com.alexrcq.tvpicturesettings.util.setWindowVisible
 import com.alexrcq.tvpicturesettings.util.showToast
 import kotlinx.coroutines.flow.launchIn
@@ -49,7 +49,11 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
     private val viewModel: MainViewModel by viewModels {
         with(requireActivity().application as App) {
             MainViewModel.provideFactory(
-                darkModeManager, darkModePreferences, adbClient, tvSettings, CaptureScreenUseCase(adbClient)
+                darkModePreferences,
+                DarkModeHintProvider(darkModePreferences),
+                adbClient,
+                CaptureScreenUseCase(adbClient),
+                tvSettingsRepository
             )
         }
     }
@@ -57,8 +61,8 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initPreferences()
-        viewModel.mainState.onEach(::render).launchIn(viewLifecycleOwner.lifecycleScope)
-        viewModel.mainSideEffect.onEach(::handleEffect).launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.uiStateFlow.onEach(::updateUiState).launchIn(viewLifecycleOwner.lifecycleScope)
+        viewModel.sideEffectFlow.onEach(::handleSideEffect).launchIn(viewLifecycleOwner.lifecycleScope)
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
@@ -67,8 +71,13 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
                     }
                 }
                 launch {
-                    viewModel.isTvSourceActiveFlow.collect { isTvSourceActive ->
-                        takeScreenshotPref?.isEnabled = !isTvSourceActive
+                    viewModel.isTvSourceInactiveFlow.collect { isTvSourceInactive ->
+                        takeScreenshotPref?.isEnabled = isTvSourceInactive
+                    }
+                }
+                launch {
+                    viewModel.isBacklightAdjustAllowedFlow.collect { isBacklightAdjustAllowed ->
+                        backlightPref?.isEnabled = isBacklightAdjustAllowed
                     }
                 }
             }
@@ -91,33 +100,39 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
             viewModel.processIntent(MainIntent.ToggleScreenPower)
         }
         findPreference<Preference>(OPEN_PICTURE_SETTINGS)?.apply {
-            isVisible = !DeviceUtils.isModelMssp()
+            isVisible = !TvUtils.isModelMssp()
             onClick(::openAppropriatePictureSettings)
         }
-        findPreference<Preference>(VIDEO_PREFERENCES)?.isVisible = DeviceUtils.isModelMssp()
+        findPreference<Preference>(VIDEO_PREFERENCES)?.isVisible = TvUtils.isModelMssp()
         findPreference<Preference>(APP_DESCRIPTION)?.summary =
             getString(R.string.app_description, BuildConfig.VERSION_NAME)
     }
 
     override fun onStart() {
         super.onStart()
-        requireWriteSettingsPermission()
+        requirePermissions(
+            listOf(
+                android.Manifest.permission.WRITE_SECURE_SETTINGS,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        )
     }
 
-    private fun render(state: MainState) {
+    private fun updateUiState(state: MainUiState) {
         when (state) {
-            is MainState.Idle -> {
+            is MainUiState.Idle -> {
                 takeScreenshotPref?.summary = ""
                 val loadingDialog = childFragmentManager.findFragmentByTag(LoadingDialog.TAG) as DialogFragment?
                 loadingDialog?.dismiss()
             }
-            is MainState.Loading -> {
+            is MainUiState.Loading -> {
                 LoadingDialog().show(childFragmentManager, LoadingDialog.TAG)
             }
-            is MainState.ScreenCapturing -> {
+            is MainUiState.ScreenCapturing -> {
                 setWindowVisible(false)
             }
-            is MainState.ScreenCaptureFinished -> {
+            is MainUiState.ScreenCaptureFinished -> {
                 setWindowVisible(true)
                 takeScreenshotPref?.summary = if (state.isSuccess) {
                     getString(R.string.screenshot_saved)
@@ -128,16 +143,17 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
         }
     }
 
-    private fun handleEffect(effect: MainSideEffect) {
-        when (effect) {
+    private fun handleSideEffect(sideEffect: MainSideEffect) {
+        when (sideEffect) {
             is MainSideEffect.ShowAdbRequired -> showAdbRequired()
-            is MainSideEffect.ShowAcceptAdbForPermissions -> showAcceptAdbForPermissions()
-            is MainSideEffect.ShowError -> showToast(effect.message)
+            is MainSideEffect.ShowGrantPermissions -> showGrantPermissionsDialog(sideEffect.permissions)
+            is MainSideEffect.ShowPermissionsGranted -> showToast(getString(R.string.permissions_granted))
+            is MainSideEffect.ShowError -> showToast(sideEffect.errorMessage)
         }
     }
 
     private fun showAdbRequired() {
-        AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert)
+        val dialog = AlertDialog.Builder(context)
             .setMessage(R.string.adb_debugging_required)
             .setPositiveButton(R.string.open_settings) { _, _ ->
                 startActivity(Intent(Settings.ACTION_SETTINGS))
@@ -145,26 +161,26 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
             }
             .setNegativeButton(android.R.string.cancel) { _, _ -> requireActivity().finish() }
             .setOnCancelListener { requireActivity().finish() }
-            .create().apply {
-                setOnShowListener { getButton(BUTTON_POSITIVE).requestFocusForced() }
-            }.show()
+            .create()
+        dialog.show()
+        dialog.getButton(BUTTON_POSITIVE).requestFocus()
     }
 
-    private fun showAcceptAdbForPermissions() {
-        AlertDialog.Builder(requireActivity(), android.R.style.Theme_Material_Dialog_Alert)
+    private fun showGrantPermissionsDialog(missingPermissions: List<String>) {
+        val dialog = AlertDialog.Builder(context)
             .setMessage(R.string.wait_for_debug_window)
-            .setPositiveButton(android.R.string.ok) { _, _ ->
-                viewModel.processIntent(MainIntent.GrantPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS))
+            .setPositiveButton(getString(R.string.grant_permissions)) { dialog, _ ->
+                viewModel.processIntent(MainIntent.GrantPermissions(missingPermissions))
+                dialog.dismiss()
             }
             .setOnCancelListener { requireActivity().finish() }
-            .create().apply {
-                setOnShowListener { getButton(Dialog.BUTTON_POSITIVE).requestFocusForced() }
-            }.show()
+            .create()
+        dialog.show()
+        dialog.getButton(Dialog.BUTTON_POSITIVE).requestFocus()
     }
 
-
     private fun openAppropriatePictureSettings() {
-        if (DeviceUtils.isModel4kSmartTv()) {
+        if (TvUtils.isModel4kSmartTv()) {
             openPQAQSettings()
         } else {
             openPictureSettings()
@@ -190,12 +206,15 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
         }
     }
 
-    private fun requireWriteSettingsPermission() {
-        if (requireContext().hasPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS)) return
+    private fun requirePermissions(permissions: List<String>) {
+        val missingPermissions = permissions.filter { !requireContext().hasPermission(it) }
+        if (missingPermissions.isEmpty()) {
+            return
+        }
         if (!viewModel.isAdbEnabled) {
             showAdbRequired()
             return
         }
-        showAcceptAdbForPermissions()
+        showGrantPermissionsDialog(missingPermissions)
     }
 }

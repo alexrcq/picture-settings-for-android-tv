@@ -64,4 +64,7 @@
     <string name="step_by_step_dark_mode">Трехшаговое переключение ночного режима</string>
     <string name="click_to_turn_on_the_dark_filter">Нажмите для включения доп. затемнения</string>
     <string name="dark_mode_only_backlight">Ночной режим (снижение подсветки)</string>
+    <string name="mode_cannot_be_applied">Режим подсветки не может быть применён при текущей конфигурации системы</string>
+    <string name="grant_permissions">Выдать разрешения</string>
+    <string name="permissions_granted">Разрешения выданы</string>
 </resources>
