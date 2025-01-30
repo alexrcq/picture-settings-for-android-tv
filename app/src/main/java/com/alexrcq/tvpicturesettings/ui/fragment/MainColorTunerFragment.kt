@@ -5,7 +5,7 @@ import androidx.preference.SwitchPreference
 import com.alexrcq.tvpicturesettings.App
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.storage.MtkGlobalKeys
-import com.alexrcq.tvpicturesettings.storage.PictureSettings
+import com.alexrcq.tvpicturesettings.domain.PictureSettings
 import com.alexrcq.tvpicturesettings.util.showToast
 
 class MainColorTunerFragment : ColorTunerFragment(R.xml.color_tuner_prefs) {

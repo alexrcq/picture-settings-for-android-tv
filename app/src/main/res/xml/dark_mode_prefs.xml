@@ -6,32 +6,24 @@
         app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.ScheduledDarkModeFragment"
         app:key="scheduled_dark_mode"
         app:title="@string/scheduled_dark_mode" />
-    <SwitchPreference
-        app:defaultValue="false"
-        app:key="is_enable_day_mode_after_screen_on_enabled"
-        app:title="@string/day_mode_after_screen_on" />
-    <SwitchPreference
-        app:key="step_by_step_dark_mode_enabled"
-        app:persistent="false"
-        app:title="@string/step_by_step_dark_mode" />
-    <SwitchPreference
-        app:key="show_mode_changed"
-        app:title="@string/show_mode_changed"
-        app:defaultValue="true"/>
     <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         app:key="ab_night_backlight"
-        app:persistent="false"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/backlight_at_night" />
+    <Preference
+        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.AdvancedSettingsFragment"
+        app:key="advanced_dark_mode_preferences"
+        app:title="@string/advanced_settings"/>
+    <PreferenceCategory app:title="@string/extra_dimming"/>
     <SwitchPreference
-        app:defaultValue="false"
+        app:defaultValue="@bool/is_additional_dimming_enabled"
         app:key="is_dark_filter_enabled"
-        app:title="@string/extra_dimming" />
+        app:title="@string/enable" />
     <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
         android:max="98"
         app:key="dark_filter_power"
-        app:persistent="false"
+        app:defaultValue="@integer/screen_dimming_power"
         app:seekBarIncrement="1"
         app:showSeekBarValue="true"
         app:title="@string/dimming_power" />

@@ -1,4 +1,4 @@
-package com.alexrcq.tvpicturesettings.storage
+package com.alexrcq.tvpicturesettings.domain
 
 interface ColorTuneSettings {
     var isColorTuneEnabled: Boolean

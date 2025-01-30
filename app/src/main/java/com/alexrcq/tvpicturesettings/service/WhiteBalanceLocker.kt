@@ -16,7 +16,7 @@ import com.alexrcq.tvpicturesettings.App
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.storage.MtkGlobalKeys
 import com.alexrcq.tvpicturesettings.storage.PicturePreferences
-import com.alexrcq.tvpicturesettings.storage.TvSettings
+import com.alexrcq.tvpicturesettings.domain.TvSettings
 
 private const val DEFAULT_COLOR_GAIN = 1024
 

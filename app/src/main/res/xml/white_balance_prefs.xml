@@ -14,7 +14,7 @@
         android:max="2047"
         android:title="@string/blue" />
     <SwitchPreference
-        android:defaultValue="false"
+        android:defaultValue="@bool/is_white_balance_locked"
         android:key="fix_wb_values"
         android:title="@string/fix_values"
         android:summary="@string/fix_values_summary"/>

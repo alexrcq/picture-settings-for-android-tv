@@ -31,7 +31,7 @@
         android:theme="@style/Theme.AppTheme"
         tools:ignore="DataExtractionRules">
         <service
-            android:name="com.alexrcq.tvpicturesettings.service.DarkModeManager"
+            android:name="com.alexrcq.tvpicturesettings.service.ScreenManager"
             android:enabled="true"
             android:exported="false" />
         <service

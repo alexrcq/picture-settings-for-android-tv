@@ -1,10 +1,11 @@
 package com.alexrcq.tvpicturesettings.util
 
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.service.DarkModeManager
+import com.alexrcq.tvpicturesettings.domain.DarkModeManager
 import com.alexrcq.tvpicturesettings.storage.DarkModePreferences
 
 class DarkModeHintProvider(private val darkModePreferences: DarkModePreferences) {
+
     fun getClickToNextModeHint(mode: DarkModeManager.Mode): Int = when (mode) {
         DarkModeManager.Mode.OFF -> R.string.click_to_dark_mode
         DarkModeManager.Mode.ONLY_BACKLIGHT -> getHintForOnlyBacklight()

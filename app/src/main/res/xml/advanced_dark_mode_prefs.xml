@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/advanced_preferences">
+    <SwitchPreference
+        app:defaultValue="@bool/turn_off_dark_mode_on_screen_on"
+        app:key="is_enable_day_mode_after_screen_on_enabled"
+        app:title="@string/day_mode_after_screen_on" />
+    <SwitchPreference
+        app:key="step_by_step_dark_mode_enabled"
+        app:title="@string/step_by_step_dark_mode" />
+    <SwitchPreference
+        app:defaultValue="@bool/show_mode_changed"
+        app:key="show_mode_changed"
+        app:title="@string/show_mode_changed" />
+    <SwitchPreference
+        app:defaultValue="@bool/is_night_blue_filter_enabled"
+        app:key="night_blue_filter_enabled"
+        app:title="@string/night_blue_filter_enabled_summary" />
+</androidx.preference.PreferenceScreen>

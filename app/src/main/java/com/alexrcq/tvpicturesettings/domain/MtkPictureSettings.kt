@@ -1,4 +1,4 @@
-package com.alexrcq.tvpicturesettings.storage
+package com.alexrcq.tvpicturesettings.domain
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -9,6 +9,8 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import com.alexrcq.tvpicturesettings.App.Companion.applicationScope
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings
+import com.alexrcq.tvpicturesettings.storage.MtkGlobalKeys
 import com.alexrcq.tvpicturesettings.util.TvUtils.isLocalDimmingSupported
 import com.alexrcq.tvpicturesettings.util.TvUtils.isOled
 import kotlinx.coroutines.Dispatchers

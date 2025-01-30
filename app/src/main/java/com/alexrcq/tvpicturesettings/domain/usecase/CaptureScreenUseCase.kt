@@ -1,4 +1,4 @@
-package com.alexrcq.tvpicturesettings
+package com.alexrcq.tvpicturesettings.domain.usecase
 
 import android.os.Environment
 import com.alexrcq.tvpicturesettings.adblib.AdbClient

@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.alexrcq.tvpicturesettings.App
-import com.alexrcq.tvpicturesettings.service.DarkModeManager
+import com.alexrcq.tvpicturesettings.service.ScreenManager
 import com.alexrcq.tvpicturesettings.service.WhiteBalanceLocker
 
 class SystemEventReceiver : BroadcastReceiver() {
@@ -18,7 +18,7 @@ class SystemEventReceiver : BroadcastReceiver() {
     }
 
     private fun onSystemAction(context: Context, action: String) {
-        DarkModeManager.startForeground(context, action == Intent.ACTION_BOOT_COMPLETED)
+        ScreenManager.startForeground(context, action == Intent.ACTION_BOOT_COMPLETED)
         val isWhiteBalanceLocked = (context.applicationContext as App).picturePreferences.isWhiteBalanceLocked
         if (isWhiteBalanceLocked) {
             WhiteBalanceLocker.startForeground(context)

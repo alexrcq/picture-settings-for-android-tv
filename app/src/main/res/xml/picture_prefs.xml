@@ -22,6 +22,10 @@
         tools:isPreferenceVisible="false"/>
     <PreferenceCategory app:title="@string/advanced"/>
     <Preference
+        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.BlueLightFilterFragment"
+        app:key="blue_light_filter"
+        app:title="@string/blue_light_filter"/>
+    <Preference
         app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.DarkModePreferencesFragment"
         app:key="dark_mode_preferences"
         app:title="@string/dark_mode_preferences"/>

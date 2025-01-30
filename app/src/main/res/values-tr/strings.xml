@@ -15,7 +15,7 @@
     <string name="activity_not_found">%1$s not found</string>
     <string name="step_by_step_dark_mode">Karanlık modu 3 adımda değiştirin</string>
     <string name="click_to_turn_on_the_dark_filter">Karanlık filtre için tıklayın</string>
-    <string name="dark_mode_only_backlight">Karanlık mod (arka ışık azaltma)</string>
+    <string name="dark_mode_only_backlight">Karanlık mod</string>
     <string name="backlight_at_night">Karanlık mod arka ışığı</string>
     <string name="brightness">Parlaklık</string>
     <string name="contrast">Kontrast</string>
@@ -27,7 +27,7 @@
     <string name="power_picture_off">Ekranı kapat</string>
     <string name="adb_debugging_required">Geliştirici seçeneklerinden USB hata ayıklamayı etkinleştirmeniz gerekiyor.</string>
     <string name="wait_for_debug_window">Bir sonraki pencerede “Bu bilgisayardan her zaman izin ver” onay kutusunu işaretleyin ve ardından Tamam’a tıklayın.</string>
-    <string name="dark_mode_full">Karanlık mod (Arka ışık azaltma + ekstra karartma)</string>
+    <string name="dark_mode_max">Karanlık mod (maks.)</string>
     <string name="dark_mode_off">Aydınlık moda geçildi…</string>
     <string name="red">Kırmızı</string>
     <string name="green">Yeşil</string>
@@ -63,9 +63,15 @@
     <string name="fix_values">Değerleri düzelt</string>
     <string name="custom_see_wb_settings">Özel (beyaz dengesi ayarlarına bakın)</string>
     <string name="fixed_see_wb_settings">Düzeltilmiş (beyaz dengesi ayarlarına bakın)</string>
-    <string name="mode_cannot_be_applied">Mevcut sistem yapılandırması nedeniyle arka ışık modu uygulanamıyor</string>
     <string name="grant_permissions">İzinleri Ver</string>
     <string name="permissions_granted">İzinler Başarıyla Verildi</string>
     <string name="fix_values_summary">Sistemin beyaz dengesini değiştirmesini yasaklayın</string>
     <string name="show_mode_changed">Mod değişikliği gerçekleştiğinde bir mesaj görüntüleme</string>
+    <string name="advanced_settings">Ek ayarlar</string>
+    <string name="blue_light_filter_temperature">Sıcaklık (K)</string>
+    <string name="intensity">Yoğunluk</string>
+    <string name="blue_light_filter_enabled_summary">Göz yorgunluğunu azaltmak ve uyku kalitesini iyileştirmek için mavi ışık yayılımını azaltın</string>
+    <string name="night_blue_filter_enabled_summary">Karanlık modda mavi ışık filtresini etkinleştir</string>
+    <string name="advanced_preferences">İleri düzey ayarlar</string>
+    <string name="blue_light_filter">Mavi Işık Filtresi</string>
 </resources>

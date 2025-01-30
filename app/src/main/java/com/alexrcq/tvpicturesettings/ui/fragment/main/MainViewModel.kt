@@ -3,12 +3,12 @@ package com.alexrcq.tvpicturesettings.ui.fragment.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.alexrcq.tvpicturesettings.CaptureScreenUseCase
+import com.alexrcq.tvpicturesettings.domain.usecase.CaptureScreenUseCase
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.adblib.AdbClient
-import com.alexrcq.tvpicturesettings.service.DarkModeManager
+import com.alexrcq.tvpicturesettings.domain.DarkModeManager
 import com.alexrcq.tvpicturesettings.storage.DarkModePreferences
-import com.alexrcq.tvpicturesettings.storage.TvSettings
+import com.alexrcq.tvpicturesettings.domain.TvSettings
 import com.alexrcq.tvpicturesettings.util.DarkModeHintProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -34,6 +34,7 @@ class MainViewModel(
     private val adbClient: AdbClient,
     private val captureScreen: CaptureScreenUseCase,
     private val tvSettings: TvSettings,
+    private val darkModeManager: DarkModeManager
 ) : ViewModel() {
 
     private val _uiStateFlow = MutableStateFlow<MainUiState>(MainUiState.Idle)
@@ -46,12 +47,12 @@ class MainViewModel(
         darkModePreferences.modeFlow.map { mode -> darkModeHintProvider.getClickToNextModeHint(mode) }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(),
-            initialValue = darkModeHintProvider.getClickToNextModeHint(darkModePreferences.currentMode)
+            initialValue = darkModeHintProvider.getClickToNextModeHint(darkModeManager.currentMode)
         )
 
     private val holdToToggleDimmingPeriodicHintFlow: Flow<Int> = flow {
         while (true) {
-            emit(darkModeHintProvider.getClickToNextModeHint(darkModePreferences.currentMode))
+            emit(darkModeHintProvider.getClickToNextModeHint(darkModeManager.currentMode))
             delay(HOW_TO_SWITCH_MODE_HINT_DURATION)
             emit(R.string.hold_to_toggle_extra_dimm_hint)
             delay(HOLD_TO_DIMMING_HINT_DURATION)
@@ -69,8 +70,8 @@ class MainViewModel(
 
     fun processIntent(intent: MainIntent) {
         when (intent) {
-            is MainIntent.ToggleDarkMode -> darkModePreferences.toggleMode()
-            is MainIntent.EnableDarkModeAndToggleFilter -> enableDarkModeAndToggleFilter()
+            is MainIntent.ToggleDarkMode -> darkModeManager.toggleMode()
+            is MainIntent.ToggleFullDarkMode -> toggleFullDarkMode()
             is MainIntent.ToggleScreenPower -> tvSettings.toggleScreenPower()
             is MainIntent.CaptureScreenshot -> captureScreenshot()
             is MainIntent.GrantPermissions -> grantPermissions(intent.permissions)
@@ -80,14 +81,14 @@ class MainViewModel(
 
     private fun setBacklight(value: Int) {
         tvSettings.picture.backlight = value
-        if (darkModePreferences.currentMode == DarkModeManager.Mode.OFF) {
+        if (darkModeManager.currentMode == DarkModeManager.Mode.OFF) {
             darkModePreferences.dayBacklight = value
         }
     }
 
-    private fun enableDarkModeAndToggleFilter() = with(darkModePreferences) {
+    private fun toggleFullDarkMode() = with(darkModeManager) {
         if (currentMode == DarkModeManager.Mode.FULL) {
-            toggleFilter()
+            toggleScreenDimming()
         } else {
             currentMode = DarkModeManager.Mode.FULL
         }
@@ -98,7 +99,7 @@ class MainViewModel(
     private fun captureScreenshot() {
         captureScreenJob?.cancel()
         captureScreenJob = viewModelScope.launch {
-            if (!tvSettings.isAdbEnabled()) {
+            if (!isAdbEnabled) {
                 _sideEffectChannel.send(MainSideEffect.ShowAdbRequired)
                 return@launch
             }
@@ -114,7 +115,7 @@ class MainViewModel(
         viewModelScope.launch {
             try {
                 adbClient.grantPermissions(permissions)
-                _sideEffectChannel.send(MainSideEffect.ShowPermissionsGranted)
+                _sideEffectChannel.send(MainSideEffect.PermissionsGranted)
                 _uiStateFlow.value = MainUiState.Idle
             } catch (e: TimeoutException) {
                 _sideEffectChannel.send(MainSideEffect.ShowGrantPermissions(permissions))
@@ -140,10 +141,11 @@ class MainViewModel(
             darkModeHintProvider: DarkModeHintProvider,
             adbClient: AdbClient,
             captureScreen: CaptureScreenUseCase,
-            tvSettings: TvSettings
+            tvSettings: TvSettings,
+            darkModeManager: DarkModeManager
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T = MainViewModel(
-                darkModePreferences, darkModeHintProvider, adbClient, captureScreen, tvSettings
+                darkModePreferences, darkModeHintProvider, adbClient, captureScreen, tvSettings, darkModeManager
             ) as T
         }
     }

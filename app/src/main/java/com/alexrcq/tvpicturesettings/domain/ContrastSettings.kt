@@ -1,4 +1,4 @@
-package com.alexrcq.tvpicturesettings.storage
+package com.alexrcq.tvpicturesettings.domain
 
 interface ContrastSettings {
     var isLocalContrastEnabled: Boolean

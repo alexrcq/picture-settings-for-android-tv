@@ -19,7 +19,7 @@ import androidx.preference.Preference.OnPreferenceChangeListener
 import androidx.preference.SeekBarPreference
 import com.alexrcq.tvpicturesettings.App
 import com.alexrcq.tvpicturesettings.BuildConfig
-import com.alexrcq.tvpicturesettings.CaptureScreenUseCase
+import com.alexrcq.tvpicturesettings.domain.usecase.CaptureScreenUseCase
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.TvConstants
 import com.alexrcq.tvpicturesettings.storage.MtkGlobalKeys
@@ -53,7 +53,8 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
                 DarkModeHintProvider(darkModePreferences),
                 adbClient,
                 CaptureScreenUseCase(adbClient),
-                tvSettings
+                tvSettings,
+                darkModeManager
             )
         }
     }
@@ -87,7 +88,7 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
     private fun initPreferences() {
         backlightPref = findPreference<LongPressGlobalSeekbarPreference>(MtkGlobalKeys.PICTURE_BACKLIGHT)?.apply {
             onClick { viewModel.processIntent(MainIntent.ToggleDarkMode) }
-            onLongClick { viewModel.processIntent(MainIntent.EnableDarkModeAndToggleFilter) }
+            onLongClick { viewModel.processIntent(MainIntent.ToggleFullDarkMode) }
             onPreferenceChangeListener = OnPreferenceChangeListener { _, newValue ->
                 viewModel.processIntent(MainIntent.ChangeBacklight(newValue as Int))
                 true
@@ -148,9 +149,14 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
         when (sideEffect) {
             is MainSideEffect.ShowAdbRequired -> showAdbRequired()
             is MainSideEffect.ShowGrantPermissions -> showGrantPermissionsDialog(sideEffect.permissions)
-            is MainSideEffect.ShowPermissionsGranted -> showToast(getString(R.string.permissions_granted))
+            is MainSideEffect.PermissionsGranted -> onPermissionsGranted()
             is MainSideEffect.ShowError -> showToast(sideEffect.errorMessage)
         }
+    }
+
+    private fun onPermissionsGranted() {
+        showToast(getString(R.string.permissions_granted))
+        (requireActivity().application as App).overlayManager.initOverlay()
     }
 
     private fun showAdbRequired() {

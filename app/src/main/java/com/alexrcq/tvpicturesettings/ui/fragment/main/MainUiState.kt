@@ -9,7 +9,7 @@ sealed interface MainUiState {
 
 sealed interface MainIntent {
     object CaptureScreenshot : MainIntent
-    object EnableDarkModeAndToggleFilter : MainIntent
+    object ToggleFullDarkMode : MainIntent
     object ToggleDarkMode : MainIntent
     object ToggleScreenPower : MainIntent
     class GrantPermissions(val permissions: List<String>) : MainIntent
@@ -19,6 +19,6 @@ sealed interface MainIntent {
 sealed interface MainSideEffect {
     object ShowAdbRequired : MainSideEffect
     class ShowGrantPermissions(val permissions: List<String>) : MainSideEffect
-    object ShowPermissionsGranted : MainSideEffect
+    object PermissionsGranted : MainSideEffect
     class ShowError(val errorMessage: String) : MainSideEffect
 }

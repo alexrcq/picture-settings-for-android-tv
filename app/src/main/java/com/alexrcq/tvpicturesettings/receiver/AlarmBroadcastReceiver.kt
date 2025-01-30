@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import com.alexrcq.tvpicturesettings.App
 import com.alexrcq.tvpicturesettings.App.Companion.applicationScope
-import com.alexrcq.tvpicturesettings.service.DarkModeManager
+import com.alexrcq.tvpicturesettings.domain.DarkModeManager
 import com.alexrcq.tvpicturesettings.storage.DarkModePreferences
 import com.alexrcq.tvpicturesettings.util.AlarmScheduler
 import com.alexrcq.tvpicturesettings.util.AlarmScheduler.ACTION_ALARM_TRIGGERED
@@ -19,10 +19,13 @@ import timber.log.Timber
 class AlarmBroadcastReceiver : BroadcastReceiver() {
 
     private lateinit var darkModePreferences: DarkModePreferences
+    private lateinit var darkModeManager: DarkModeManager
 
     override fun onReceive(context: Context, intent: Intent) {
         Timber.d("intent action: ${intent.action}")
-        darkModePreferences = (context.applicationContext as App).darkModePreferences
+        val application = (context.applicationContext as App)
+        darkModePreferences = application.darkModePreferences
+        darkModeManager = application.darkModeManager
         if (intent.action == ACTION_ALARM_TRIGGERED) {
             val alarmType = intent.getSerializableExtra(EXTRA_ALARM_TYPE) as AlarmScheduler.AlarmType?
             handleAlarm(alarmType)
@@ -41,9 +44,9 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
         applicationScope.launch {
             mutex.withLock {
                 if (darkModePreferences.isAdditionalDimmingEnabled) {
-                    darkModePreferences.currentMode = DarkModeManager.Mode.FULL
+                    darkModeManager.currentMode = DarkModeManager.Mode.FULL
                 } else {
-                    darkModePreferences.currentMode = DarkModeManager.Mode.ONLY_BACKLIGHT
+                    darkModeManager.currentMode = DarkModeManager.Mode.ONLY_BACKLIGHT
                 }
             }
         }
@@ -54,7 +57,7 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
             mutex.withLock {
                 // waiting for the system settings service wake up
                 delay(DAY_MODE_DELAY)
-                darkModePreferences.currentMode = DarkModeManager.Mode.OFF
+                darkModeManager.currentMode = DarkModeManager.Mode.OFF
             }
         }
     }
