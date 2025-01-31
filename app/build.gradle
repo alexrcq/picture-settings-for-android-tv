@@ -11,8 +11,8 @@ android {
         minSdkVersion 26
         compileSdk 32
         targetSdkVersion 33
-        versionCode 44
-        versionName "1.0.80"
+        versionCode 45
+        versionName "1.0.81"
     }
 
     compileOptions {
