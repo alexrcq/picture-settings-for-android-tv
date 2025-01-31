@@ -36,6 +36,7 @@ class OverlayManager(context: Context) {
 
     fun destroyOverlay() {
         if (overlayContainer.hasParent()) {
+            overlayContainer.removeAllViews()
             windowManager.removeView(overlayContainer)
         }
     }
