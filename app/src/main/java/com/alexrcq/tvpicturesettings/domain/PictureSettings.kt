@@ -1,4 +1,4 @@
-package com.alexrcq.tvpicturesettings.storage
+package com.alexrcq.tvpicturesettings.domain
 
 interface PictureSettings: BacklightSettings, WhiteBalanceSettings, HdrSettings, ColorTuneSettings, ContrastSettings {
     var pictureMode: Int

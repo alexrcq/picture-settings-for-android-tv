@@ -1,4 +1,4 @@
-package com.alexrcq.tvpicturesettings.storage
+package com.alexrcq.tvpicturesettings.domain
 
 import kotlinx.coroutines.flow.StateFlow
 

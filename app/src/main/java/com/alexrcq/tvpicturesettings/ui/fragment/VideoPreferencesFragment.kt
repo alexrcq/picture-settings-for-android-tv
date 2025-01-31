@@ -12,8 +12,8 @@ import com.alexrcq.tvpicturesettings.App
 import com.alexrcq.tvpicturesettings.storage.PreferencesKeys
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.storage.MtkGlobalKeys
-import com.alexrcq.tvpicturesettings.storage.MtkPictureSettings.Companion.PICTURE_MODE_USER
-import com.alexrcq.tvpicturesettings.storage.PictureSettings
+import com.alexrcq.tvpicturesettings.domain.MtkPictureSettings.Companion.PICTURE_MODE_USER
+import com.alexrcq.tvpicturesettings.domain.PictureSettings
 import com.alexrcq.tvpicturesettings.util.onClick
 import com.alexrcq.tvpicturesettings.util.showToast
 

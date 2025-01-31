@@ -7,7 +7,7 @@ import android.view.WindowManager
 import androidx.fragment.app.FragmentActivity
 import com.alexrcq.tvpicturesettings.App
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.service.DarkModeManager
+import com.alexrcq.tvpicturesettings.service.ScreenManager
 import com.alexrcq.tvpicturesettings.service.WhiteBalanceLocker
 import com.alexrcq.tvpicturesettings.util.TvUtils
 
@@ -46,7 +46,7 @@ class MainActivity : FragmentActivity() {
     }
 
     private fun startServices() {
-        DarkModeManager.startForeground(this)
+        ScreenManager.startForeground(this)
         val isWhiteBalanceLocked = (application as App).picturePreferences.isWhiteBalanceLocked
         if (isWhiteBalanceLocked) {
             WhiteBalanceLocker.startForeground(this)

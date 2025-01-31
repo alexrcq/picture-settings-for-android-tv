@@ -1,7 +1,9 @@
-package com.alexrcq.tvpicturesettings.storage
+package com.alexrcq.tvpicturesettings.domain
 
 import android.content.ContentResolver
 import android.net.Uri
+import com.alexrcq.tvpicturesettings.storage.GlobalSettings
+import com.alexrcq.tvpicturesettings.storage.MtkGlobalKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow

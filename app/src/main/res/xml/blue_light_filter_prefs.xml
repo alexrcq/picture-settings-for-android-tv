@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:title="@string/blue_light_filter">
+    <SwitchPreference
+        android:defaultValue="@bool/is_blue_light_filter_enabled"
+        android:key="blue_light_filter_enabled"
+        android:title="@string/enable"
+        android:summary="@string/blue_light_filter_enabled_summary"/>
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
+        android:defaultValue="@integer/blue_filter_temperature"
+        android:key="blue_light_filter_temperature"
+        android:title="@string/blue_light_filter_temperature"
+        android:max="2900"
+        app:min="1000"
+        app:showSeekBarValue="true"
+        app:seekBarIncrement="50"/>
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
+        android:defaultValue="@integer/blue_light_filter_power"
+        android:key="blue_light_filter_power"
+        android:title="@string/intensity"
+        android:max="50"
+        app:showSeekBarValue="true"
+        app:seekBarIncrement="1"/>
+    <Preference
+        app:key="reset_values"
+        app:title="@string/reset_values"/>
+</PreferenceScreen>

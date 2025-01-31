@@ -2,16 +2,16 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/scheduled_dark_mode">
     <SwitchPreference
-        app:defaultValue="false"
+        app:defaultValue="@bool/is_auto_dark_mode_enabled"
         app:key="auto_backlight"
         app:title="@string/enable" />
     <com.alexrcq.tvpicturesettings.ui.preference.TimePickerPreference
-        app:defaultValue="22:45"
+        app:defaultValue="@string/dark_mode_time"
         app:dependency="auto_backlight"
         app:key="ab_night_time"
         app:title="@string/dark_mode_enable_time" />
     <com.alexrcq.tvpicturesettings.ui.preference.TimePickerPreference
-        app:defaultValue="07:30"
+        app:defaultValue="@string/day_mode_time"
         app:dependency="auto_backlight"
         app:key="ab_day_time"
         app:title="@string/dark_mode_disable_time" />

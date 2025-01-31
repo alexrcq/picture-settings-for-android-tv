@@ -9,7 +9,7 @@ import com.alexrcq.tvpicturesettings.storage.PreferencesKeys
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.service.WhiteBalanceLocker
 import com.alexrcq.tvpicturesettings.storage.PicturePreferences
-import com.alexrcq.tvpicturesettings.storage.PictureSettings
+import com.alexrcq.tvpicturesettings.domain.PictureSettings
 import com.alexrcq.tvpicturesettings.util.onClick
 
 class WhiteBalanceFragment : GlobalSettingsFragment(R.xml.white_balance_prefs) {

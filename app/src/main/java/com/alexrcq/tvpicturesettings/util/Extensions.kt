@@ -3,6 +3,7 @@ package com.alexrcq.tvpicturesettings.util
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.FileObserver
+import android.view.View
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -52,3 +53,5 @@ fun Preference.onClick(onClick: () -> Unit) {
         true
     }
 }
+
+fun View.hasParent(): Boolean = parent != null
