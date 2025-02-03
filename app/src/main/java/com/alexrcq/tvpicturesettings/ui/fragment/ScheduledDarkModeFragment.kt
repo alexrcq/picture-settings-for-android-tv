@@ -27,11 +27,11 @@ class ScheduledDarkModeFragment : BasePreferenceFragment(R.xml.scheduled_dark_mo
     }
 
     private fun scheduleDayMode(dayModeTime: String) {
-        AlarmScheduler.setDailyAlarm(requireContext(), AlarmScheduler.AlarmType.DAY_MODE_ALARM, dayModeTime)
+        AlarmScheduler.setAlarm(requireContext(), AlarmScheduler.AlarmType.DAY_MODE_ALARM, dayModeTime)
     }
 
     private fun scheduleDarkMode(darkModeTime: String) {
-        AlarmScheduler.setDailyAlarm(requireContext(), AlarmScheduler.AlarmType.DARK_MODE_ALARM, darkModeTime)
+        AlarmScheduler.setAlarm(requireContext(), AlarmScheduler.AlarmType.DARK_MODE_ALARM, darkModeTime)
     }
 
     private fun toggleAutoDarkMode(isAutoDarkModeEnabled: Boolean) {

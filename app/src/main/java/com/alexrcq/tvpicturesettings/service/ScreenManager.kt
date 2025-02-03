@@ -114,8 +114,8 @@ class ScreenManager : Service(), SharedPreferences.OnSharedPreferenceChangeListe
 
     private fun setupDarkModeAlarms() {
         if (darkModePrefs.isAutoDarkModeEnabled) {
-            AlarmScheduler.setDailyAlarm(this, AlarmScheduler.AlarmType.DAY_MODE_ALARM, darkModePrefs.dayModeTime)
-            AlarmScheduler.setDailyAlarm(this, AlarmScheduler.AlarmType.DARK_MODE_ALARM, darkModePrefs.darkModeTime)
+            AlarmScheduler.setAlarm(this, AlarmScheduler.AlarmType.DAY_MODE_ALARM, darkModePrefs.dayModeTime)
+            AlarmScheduler.setAlarm(this, AlarmScheduler.AlarmType.DARK_MODE_ALARM, darkModePrefs.darkModeTime)
         }
     }
 
