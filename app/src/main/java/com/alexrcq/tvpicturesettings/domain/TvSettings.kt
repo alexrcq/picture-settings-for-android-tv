@@ -9,9 +9,13 @@ interface TvSettings {
     val global: GlobalSettings
     val picture: PictureSettings
 
+    var isScreenOn: Boolean
+
     fun tvSourceFlow(): Flow<String?>
 
     fun isAdbEnabled(): Boolean = global.getInt(Settings.Global.ADB_ENABLED).toBoolean()
 
-    fun toggleScreenPower()
+    fun toggleScreenPower() {
+        isScreenOn = !isScreenOn
+    }
 }

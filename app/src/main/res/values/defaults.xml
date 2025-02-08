@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <bool name="is_auto_dark_mode_enabled">false</bool>
-    <bool name="turn_off_dark_mode_on_screen_on">false</bool>
+    <bool name="turn_off_dark_mode_on_power_on">false</bool>
     <bool name="is_additional_dimming_enabled">false</bool>
     <bool name="is_screen_dimming_enabled">false</bool>
     <bool name="three_steps_dark_mode_enabled">false</bool>

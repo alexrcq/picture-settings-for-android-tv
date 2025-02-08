@@ -24,9 +24,9 @@ class DarkModePreferences(sharedPreferences: SharedPreferences, resources: Resou
         PreferencesKeys.DAY_BACKLIGHT,
         resources.getInteger(R.integer.day_backlight)
     )
-    var turnOffDarkModeOnScreenOn: Boolean by preference(
-        PreferencesKeys.TURN_OFF_DARK_MODE_ON_SCREEN_ON,
-        resources.getBoolean(R.bool.turn_off_dark_mode_on_screen_on)
+    var turnOffDarkModeOnPowerOn: Boolean by preference(
+        PreferencesKeys.TURN_OFF_DARK_MODE_ON_POWER_ON,
+        resources.getBoolean(R.bool.turn_off_dark_mode_on_power_on)
     )
     var isAdditionalDimmingEnabled: Boolean by preference(
         PreferencesKeys.IS_ADDITIONAL_DIMMING_ENABLED,

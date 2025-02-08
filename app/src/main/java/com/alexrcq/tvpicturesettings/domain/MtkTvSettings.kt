@@ -24,6 +24,8 @@ class MtkTvSettings(
     override val picture: PictureSettings
 ) : TvSettings {
 
+    override var isScreenOn: Boolean by global.booleanSetting(MtkGlobalKeys.POWER_PICTURE_OFF)
+
     override fun tvSourceFlow(): Flow<String?> = flow {
         // the content provider doesn't implement notifyChange(), so we're polling
         while (true) {
@@ -47,11 +49,5 @@ class MtkTvSettings(
         }
         Timber.d("currentSource: $currentSourceName")
         return if (currentSourceName == TV_SOURCE_INACTIVE) null else currentSourceName
-    }
-
-    private var isScreenPowerOn: Boolean by global.booleanSetting(MtkGlobalKeys.POWER_PICTURE_OFF)
-
-    override fun toggleScreenPower() {
-        isScreenPowerOn = !isScreenPowerOn
     }
 }
