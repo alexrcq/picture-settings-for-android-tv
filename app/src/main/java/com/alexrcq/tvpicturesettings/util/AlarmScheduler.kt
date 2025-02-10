@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import com.alexrcq.tvpicturesettings.receiver.AlarmBroadcastReceiver
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -14,7 +15,11 @@ object AlarmScheduler {
     const val EXTRA_ALARM_TYPE = "alarmType"
     const val ACTION_ALARM_TRIGGERED = "com.alerxrcq.tvpicturesettings.AlarmScheduler.ACTION_ALARM_TRIGGERED"
 
-    fun setDailyAlarm(context: Context, alarmType: AlarmType, alarmTime: String) {
+    fun setAlarm(context: Context, alarmType: AlarmType, alarmTime: String) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            return
+        }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
             alarmType.ordinal,
@@ -25,11 +30,9 @@ object AlarmScheduler {
         if (alarmDateTime.isBefore(LocalDateTime.now())) {
             alarmDateTime = alarmDateTime.plusDays(1)
         }
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setRepeating(
+        alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             alarmDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
-            AlarmManager.INTERVAL_DAY,
             pendingIntent
         )
     }

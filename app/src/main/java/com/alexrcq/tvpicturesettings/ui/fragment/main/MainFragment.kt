@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.View
@@ -59,9 +60,13 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
         }
     }
 
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        super.onCreatePreferences(savedInstanceState, rootKey)
+        initPreferences()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initPreferences()
         viewModel.uiStateFlow.onEach(::updateUiState).launchIn(viewLifecycleOwner.lifecycleScope)
         viewModel.sideEffectFlow.onEach(::handleSideEffect).launchIn(viewLifecycleOwner.lifecycleScope)
         viewLifecycleOwner.lifecycleScope.launch {
@@ -111,14 +116,16 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
 
     override fun onStart() {
         super.onStart()
-        requirePermissions(
-            listOf(
-                android.Manifest.permission.WRITE_SECURE_SETTINGS,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                android.Manifest.permission.SYSTEM_ALERT_WINDOW
-            )
+        val permissions = mutableListOf(
+            android.Manifest.permission.WRITE_SECURE_SETTINGS,
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            android.Manifest.permission.SYSTEM_ALERT_WINDOW,
         )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissions.add(android.Manifest.permission.SCHEDULE_EXACT_ALARM)
+        }
+        requirePermissions(permissions)
     }
 
     private fun updateUiState(state: MainUiState) {

@@ -23,24 +23,26 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Timber.d("intent action: ${intent.action}")
+        if (intent.action != ACTION_ALARM_TRIGGERED) {
+            return
+        }
         val application = (context.applicationContext as App)
         darkModePreferences = application.darkModePreferences
         darkModeManager = application.darkModeManager
-        if (intent.action == ACTION_ALARM_TRIGGERED) {
-            val alarmType = intent.getSerializableExtra(EXTRA_ALARM_TYPE) as AlarmScheduler.AlarmType?
-            handleAlarm(alarmType)
+        val alarmType = intent.getSerializableExtra(EXTRA_ALARM_TYPE) as AlarmScheduler.AlarmType?
+        if (alarmType != null) {
+            handleAlarm(context, alarmType)
         }
     }
 
-    private fun handleAlarm(alarmType: AlarmScheduler.AlarmType?) {
+    private fun handleAlarm(context: Context, alarmType: AlarmScheduler.AlarmType) {
         when (alarmType) {
-            AlarmScheduler.AlarmType.DARK_MODE_ALARM -> onDarkModeAlarmTriggered()
-            AlarmScheduler.AlarmType.DAY_MODE_ALARM -> onDayModeAlarmTriggered()
-            else -> Unit
+            AlarmScheduler.AlarmType.DARK_MODE_ALARM -> onDarkModeAlarmTriggered(context)
+            AlarmScheduler.AlarmType.DAY_MODE_ALARM -> onDayModeAlarmTriggered(context)
         }
     }
 
-    private fun onDarkModeAlarmTriggered() {
+    private fun onDarkModeAlarmTriggered(context: Context) {
         applicationScope.launch {
             mutex.withLock {
                 if (darkModePreferences.isAdditionalDimmingEnabled) {
@@ -50,9 +52,10 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
                 }
             }
         }
+        AlarmScheduler.setAlarm(context, AlarmScheduler.AlarmType.DARK_MODE_ALARM, darkModePreferences.darkModeTime)
     }
 
-    private fun onDayModeAlarmTriggered() {
+    private fun onDayModeAlarmTriggered(context: Context) {
         applicationScope.launch {
             mutex.withLock {
                 // waiting for the system settings service wake up
@@ -60,6 +63,7 @@ class AlarmBroadcastReceiver : BroadcastReceiver() {
                 darkModeManager.currentMode = DarkModeManager.Mode.OFF
             }
         }
+        AlarmScheduler.setAlarm(context, AlarmScheduler.AlarmType.DAY_MODE_ALARM, darkModePreferences.dayModeTime)
     }
 
     companion object {

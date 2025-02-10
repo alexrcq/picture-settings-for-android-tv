@@ -10,7 +10,7 @@ object PreferencesKeys {
     const val TAKE_SCREENSHOT = "take_screenshot"
     const val RESET_TO_DEFAULT = "reset_to_default"
     const val SCREEN_DIMMING_POWER = "dark_filter_power"
-    const val TURN_OFF_DARK_MODE_ON_SCREEN_ON = "is_enable_day_mode_after_screen_on_enabled"
+    const val TURN_OFF_DARK_MODE_ON_POWER_ON = "is_enable_day_mode_after_screen_on_enabled"
     const val OPEN_PICTURE_SETTINGS = "open_picture_settings"
     const val APP_DESCRIPTION = "app_description"
     const val IS_WHITE_BALANCE_LOCKED = "fix_wb_values"

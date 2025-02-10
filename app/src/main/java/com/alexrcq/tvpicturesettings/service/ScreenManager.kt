@@ -14,14 +14,15 @@ import androidx.core.app.NotificationCompat
 import com.alexrcq.tvpicturesettings.App
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.domain.DarkModeManager
-import com.alexrcq.tvpicturesettings.ui.OverlayManager
-import com.alexrcq.tvpicturesettings.storage.DarkModePreferences
 import com.alexrcq.tvpicturesettings.domain.PictureSettings
-import com.alexrcq.tvpicturesettings.storage.PreferencesKeys
 import com.alexrcq.tvpicturesettings.domain.TvSettings
+import com.alexrcq.tvpicturesettings.storage.DarkModePreferences
+import com.alexrcq.tvpicturesettings.storage.PreferencesKeys
+import com.alexrcq.tvpicturesettings.ui.OverlayManager
 import com.alexrcq.tvpicturesettings.ui.view.BlueLightFilterView
 import com.alexrcq.tvpicturesettings.ui.view.ScreenDimmerView
 import com.alexrcq.tvpicturesettings.util.AlarmScheduler
+import com.alexrcq.tvpicturesettings.util.TvUtils
 import com.alexrcq.tvpicturesettings.util.hasPermission
 import com.alexrcq.tvpicturesettings.util.showToast
 import timber.log.Timber
@@ -64,7 +65,7 @@ class ScreenManager : Service(), SharedPreferences.OnSharedPreferenceChangeListe
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.getBooleanExtra(EXTRA_AFTER_BOOT, false) == true) {
-            onScreenOn()
+            onPowerOn()
         }
         createNotificationChannel()
         startForeground(2, createNotification())
@@ -114,8 +115,8 @@ class ScreenManager : Service(), SharedPreferences.OnSharedPreferenceChangeListe
 
     private fun setupDarkModeAlarms() {
         if (darkModePrefs.isAutoDarkModeEnabled) {
-            AlarmScheduler.setDailyAlarm(this, AlarmScheduler.AlarmType.DAY_MODE_ALARM, darkModePrefs.dayModeTime)
-            AlarmScheduler.setDailyAlarm(this, AlarmScheduler.AlarmType.DARK_MODE_ALARM, darkModePrefs.darkModeTime)
+            AlarmScheduler.setAlarm(this, AlarmScheduler.AlarmType.DAY_MODE_ALARM, darkModePrefs.dayModeTime)
+            AlarmScheduler.setAlarm(this, AlarmScheduler.AlarmType.DARK_MODE_ALARM, darkModePrefs.darkModeTime)
         }
     }
 
@@ -130,13 +131,21 @@ class ScreenManager : Service(), SharedPreferences.OnSharedPreferenceChangeListe
             addAction(ACTION_CHANGE_DIMMING_POWER)
             addAction(ACTION_TOGGLE_SCREEN_POWER)
             addAction(Intent.ACTION_SCREEN_ON)
+            addAction(Intent.ACTION_SCREEN_OFF)
         }
         registerReceiver(broadcastReceiver, intentFilter)
     }
 
-    private fun onScreenOn() {
-        if (darkModePrefs.turnOffDarkModeOnScreenOn) {
+    private fun onPowerOn() {
+        if (darkModePrefs.turnOffDarkModeOnPowerOn) {
             darkModeManager.currentMode = DarkModeManager.Mode.OFF
+        }
+    }
+
+    private fun onPowerOff() {
+        if (TvUtils.isModelMssp()) {
+            // Screen must be on at this point
+            tvSettings.isScreenOn = true
         }
     }
 
@@ -226,7 +235,8 @@ class ScreenManager : Service(), SharedPreferences.OnSharedPreferenceChangeListe
             ACTION_CHANGE_DIMMING_POWER -> darkModePrefs.screenDimmingPower =
                 intent.getIntExtra(EXTRA_DIMMING_POWER, 0)
             ACTION_TOGGLE_SCREEN_POWER -> tvSettings.toggleScreenPower()
-            Intent.ACTION_SCREEN_ON -> onScreenOn()
+            Intent.ACTION_SCREEN_ON -> onPowerOn()
+            Intent.ACTION_SCREEN_OFF -> onPowerOff()
         }
     }
 
