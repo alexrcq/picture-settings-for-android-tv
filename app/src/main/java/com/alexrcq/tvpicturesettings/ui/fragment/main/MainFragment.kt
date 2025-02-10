@@ -60,9 +60,13 @@ class MainFragment : GlobalSettingsFragment(R.xml.picture_prefs) {
         }
     }
 
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        super.onCreatePreferences(savedInstanceState, rootKey)
+        initPreferences()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initPreferences()
         viewModel.uiStateFlow.onEach(::updateUiState).launchIn(viewLifecycleOwner.lifecycleScope)
         viewModel.sideEffectFlow.onEach(::handleSideEffect).launchIn(viewLifecycleOwner.lifecycleScope)
         viewLifecycleOwner.lifecycleScope.launch {
