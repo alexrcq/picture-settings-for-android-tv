@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/advanced_screen_control_title">
+    <Preference
+        app:key="take_screenshot"
+        app:title="@string/take_screenshot" />
+    <ListPreference
+        app:defaultValue="@string/def_screen_off_timeout"
+        app:entries="@array/screen_off_timeout_entries"
+        app:entryValues="@array/screen_off_timeout_values"
+        app:key="screen_off_timeout"
+        app:title="@string/screen_off_timeout_title"
+        app:useSimpleSummaryProvider="true" />
+    <Preference
+        app:key="screen_schedule_preferences"
+        app:title="@string/screen_schedule" />
+</PreferenceScreen>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/screen_schedule">
+
+    <ListPreference
+        app:defaultValue="0"
+        app:entries="@array/screen_schedule_mode_entries"
+        app:entryValues="@array/screen_schedule_mode_values"
+        app:key="screen_schedule_mode"
+        app:title="@string/screen_schedule_mode_title"
+        app:useSimpleSummaryProvider="true" />
+
+    <com.alexrcq.tvpicturesettings.ui.preference.TimePickerPreference
+        app:defaultValue="08:00"
+        app:key="screen_on_time"
+        app:title="@string/screen_on_time" />
+    <com.alexrcq.tvpicturesettings.ui.preference.TimePickerPreference
+        app:defaultValue="23:00"
+        app:key="screen_off_time"
+        app:title="@string/screen_off_time" />
+
+    <Preference app:key="screen_schedule_day_1" app:title="@string/monday" />
+    <Preference app:key="screen_schedule_day_2" app:title="@string/tuesday"/>
+    <Preference app:key="screen_schedule_day_3" app:title="@string/wednesday"/>
+    <Preference app:key="screen_schedule_day_4" app:title="@string/thursday"/>
+    <Preference app:key="screen_schedule_day_5" app:title="@string/friday"/>
+    <Preference app:key="screen_schedule_day_6" app:title="@string/saturday"/>
+    <Preference app:key="screen_schedule_day_7" app:title="@string/sunday"/>
+
+</PreferenceScreen>
