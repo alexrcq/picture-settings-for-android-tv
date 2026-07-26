@@ -4,27 +4,23 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.preference.PreferenceViewHolder
 
-class LongPressGlobalSeekbarPreference @JvmOverloads constructor(
+class LongPressGlobalSeekBarPreference @JvmOverloads constructor(
     context: Context,
     attributeSet: AttributeSet? = null,
-    defStyleAttr: Int = android.R.attr.seekBarStyle
-) : GlobalSeekbarPreference(context, attributeSet, defStyleAttr) {
+    defStyleAttr: Int = androidx.preference.R.attr.seekBarPreferenceStyle
+) : GlobalSeekBarPreference(context, attributeSet, defStyleAttr) {
 
-    private var onLongClickCallback: (() -> Unit)? = null
+    private var onLongClick: (() -> Unit)? = null
 
-    fun onLongClick(onLongClick: () -> Unit) {
-        onLongClickCallback = onLongClick
+    fun onLongClick(action: () -> Unit) {
+        onLongClick = action
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
-        holder.itemView.setOnLongClickListener { performLongClick() }
-    }
-
-    private fun performLongClick(): Boolean {
-        if (!isEnabled || !isSelectable) {
-            return false
+        holder.itemView.setOnLongClickListener {
+            onLongClick?.invoke()
+            onLongClick != null
         }
-        return onLongClickCallback?.let { it(); true } ?: false
     }
 }

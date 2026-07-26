@@ -3,65 +3,38 @@ package com.alexrcq.tvpicturesettings.ui.preference
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
-import android.util.TypedValue
 import androidx.preference.DialogPreference
-import androidx.preference.PreferenceViewHolder
-import com.alexrcq.tvpicturesettings.R
-import timber.log.Timber
 import java.time.LocalTime
-import java.time.format.DateTimeParseException
 
 class TimePickerPreference @JvmOverloads constructor(
     context: Context,
-    attributeSet: AttributeSet? = null,
-    defStyleAttr: Int = android.R.attr.dialogPreferenceStyle
-) : DialogPreference(context, attributeSet, defStyleAttr) {
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = androidx.preference.R.attr.dialogPreferenceStyle
+) : DialogPreference(context, attrs, defStyleAttr) {
 
-    var hour = 0
-        private set
+    private var time: LocalTime = LocalTime.MIDNIGHT
 
-    var minute = 0
-        private set
+    val hour: Int get() = time.hour
+    val minute: Int get() = time.minute
 
     fun setTime(hour: Int, minute: Int) {
-        this.hour = hour
-        this.minute = minute
-        val time = String.format("%02d:%02d", hour, minute)
-        persistString(time)
-        callChangeListener(time)
-    }
+        val time = LocalTime.of(hour, minute)
+        val timeStr = time.toString()
 
-    override fun onBindViewHolder(holder: PreferenceViewHolder) {
-        super.onBindViewHolder(holder)
-        with(TypedValue()) {
-            context.theme.resolveAttribute(
-                android.R.attr.selectableItemBackground,
-                this,
-                true
-            )
-            holder.itemView.setBackgroundResource(resourceId)
+        if (callChangeListener(timeStr)) {
+            this.time = time
+            persistString(timeStr)
+            notifyChanged()
         }
     }
-
-    override fun getDialogLayoutResource(): Int =
-        R.layout.preference_dialog_timepicker
 
     override fun onGetDefaultValue(a: TypedArray, index: Int): String? = a.getString(index)
 
     override fun onSetInitialValue(defaultValue: Any?) {
-        val timeStr = getPersistedString(defaultValue.toString())
-        val time = if (timeStr.isNullOrBlank()) {
-            getDefaultTime()
-        } else try {
-            LocalTime.parse(timeStr)
-        } catch (e: DateTimeParseException) {
-            Timber.d("The time pattern should be 'HH:mm'", e)
-            getDefaultTime()
-        }
-        setTime(time.hour, time.minute)
+        time = runCatching {
+            LocalTime.parse(getPersistedString(defaultValue as? String))
+        }.getOrDefault(LocalTime.MIDNIGHT)
     }
 
-    private fun getDefaultTime(): LocalTime = LocalTime.of(0, 0)
-
-    override fun getSummary(): String = String.format("%d:%02d", hour, minute)
+    override fun getSummary(): String = time.toString()
 }

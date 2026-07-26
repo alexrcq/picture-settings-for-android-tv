@@ -2,17 +2,15 @@ package com.alexrcq.tvpicturesettings.ui.preference
 
 import android.content.Context
 import android.util.AttributeSet
+import com.alexrcq.tvpicturesettings.storage.GlobalSettingsStore
 
-open class GlobalSeekbarPreference @JvmOverloads constructor(
+open class GlobalSeekBarPreference @JvmOverloads constructor(
     context: Context,
     attributeSet: AttributeSet? = null,
-    defStyleAttr: Int = android.R.attr.seekBarStyle
-) : LeanbackSeekbarPreference(context, attributeSet, defStyleAttr) {
+    defStyleAttr: Int = androidx.preference.R.attr.seekBarPreferenceStyle
+) : LeanbackSeekBarPreference(context, attributeSet, defStyleAttr) {
 
     init {
-        seekBarIncrement = 1
-        showSeekBarValue = true
+        preferenceDataStore = GlobalSettingsStore(context.contentResolver)
     }
-
-    override fun isPersistent(): Boolean = false
 }

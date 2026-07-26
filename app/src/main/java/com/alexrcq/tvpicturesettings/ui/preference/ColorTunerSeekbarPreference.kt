@@ -3,8 +3,17 @@ package com.alexrcq.tvpicturesettings.ui.preference
 import android.content.Context
 import android.util.AttributeSet
 
-class ColorTunerSeekbarPreference @JvmOverloads constructor(
+class ColorTunerSeekBarPreference @JvmOverloads constructor(
     context: Context,
     attributeSet: AttributeSet? = null,
-    defStyleAttr: Int = android.R.attr.seekBarStyle
-) : GlobalSeekbarPreference(context, attributeSet, defStyleAttr)
+    defStyleAttr: Int = androidx.preference.R.attr.seekBarPreferenceStyle
+) : GlobalSeekBarPreference(context, attributeSet, defStyleAttr) {
+
+    fun reset() {
+        value = DEFAULT_VALUE
+    }
+
+    companion object {
+        private const val DEFAULT_VALUE = 50
+    }
+}
