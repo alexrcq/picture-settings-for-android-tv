@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/color_tuner">
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalSwitchPreference
+        app:key="tv_picture_color_tune_enable"
+        app:title="@string/enable" />
+    <PreferenceCategory app:title="@string/color_management" />
+    <Preference
+        app:key="mtk_brightness_tune"
+        app:title="@string/brightness" />
+    <Preference
+        app:key="mtk_saturation_tune"
+        app:title="@string/saturation" />
+    <Preference
+        app:key="mtk_hue_tune"
+        app:title="@string/hue" />
+    <PreferenceCategory app:title="@string/white_balance" />
+    <Preference
+        app:key="mtk_offset_tune"
+        app:title="@string/offset" />
+    <Preference
+        app:key="mtk_gain_tune"
+        app:title="@string/color_gain" />
+</PreferenceScreen>
