@@ -46,13 +46,14 @@ open class SharedPreferencesStore(private val sharedPreferences: SharedPreferenc
             override fun setValue(thisRef: Any?, property: KProperty<*>, value: T): Unit = put(key, value)
         }
 
-    fun <T: Any> preferenceFlow(key: String, defValue: T) = callbackFlow {
+    fun <T : Any> preferenceFlow(key: String, defValue: T) = callbackFlow {
         val listener = OnSharedPreferenceChangeListener { _, changedPrefKey ->
             if (key == changedPrefKey) {
                 trySend(get(changedPrefKey, defValue))
             }
         }
         registerOnSharedPreferenceChangeListener(listener)
+        trySend(get(key, defValue))
         awaitClose {
             unregisterOnSharedPreferenceChangeListener(listener)
         }
