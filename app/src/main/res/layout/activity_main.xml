@@ -10,6 +10,6 @@
         android:id="@+id/content_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        class="com.alexrcq.tvpicturesettings.ui.fragment.SettingsFragment"/>
+        class="com.alexrcq.tvpicturesettings.ui.fragment.SettingsHostFragment"/>
 
 </FrameLayout>

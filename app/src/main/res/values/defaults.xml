@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <bool name="is_auto_dark_mode_enabled">false</bool>
-    <bool name="turn_off_dark_mode_on_power_on">false</bool>
-    <bool name="is_additional_dimming_enabled">false</bool>
-    <bool name="is_screen_dimming_enabled">false</bool>
-    <bool name="three_steps_dark_mode_enabled">false</bool>
-    <bool name="show_mode_changed">true</bool>
-    <bool name="is_blue_light_filter_enabled">false</bool>
-    <bool name="is_night_blue_filter_enabled">false</bool>
-    <bool name="is_always_blue_filter_enabled">false</bool>
-    <bool name="is_white_balance_locked">false</bool>
-    <bool name="show_about_video_prefs_ru_localization">true</bool>
+    <bool name="def_dark_mode_schedule_enabled">false</bool>
+    <bool name="def_disable_dark_mode_on_power_on">false</bool>
+    <bool name="def_additional_dimming_enabled">false</bool>
+    <bool name="def_screen_dimming_enabled">false</bool>
+    <bool name="def_three_steps_dark_mode_enabled">false</bool>
+    <bool name="def_show_mode_changed">true</bool>
+    <bool name="def_white_balance_locked">false</bool>
+    <bool name="def_show_about_video_prefs_ru_localization">true</bool>
 
-    <integer name="night_backlight">0</integer>
-    <integer name="day_backlight">-1</integer>
-    <integer name="screen_dimming_power">50</integer>
-    <integer name="blue_light_filter_power">25</integer>
-    <integer name="blue_filter_temperature">1950</integer>
-    <integer name="color_gain">1024</integer>
+    <integer name="def_night_backlight">0</integer>
+    <integer name="def_day_backlight">-1</integer>
+    <integer name="def_screen_dimming_power">50</integer>
+    <integer name="def_blue_light_filter_power">25</integer>
+    <integer name="def_blue_light_filter_temperature">1950</integer>
 
-    <string name="dark_mode_time" translatable="false">22:45</string>
-    <string name="day_mode_time" translatable="false">07:30</string>
+    <string name="def_dark_mode_time" translatable="false">22:45</string>
+    <string name="def_day_mode_time" translatable="false">07:30</string>
+    <string name="def_screen_off_timeout" translatable="false">0</string>
 </resources>

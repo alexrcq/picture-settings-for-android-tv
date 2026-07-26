@@ -41,4 +41,61 @@
         <item>2</item>
         <item>3</item>
     </string-array>
+
+    <string-array name="screen_off_timeout_entries">
+        <item>Never turn off</item>
+        <item>After 5 minutes of inactivity</item>
+        <item>After 15 minutes of inactivity</item>
+        <item>After 30 minutes of inactivity</item>
+        <item>After 1 hour of inactivity</item>
+        <item>After 2 hours of inactivity</item>
+        <item>After 4 hours of inactivity</item>
+        <item>After 8 hours of inactivity</item>
+        <item>After 12 hours of inactivity</item>
+    </string-array>
+
+    <string-array name="screen_off_timeout_values">
+        <item>0</item>
+        <item>5</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>120</item>
+        <item>240</item>
+        <item>480</item>
+        <item>720</item>
+    </string-array>
+
+    <string-array name="blue_light_filter_mode_entries">
+        <item>Off</item>
+        <item>Night Mode only</item>
+        <item>Always</item>
+    </string-array>
+
+    <string-array name="blue_light_filter_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="screen_schedule_mode_entries">
+        <item>Off</item>
+        <item>Daily</item>
+        <item>By days of the week</item>
+    </string-array>
+    <string-array name="screen_schedule_mode_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="days_of_week_entries">
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
+    </string-array>
 </resources>

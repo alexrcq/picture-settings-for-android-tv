@@ -5,50 +5,28 @@
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
-    <uses-permission
-        android:name="android.permission.WRITE_SECURE_SETTINGS"
-        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <uses-feature
-        android:name="android.software.leanback"
-        android:required="true" />
-    <uses-feature
-        android:name="android.hardware.touchscreen"
-        android:required="false" />
+    <uses-feature android:name="android.software.leanback" android:required="true" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
 
     <application
         android:name=".App"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppTheme"
         tools:ignore="DataExtractionRules">
-        <service
-            android:name="com.alexrcq.tvpicturesettings.service.ScreenManager"
-            android:enabled="true"
-            android:exported="false" />
-        <service
-            android:name=".service.WhiteBalanceLocker"
-            android:enabled="true"
-            android:exported="false" />
-        <receiver
-            android:name="com.alexrcq.tvpicturesettings.receiver.AlarmBroadcastReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.alerxrcq.tvpicturesettings.AlarmScheduler.ACTION_ALARM_TRIGGERED" />
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name="com.alexrcq.tvpicturesettings.receiver.SystemEventReceiver"
-            android:exported="true">
+
+        <service android:name=".service.ScreenManager" />
+        <service android:name=".service.MtkWhiteBalanceLocker" />
+
+        <receiver android:name=".receiver.AlarmBroadcastReceiver" />
+        <receiver android:name=".receiver.BootReceiver" android:exported="true">
             <intent-filter android:priority="999">
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
@@ -56,10 +34,10 @@
         </receiver>
 
         <activity
-            android:name="com.alexrcq.tvpicturesettings.ui.MainActivity"
+            android:name=".ui.MainActivity"
             android:banner="@drawable/app_tv_logo"
             android:exported="true"
-            android:screenOrientation="landscape">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
