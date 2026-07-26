@@ -2,27 +2,29 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:title="@string/blue_light_filter">
-    <SwitchPreference
-        android:defaultValue="@bool/is_blue_light_filter_enabled"
-        android:key="blue_light_filter_enabled"
-        android:title="@string/enable"
-        android:summary="@string/blue_light_filter_enabled_summary"/>
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        android:defaultValue="@integer/blue_filter_temperature"
-        android:key="blue_light_filter_temperature"
-        android:title="@string/blue_light_filter_temperature"
+    <ListPreference
+        app:defaultValue="0"
+        app:entries="@array/blue_light_filter_mode_entries"
+        app:entryValues="@array/blue_light_filter_mode_values"
+        app:key="blue_light_filter_mode"
+        app:title="@string/blue_light_filter_mode_title"
+        app:useSimpleSummaryProvider="true" />
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekBarPreference
         android:max="2900"
+        app:defaultValue="@integer/def_blue_light_filter_temperature"
+        app:key="blue_light_filter_temperature"
         app:min="1000"
+        app:seekBarIncrement="50"
         app:showSeekBarValue="true"
-        app:seekBarIncrement="50"/>
-    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekbarPreference
-        android:defaultValue="@integer/blue_light_filter_power"
-        android:key="blue_light_filter_power"
-        android:title="@string/intensity"
+        app:title="@string/blue_light_filter_temperature" />
+    <com.alexrcq.tvpicturesettings.ui.preference.LeanbackSeekBarPreference
         android:max="50"
+        app:defaultValue="@integer/def_blue_light_filter_power"
+        app:key="blue_light_filter_power"
+        app:seekBarIncrement="1"
         app:showSeekBarValue="true"
-        app:seekBarIncrement="1"/>
+        app:title="@string/intensity" />
     <Preference
         app:key="reset_values"
-        app:title="@string/reset_values"/>
+        app:title="@string/reset" />
 </PreferenceScreen>

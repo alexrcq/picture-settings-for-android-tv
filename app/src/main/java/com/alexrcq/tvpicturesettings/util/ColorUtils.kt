@@ -1,14 +1,14 @@
-package com.alexrcq.tvpicturesettings.ui.view
+package com.alexrcq.tvpicturesettings.util
 
-import android.content.Context
+import android.graphics.Color
 import kotlin.math.ln
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 
-class BlueLightFilterView(context: Context): ScreenFilterView(context) {
+object ColorUtils {
 
-    fun setTemperature(temperature: Int) {
+    fun kelvinToRgb(temperature: Int): Int {
         val temp = temperature.coerceIn(1000, 40000) / 100.0
 
         val red: Int = if (temp <= 66) 255 else {
@@ -30,7 +30,7 @@ class BlueLightFilterView(context: Context): ScreenFilterView(context) {
                 min(255, max(0, (138.5177312231 * ln(t) - 305.0447927307).toInt()))
             }
         }
-        val color: Int = (0xFF shl 24) or (red shl 16) or (green shl 8) or blue
-        setBackgroundColor(color)
+
+        return Color.rgb(red, green, blue)
     }
 }
