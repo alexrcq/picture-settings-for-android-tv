@@ -1,266 +1,240 @@
 package com.alexrcq.tvpicturesettings.service
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.SharedPreferences
+import android.graphics.Color
 import android.os.IBinder
+import android.view.View
 import androidx.core.app.NotificationCompat
+import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import com.alexrcq.tvpicturesettings.App
+import com.alexrcq.tvpicturesettings.BroadcastActions
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.domain.DarkModeManager
-import com.alexrcq.tvpicturesettings.domain.PictureSettings
-import com.alexrcq.tvpicturesettings.domain.TvSettings
+import com.alexrcq.tvpicturesettings.manager.DarkModeManager
+import com.alexrcq.tvpicturesettings.manager.model.OverlayState
+import com.alexrcq.tvpicturesettings.platform.BacklightControlPolicy
+import com.alexrcq.tvpicturesettings.platform.Device
+import com.alexrcq.tvpicturesettings.platform.InactivityMonitor
+import com.alexrcq.tvpicturesettings.platform.ScreenSettings
 import com.alexrcq.tvpicturesettings.storage.DarkModePreferences
-import com.alexrcq.tvpicturesettings.storage.PreferencesKeys
-import com.alexrcq.tvpicturesettings.ui.OverlayManager
-import com.alexrcq.tvpicturesettings.ui.view.BlueLightFilterView
-import com.alexrcq.tvpicturesettings.ui.view.ScreenDimmerView
-import com.alexrcq.tvpicturesettings.util.AlarmScheduler
-import com.alexrcq.tvpicturesettings.util.TvUtils
-import com.alexrcq.tvpicturesettings.util.hasPermission
+import com.alexrcq.tvpicturesettings.storage.ScreenControlPreferences
+import com.alexrcq.tvpicturesettings.ui.OverlayContainer
+import com.alexrcq.tvpicturesettings.util.ColorUtils
+import com.alexrcq.tvpicturesettings.util.registerReceiverCompat
 import com.alexrcq.tvpicturesettings.util.showToast
-import timber.log.Timber
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
-class ScreenManager : Service(), SharedPreferences.OnSharedPreferenceChangeListener {
+class ScreenManager : LifecycleService() {
 
+    private lateinit var screenControlPrefs: ScreenControlPreferences
     private lateinit var darkModePrefs: DarkModePreferences
-    private lateinit var tvSettings: TvSettings
-    private lateinit var screenDimmerView: ScreenDimmerView
-    private lateinit var blueLightFilterView: BlueLightFilterView
-    private lateinit var overlayManager: OverlayManager
+    private lateinit var screenSettings: ScreenSettings
+    private lateinit var screenDimmerView: View
+    private lateinit var blueLightFilterView: View
+    private lateinit var overlayContainer: OverlayContainer
     private lateinit var darkModeManager: DarkModeManager
+    private lateinit var backlightControlPolicy: BacklightControlPolicy
+    private lateinit var inactivityMonitor: InactivityMonitor
 
     private val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            Timber.d(intent.toString())
             handleIntent(intent)
         }
     }
 
     override fun onCreate() {
         super.onCreate()
-        val application = application as App
-        tvSettings = application.tvSettings
-        darkModePrefs = application.darkModePreferences
-        darkModeManager = application.darkModeManager
-        overlayManager = application.overlayManager
-        screenDimmerView = ScreenDimmerView(this).apply {
-            setPower(darkModePrefs.screenDimmingPower)
-        }
-        blueLightFilterView = BlueLightFilterView(this).apply {
-            setPower(darkModePrefs.blueLightFilterPower)
-            setTemperature(darkModePrefs.blueLightFilterTemp)
-        }
-        setupOverlay()
-        setupPreferences()
-        setupDarkModeAlarms()
+        val app = application as App
+        screenSettings = app.screenSettings
+        darkModePrefs = app.darkModePreferences
+        screenControlPrefs = app.screenControlPreferences
+        darkModeManager = app.darkModeManager
+        backlightControlPolicy = app.backlightControlPolicy
+        inactivityMonitor = app.inactivityMonitor
+        overlayContainer = OverlayContainer(this)
+        screenDimmerView = View(this).apply { setBackgroundColor(Color.BLACK) }
+        blueLightFilterView = View(this)
+        overlayContainer.addView(blueLightFilterView)
+        overlayContainer.addView(screenDimmerView)
+        startForeground()
         registerReceiver()
+        setupObservers()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         if (intent?.getBooleanExtra(EXTRA_AFTER_BOOT, false) == true) {
             onPowerOn()
         }
-        createNotificationChannel()
-        startForeground(2, createNotification())
         return START_STICKY
     }
 
-    override fun onBind(intent: Intent): IBinder? = null
+    override fun onBind(intent: Intent): IBinder? {
+        super.onBind(intent)
+        return null
+    }
 
     override fun onDestroy() {
         unregisterReceiver(broadcastReceiver)
-        darkModePrefs.unregisterOnSharedPreferenceChangeListener(this)
-        overlayManager.destroyOverlay()
+        overlayContainer.destroy()
+        super.onDestroy()
     }
 
-    private fun createNotificationChannel() {
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(
-            NotificationChannel(
-                NOTIFICATION_CHANNEL_ID, NOTIFICATION_CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT
-            )
-        )
-    }
+    private fun setupObservers() {
+        darkModeManager.state
+            .map { it.overlayState }
+            .distinctUntilChanged()
+            .onEach(::renderOverlay)
+            .launchIn(lifecycleScope)
 
-    private fun createNotification(): Notification =
-        NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle(NOTIFICATION_TITLE)
-            .setContentText(NOTIFICATION_CONTENT)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .build()
-
-    private fun setupOverlay() {
-        overlayManager.apply {
-            if (hasPermission(android.Manifest.permission.SYSTEM_ALERT_WINDOW)) {
-                initOverlay()
+        darkModeManager.state
+            .map { it.targetBacklight }
+            .distinctUntilChanged()
+            .onEach { targetBacklight ->
+                val canAdjustBacklight = backlightControlPolicy.isAdjustmentAllowed.value
+                if (canAdjustBacklight) screenSettings.backlight = targetBacklight
             }
-            updateViewAttachment(screenDimmerView, isAttachedToOverlay = darkModePrefs.isScreenDimmingEnabled)
-            updateViewAttachment(blueLightFilterView, isAttachedToOverlay = darkModePrefs.isBlueLightFilterEnabled)
+            .launchIn(lifecycleScope)
+
+        darkModeManager.state
+            .map { it.activeMode }
+            .distinctUntilChanged()
+            .drop(1)
+            .onEach { mode -> if (darkModePrefs.showModeChanged) showToast(getString(mode.message)) }
+            .launchIn(lifecycleScope)
+
+        lifecycleScope.launch {
+            screenControlPrefs.screenOffTimeoutMinutes.collectLatest { timeout ->
+                inactivityMonitor.startMonitoring(timeout, onTimeout = { screenSettings.isScreenOn = false })
+            }
         }
     }
 
-    private fun setupPreferences() {
-        darkModePrefs.registerOnSharedPreferenceChangeListener(this)
-        if (darkModePrefs.dayBacklight !in 0..PictureSettings.MAX_BACKLIGHT) {
-            darkModePrefs.dayBacklight = tvSettings.picture.backlight
+    private fun renderOverlay(state: OverlayState) {
+        val shouldShowOverlay = state.shouldShowDimmer || state.shouldShowBlueLightFilter
+
+        if (!shouldShowOverlay) {
+            overlayContainer.detachFromWindow()
+            return
         }
+
+        if (!overlayContainer.attachToWindow()) return
+
+        screenDimmerView.alpha = (state.dimmingPower / 100f) * MAX_SCREEN_FILTER_ALPHA
+        screenDimmerView.isVisible = state.shouldShowDimmer
+
+        if (state.shouldShowBlueLightFilter) {
+            blueLightFilterView.setBackgroundColor(ColorUtils.kelvinToRgb(state.blueLightFilterTemp))
+            blueLightFilterView.alpha = (state.blueLightFilterPower / 100f) * MAX_SCREEN_FILTER_ALPHA
+        }
+
+        blueLightFilterView.isVisible = state.shouldShowBlueLightFilter
     }
 
-    private fun setupDarkModeAlarms() {
-        if (darkModePrefs.isAutoDarkModeEnabled) {
-            AlarmScheduler.setAlarm(this, AlarmScheduler.AlarmType.DAY_MODE_ALARM, darkModePrefs.dayModeTime)
-            AlarmScheduler.setAlarm(this, AlarmScheduler.AlarmType.DARK_MODE_ALARM, darkModePrefs.darkModeTime)
-        }
-    }
+    private val legacyActionMap = mapOf(
+        BroadcastActions.LEGACY_TOGGLE_DARK_MODE to BroadcastActions.TOGGLE_DARK_MODE,
+        BroadcastActions.LEGACY_ENABLE_DARK_MODE to BroadcastActions.ENABLE_DARK_MODE,
+        BroadcastActions.LEGACY_DISABLE_DARK_MODE to BroadcastActions.DISABLE_DARK_MODE,
+        BroadcastActions.LEGACY_TOGGLE_DIMMING to BroadcastActions.TOGGLE_DIMMING,
+        BroadcastActions.LEGACY_ENABLE_DIMMING to BroadcastActions.ENABLE_DIMMING,
+        BroadcastActions.LEGACY_DISABLE_DIMMING to BroadcastActions.DISABLE_DIMMING,
+        BroadcastActions.LEGACY_CHANGE_DIMMING_POWER to BroadcastActions.SET_DIMMING_POWER,
+        BroadcastActions.LEGACY_TOGGLE_SCREEN_POWER to BroadcastActions.TOGGLE_SCREEN_POWER,
+    )
 
     private fun registerReceiver() {
         val intentFilter = IntentFilter().apply {
-            addAction(ACTION_TOGGLE_DARK_MODE)
-            addAction(ACTION_ENABLE_DARK_MODE)
-            addAction(ACTION_DISABLE_DARK_MODE)
-            addAction(ACTION_TOGGLE_DIMMING)
-            addAction(ACTION_ENABLE_DIMMING)
-            addAction(ACTION_DISABLE_DIMMING)
-            addAction(ACTION_CHANGE_DIMMING_POWER)
-            addAction(ACTION_TOGGLE_SCREEN_POWER)
+            addAction(BroadcastActions.TOGGLE_DARK_MODE)
+            addAction(BroadcastActions.ENABLE_DARK_MODE)
+            addAction(BroadcastActions.DISABLE_DARK_MODE)
+            addAction(BroadcastActions.TOGGLE_DIMMING)
+            addAction(BroadcastActions.ENABLE_DIMMING)
+            addAction(BroadcastActions.DISABLE_DIMMING)
+            addAction(BroadcastActions.SET_DIMMING_POWER)
+            addAction(BroadcastActions.TOGGLE_SCREEN_POWER)
+            addAction(BroadcastActions.TOGGLE_BLUE_LIGHT_FILTER)
+            legacyActionMap.keys.forEach(::addAction)
             addAction(Intent.ACTION_SCREEN_ON)
             addAction(Intent.ACTION_SCREEN_OFF)
         }
-        registerReceiver(broadcastReceiver, intentFilter)
-    }
-
-    private fun onPowerOn() {
-        if (darkModePrefs.turnOffDarkModeOnPowerOn) {
-            darkModeManager.currentMode = DarkModeManager.Mode.OFF
-        }
-    }
-
-    private fun onPowerOff() {
-        if (TvUtils.isModelMssp()) {
-            // Screen must be on at this point
-            tvSettings.isScreenOn = true
-        }
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
-        when (key) {
-            PreferencesKeys.CURRENT_MODE_NAME -> handleModeChanged(sharedPreferences, key)
-            PreferencesKeys.IS_SCREEN_DIMMING_ENABLED -> handleScreenDimmingEnabled(sharedPreferences, key)
-            PreferencesKeys.SCREEN_DIMMING_POWER -> handleScreenDimmingPower(sharedPreferences, key)
-            PreferencesKeys.NIGHT_BACKLIGHT -> handleNightBacklight(sharedPreferences, key)
-            PreferencesKeys.IS_BLUE_LIGHT_FILTER_ENABLED -> handleBlueLightFilterEnabled(sharedPreferences, key)
-            PreferencesKeys.BLUE_LIGHT_FILTER_TEMPERATURE -> handleBlueLightFilterTemperature(sharedPreferences, key)
-            PreferencesKeys.BLUE_LIGHT_FILTER_POWER -> handleBlueLightFilterPower(sharedPreferences, key)
-            PreferencesKeys.IS_NIGHT_BLUE_FILTER_ENABLED -> handleNightBlueLightFilterEnabled(sharedPreferences, key)
-            PreferencesKeys.IS_ADDITIONAL_DIMMING_ENABLED -> handleAdditionalDimmingEnabled(sharedPreferences, key)
-        }
-    }
-
-    private fun handleModeChanged(sharedPreferences: SharedPreferences, key: String) {
-        if (darkModePrefs.showModeChanged) {
-            val mode = DarkModeManager.Mode.valueOf(sharedPreferences.getString(key, DarkModeManager.Mode.OFF.name)!!)
-            showToast(getString(mode.message))
-        }
-    }
-
-    private fun handleScreenDimmingEnabled(sharedPreferences: SharedPreferences, key: String) {
-        val isDimmingEnabled = sharedPreferences.getBoolean(key, resources.getBoolean(R.bool.is_screen_dimming_enabled))
-        overlayManager.updateViewAttachment(screenDimmerView, isAttachedToOverlay = isDimmingEnabled)
-    }
-
-    private fun handleScreenDimmingPower(sharedPreferences: SharedPreferences, key: String) {
-        screenDimmerView.setPower(sharedPreferences.getInt(key, resources.getInteger(R.integer.screen_dimming_power)))
-    }
-
-    private fun handleNightBacklight(sharedPreferences: SharedPreferences, key: String) {
-        if (darkModeManager.currentMode != DarkModeManager.Mode.OFF && tvSettings.picture.isBacklightAdjustAllowed()) {
-            tvSettings.picture.backlight =
-                sharedPreferences.getInt(key, resources.getInteger(R.integer.night_backlight))
-        }
-    }
-
-    private fun handleBlueLightFilterEnabled(sharedPreferences: SharedPreferences, key: String) {
-        val isEnabled = sharedPreferences.getBoolean(key, resources.getBoolean(R.bool.is_blue_light_filter_enabled))
-        overlayManager.updateViewAttachment(blueLightFilterView, isAttachedToOverlay = isEnabled)
-    }
-
-    private fun handleBlueLightFilterTemperature(sharedPreferences: SharedPreferences, key: String) {
-        blueLightFilterView.setTemperature(
-            sharedPreferences.getInt(key, resources.getInteger(R.integer.blue_filter_temperature))
-        )
-    }
-
-    private fun handleBlueLightFilterPower(sharedPreferences: SharedPreferences, key: String) {
-        blueLightFilterView.setPower(
-            sharedPreferences.getInt(key, resources.getInteger(R.integer.blue_light_filter_power))
-        )
-    }
-
-    private fun handleNightBlueLightFilterEnabled(sharedPreferences: SharedPreferences, key: String) {
-        if (darkModeManager.currentMode != DarkModeManager.Mode.OFF) {
-            darkModePrefs.isBlueLightFilterEnabled =
-                sharedPreferences.getBoolean(key, resources.getBoolean(R.bool.is_night_blue_filter_enabled))
-        }
-    }
-
-    private fun handleAdditionalDimmingEnabled(sharedPreferences: SharedPreferences, key: String) {
-        if (darkModeManager.currentMode != DarkModeManager.Mode.OFF) {
-            darkModePrefs.isScreenDimmingEnabled =
-                sharedPreferences.getBoolean(key, resources.getBoolean(R.bool.is_additional_dimming_enabled))
-        }
+        registerReceiverCompat(broadcastReceiver, intentFilter)
     }
 
     private fun handleIntent(intent: Intent) {
-        when (intent.action) {
-            ACTION_TOGGLE_DARK_MODE -> darkModeManager.toggleMode()
-            ACTION_ENABLE_DARK_MODE -> {
-                if (darkModeManager.currentMode != DarkModeManager.Mode.OFF) return
-                darkModeManager.currentMode = if (darkModePrefs.isAdditionalDimmingEnabled) {
-                    DarkModeManager.Mode.FULL
-                } else {
-                    DarkModeManager.Mode.ONLY_BACKLIGHT
-                }
-            }
-            ACTION_DISABLE_DARK_MODE -> darkModeManager.currentMode = DarkModeManager.Mode.OFF
-            ACTION_TOGGLE_DIMMING -> darkModeManager.toggleScreenDimming()
-            ACTION_ENABLE_DIMMING -> darkModePrefs.isScreenDimmingEnabled = true
-            ACTION_DISABLE_DIMMING -> darkModePrefs.isScreenDimmingEnabled = false
-            ACTION_CHANGE_DIMMING_POWER -> darkModePrefs.screenDimmingPower =
-                intent.getIntExtra(EXTRA_DIMMING_POWER, 0)
-            ACTION_TOGGLE_SCREEN_POWER -> tvSettings.toggleScreenPower()
+        val action = legacyActionMap[intent.action] ?: intent.action
+        when (action) {
+            BroadcastActions.TOGGLE_DARK_MODE -> darkModeManager.toggleMode()
+            BroadcastActions.ENABLE_DARK_MODE -> darkModeManager.enableDarkMode()
+            BroadcastActions.DISABLE_DARK_MODE -> darkModeManager.disableDarkMode()
+            BroadcastActions.TOGGLE_DIMMING -> darkModeManager.toggleScreenDimming()
+            BroadcastActions.ENABLE_DIMMING -> darkModeManager.setScreenDimmingEnabled(true)
+            BroadcastActions.DISABLE_DIMMING -> darkModeManager.setScreenDimmingEnabled(false)
+            BroadcastActions.SET_DIMMING_POWER ->
+                darkModeManager.setScreenDimmingPower(
+                    intent.getIntExtra(BroadcastActions.EXTRA_FILTER_POWER, 0)
+                )
+            BroadcastActions.TOGGLE_SCREEN_POWER -> screenSettings.toggleScreenPower()
+            BroadcastActions.TOGGLE_BLUE_LIGHT_FILTER -> darkModeManager.toggleBlueLightFilter()
             Intent.ACTION_SCREEN_ON -> onPowerOn()
             Intent.ACTION_SCREEN_OFF -> onPowerOff()
         }
     }
 
+    private fun onPowerOn() {
+        if (darkModePrefs.disableDarkModeOnPowerOn) {
+            darkModeManager.disableDarkMode()
+        }
+    }
+
+    private fun onPowerOff() {
+        if (Device.isMssp) {
+            // Screen must be on at this point
+            screenSettings.isScreenOn = true
+        }
+    }
+
+    private fun startForeground() {
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.createNotificationChannel(
+            NotificationChannel(
+                NOTIFICATION_CHANNEL_ID,
+                NOTIFICATION_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+        )
+
+        val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            .setContentTitle(NOTIFICATION_TITLE)
+            .setContentText(NOTIFICATION_CONTENT)
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .build()
+
+        startForeground(NOTIFICATION_ID, notification)
+    }
+
     companion object : ServiceFactory() {
-        private const val EXTRA_DIMMING_POWER = "filter_power"
-
-        private const val ACTION_TOGGLE_DARK_MODE = "com.alexrcq.tvpicturesettings.ACTION_TOGGLE_DARK_MODE"
-        private const val ACTION_ENABLE_DARK_MODE = "com.alexrcq.tvpicturesettings.ACTION_ENABLE_DARK_MODE"
-        private const val ACTION_DISABLE_DARK_MODE = "com.alexrcq.tvpicturesettings.ACTION_DISABLE_DARK_MODE"
-
-        private const val ACTION_TOGGLE_DIMMING = "com.alexrcq.tvpicturesettings.ACTION_TOGGLE_FILTER"
-        private const val ACTION_ENABLE_DIMMING = "com.alexrcq.tvpicturesettings.ACTION_ENABLE_FILTER"
-        private const val ACTION_DISABLE_DIMMING = "com.alexrcq.tvpicturesettings.ACTION_DISABLE_FILTER"
-        private const val ACTION_CHANGE_DIMMING_POWER = "ACTION_CHANGE_FILTER_POWER"
-
-        private const val ACTION_TOGGLE_SCREEN_POWER = "ACTION_TOGGLE_SCREEN_POWER"
-
+        private const val NOTIFICATION_ID = 2
         private const val NOTIFICATION_TITLE = "Screen Manager"
         private const val NOTIFICATION_CONTENT = "Service is running"
 
-        private const val NOTIFICATION_CHANNEL_ID = "channel_id"
+        private const val NOTIFICATION_CHANNEL_ID = "screen_manager_channel"
         private const val NOTIFICATION_CHANNEL_NAME = "Screen Manager"
 
         private const val EXTRA_AFTER_BOOT = "after_boot"
+
+        private const val MAX_SCREEN_FILTER_ALPHA = 0.98f
 
         override fun getIntent(context: Context): Intent = Intent(context, ScreenManager::class.java)
 
