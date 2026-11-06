@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import androidx.preference.ListPreference
 import com.alexrcq.tvpicturesettings.storage.GlobalSettingsStore
 
-open class GlobalListPreferences @JvmOverloads constructor(
+open class GlobalListPreference @JvmOverloads constructor(
     context: Context,
     attributeSet: AttributeSet? = null,
     defStyleAttr: Int = androidx.preference.R.attr.dialogPreferenceStyle

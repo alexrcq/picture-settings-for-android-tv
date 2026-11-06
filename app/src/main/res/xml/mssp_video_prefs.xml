@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/video_preferences">
-    <com.alexrcq.tvpicturesettings.ui.preference.GlobalListPreferences
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalListPreference
         app:entries="@array/picture_mode"
         app:entryValues="@array/picture_mode_values"
         app:key="picture_mode"
@@ -26,12 +26,12 @@
         android:max="20"
         app:key="picture_sharpness"
         app:title="@string/sharpness" />
-    <com.alexrcq.tvpicturesettings.ui.preference.GlobalListPreferences
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalListPreference
         app:entries="@array/picture_temperature"
         app:entryValues="@array/picture_temperature_values"
         app:key="picture_color_temperature"
         app:title="@string/color_temperature" />
-    <com.alexrcq.tvpicturesettings.ui.preference.GlobalListPreferences
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalListPreference
         app:entries="@array/picture_advanced_video_noise_reduction_entries"
         app:entryValues="@array/picture_advanced_video_noise_reduction_values"
         app:key="tv_picture_advance_video_dnr"
