@@ -41,6 +41,7 @@ class MainActivity : FragmentActivity() {
     private val requiredPermissions = listOfNotNull(
         Manifest.permission.WRITE_SECURE_SETTINGS,
         Manifest.permission.SYSTEM_ALERT_WINDOW,
+        Manifest.permission.PACKAGE_USAGE_STATS,
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.SCHEDULE_EXACT_ALARM else null
     )
 

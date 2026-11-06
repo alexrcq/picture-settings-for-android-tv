@@ -45,4 +45,5 @@ object PreferencesKeys {
     const val SCREEN_SCHEDULE_MODE = "screen_schedule_mode"
     const val SCREEN_ON_TIME = "screen_on_time"
     const val SCREEN_OFF_TIME = "screen_off_time"
+    const val LAUNCHER_SCREEN_OFF_TIMEOUT = "launcher_screen_off_timeout"
 }

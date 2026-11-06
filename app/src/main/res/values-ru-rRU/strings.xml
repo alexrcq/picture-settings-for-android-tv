@@ -92,4 +92,6 @@
     <string name="saturday">Суббота</string>
     <string name="sunday">Воскресенье</string>
     <string name="screen_schedule_mode_title">Режим расписания</string>
+    <string name="screen_control_warning">Примечание: в некоторых случаях автоматическое выключение экрана может не сработать.</string>
+    <string name="launcher_screen_off_timeout_title">При бездействии на главном экране</string>
 </resources>

@@ -17,27 +17,28 @@ import com.alexrcq.tvpicturesettings.App
 import com.alexrcq.tvpicturesettings.BroadcastActions
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.manager.DarkModeManager
+import com.alexrcq.tvpicturesettings.manager.InactivityTracker
 import com.alexrcq.tvpicturesettings.manager.model.OverlayState
 import com.alexrcq.tvpicturesettings.platform.BacklightControlPolicy
 import com.alexrcq.tvpicturesettings.platform.Device
 import com.alexrcq.tvpicturesettings.platform.InactivityMonitor
 import com.alexrcq.tvpicturesettings.platform.ScreenSettings
+import com.alexrcq.tvpicturesettings.platform.android.isLauncherForeground
 import com.alexrcq.tvpicturesettings.storage.DarkModePreferences
 import com.alexrcq.tvpicturesettings.storage.ScreenControlPreferences
 import com.alexrcq.tvpicturesettings.ui.OverlayContainer
 import com.alexrcq.tvpicturesettings.util.ColorUtils
 import com.alexrcq.tvpicturesettings.util.registerReceiverCompat
 import com.alexrcq.tvpicturesettings.util.showToast
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 class ScreenManager : LifecycleService() {
 
@@ -97,8 +98,29 @@ class ScreenManager : LifecycleService() {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun setupObservers() {
-        darkModeManager.state
-            .map { it.overlayState }
+        val generalTracker = InactivityTracker(
+            idleDurationMs = inactivityMonitor.idleDurationMs,
+            timeoutMinutes = screenControlPrefs.screenOffTimeoutMinutes
+        )
+        val launcherTracker = InactivityTracker(
+            idleDurationMs = inactivityMonitor.idleDurationMs,
+            timeoutMinutes = screenControlPrefs.launcherScreenOffTimeoutMinutes,
+            condition = { isLauncherForeground() }
+        )
+        val inactivityState = combine(generalTracker.state, launcherTracker.state, ::maxOf)
+            .distinctUntilChanged()
+            .onEach { state ->
+                if (state == InactivityTracker.State.TIMEOUT) {
+                    screenSettings.isScreenOn = false
+                }
+            }
+
+        combine(
+            darkModeManager.state.map { it.overlayState }.distinctUntilChanged(),
+            inactivityState
+        ) { overlay, inactivity ->
+            if (inactivity == InactivityTracker.State.WARNING) overlay.withWarningDimming() else overlay
+        }
             .distinctUntilChanged()
             .onEach(::renderOverlay)
             .launchIn(lifecycleScope)
@@ -119,12 +141,6 @@ class ScreenManager : LifecycleService() {
             .drop(1)
             .onEach { mode -> if (darkModePrefs.showModeChanged) showToast(getString(mode.message)) }
             .launchIn(lifecycleScope)
-
-        lifecycleScope.launch {
-            screenControlPrefs.screenOffTimeoutMinutes.collectLatest { timeout ->
-                inactivityMonitor.startMonitoring(timeout, onTimeout = { screenSettings.isScreenOn = false })
-            }
-        }
     }
 
     private fun renderOverlay(state: OverlayState) {

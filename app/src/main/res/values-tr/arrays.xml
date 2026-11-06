@@ -48,4 +48,16 @@
         <item>Cumartesi</item>
         <item>Pazar</item>
     </string-array>
+
+    <string-array name="launcher_screen_off_timeout_entries">
+        <item>Ekranı kapatma</item>
+        <item>1 dakika sonra ekranı kapat</item>
+        <item>2 dakika sonra ekranı kapat</item>
+        <item>3 dakika sonra ekranı kapat</item>
+        <item>5 dakika sonra ekranı kapat</item>
+        <item>10 dakika sonra ekranı kapat</item>
+        <item>15 dakika sonra ekranı kapat</item>
+        <item>30 dakika sonra ekranı kapat</item>
+        <item>1 saat sonra ekranı kapat</item>
+    </string-array>
 </resources>

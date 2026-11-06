@@ -48,4 +48,16 @@
         <item>Суббота</item>
         <item>Воскресенье</item>
     </string-array>
+
+    <string-array name="launcher_screen_off_timeout_entries">
+        <item>Не выключать экран</item>
+        <item>Выключать экран через 1 минуту</item>
+        <item>Выключать экран через 2 минуты</item>
+        <item>Выключать экран через 3 минуты</item>
+        <item>Выключать экран через 5 минут</item>
+        <item>Выключать экран через 10 минут</item>
+        <item>Выключать экран через 15 минут</item>
+        <item>Выключать экран через 30 минут</item>
+        <item>Выключать экран через 1 час</item>
+    </string-array>
 </resources>

@@ -40,10 +40,12 @@ class ScreenControlFragment : BasePreferenceFragment(R.xml.screen_control_prefs)
             onClick(viewModel::captureScreen)
         }
         if (!Device.hasInactivityDetection()) {
-            findPreference<Preference>(PreferencesKeys.SCREEN_OFF_TIMEOUT)?.apply {
-                isEnabled = false
-                summaryProvider = Preference.SummaryProvider<Preference> {
-                    getString(R.string.device_not_supported)
+            listOf(PreferencesKeys.SCREEN_OFF_TIMEOUT, PreferencesKeys.LAUNCHER_SCREEN_OFF_TIMEOUT).forEach { key ->
+                findPreference<Preference>(key)?.apply {
+                    isEnabled = false
+                    summaryProvider = Preference.SummaryProvider<Preference> {
+                        getString(R.string.device_not_supported)
+                    }
                 }
             }
         }

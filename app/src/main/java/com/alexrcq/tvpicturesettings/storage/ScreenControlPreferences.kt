@@ -15,6 +15,11 @@ class ScreenControlPreferences(sharedPreferences: SharedPreferences, private val
         PreferencesKeys.SCREEN_OFF_TIMEOUT, resources.getString(R.string.def_screen_off_timeout)
     ).map { it.toLongOrNull() ?: 0L }
 
+    val launcherScreenOffTimeoutMinutes = preferenceFlow(
+        PreferencesKeys.LAUNCHER_SCREEN_OFF_TIMEOUT,
+        resources.getString(R.string.def_launcher_screen_off_timeout)
+    ).map { it.toLongOrNull() ?: 0L }
+
     var screenScheduleMode: ScreenScheduleMode
         get() = ScreenScheduleMode.of(
             get(PreferencesKeys.SCREEN_SCHEDULE_MODE, ScreenScheduleMode.OFF.value)

@@ -67,7 +67,7 @@ class App : Application() {
         developerSettings = DeveloperSettings(globalSettings)
         backlightControlPolicy = MtkBacklightControlPolicy(this, globalSettings, applicationScope)
         tvInputMonitor = MtkTvInputMonitor(contentResolver)
-        inactivityMonitor = MtkInactivityMonitor()
+        inactivityMonitor = MtkInactivityMonitor(this, applicationScope, globalSettings)
 
         darkModeManager = DarkModeManager(darkModePreferences, applicationScope)
         darkModeScheduler = DarkModeScheduler(this, darkModePreferences, applicationScope)

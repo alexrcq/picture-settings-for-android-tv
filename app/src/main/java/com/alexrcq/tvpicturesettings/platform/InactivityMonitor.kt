@@ -1,5 +1,7 @@
 package com.alexrcq.tvpicturesettings.platform
 
+import kotlinx.coroutines.flow.Flow
+
 interface InactivityMonitor {
-    suspend fun startMonitoring(timeoutMinutes: Long, onTimeout: () -> Unit)
+    val idleDurationMs: Flow<Long>
 }

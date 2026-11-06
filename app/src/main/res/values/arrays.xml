@@ -98,4 +98,28 @@
         <item>Saturday</item>
         <item>Sunday</item>
     </string-array>
+
+    <string-array name="launcher_screen_off_timeout_entries">
+        <item>Never turn off</item>
+        <item>Turn off screen after 1 minute</item>
+        <item>Turn off screen after 2 minutes</item>
+        <item>Turn off screen after 3 minutes</item>
+        <item>Turn off screen after 5 minutes</item>
+        <item>Turn off screen after 10 minutes</item>
+        <item>Turn off screen after 15 minutes</item>
+        <item>Turn off screen after 30 minutes</item>
+        <item>Turn off screen after 1 hour</item>
+    </string-array>
+
+    <string-array name="launcher_screen_off_timeout_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+    </string-array>
 </resources>

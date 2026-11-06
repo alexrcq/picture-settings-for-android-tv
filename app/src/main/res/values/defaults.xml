@@ -20,4 +20,5 @@
     <string name="def_screen_on_time" translatable="false">08:00</string>
     <string name="def_screen_off_time" translatable="false">23:00</string>
     <string name="def_screen_off_timeout" translatable="false">0</string>
+    <string name="def_launcher_screen_off_timeout" translatable="false">0</string>
 </resources>

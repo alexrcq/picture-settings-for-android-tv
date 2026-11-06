@@ -11,7 +11,18 @@
         app:key="screen_off_timeout"
         app:title="@string/screen_off_timeout_title"
         app:useSimpleSummaryProvider="true" />
+    <ListPreference
+        app:defaultValue="@string/def_launcher_screen_off_timeout"
+        app:entries="@array/launcher_screen_off_timeout_entries"
+        app:entryValues="@array/launcher_screen_off_timeout_values"
+        app:key="launcher_screen_off_timeout"
+        app:title="@string/launcher_screen_off_timeout_title"
+        app:useSimpleSummaryProvider="true" />
     <Preference
         app:key="screen_schedule_preferences"
         app:title="@string/screen_schedule" />
+    <Preference
+        app:enabled="false"
+        app:selectable="false"
+        app:summary="@string/screen_control_warning" />
 </PreferenceScreen>

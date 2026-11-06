@@ -92,4 +92,6 @@
     <string name="saturday">Cumartesi</string>
     <string name="sunday">Pazar</string>
     <string name="screen_schedule_mode_title">Zamanlama Modu</string>
+    <string name="screen_control_warning">Not: bazı durumlarda otomatik ekran kapatma devreye girmeyebilir.</string>
+    <string name="launcher_screen_off_timeout_title">Ana ekranda işlem yapılmadığında</string>
 </resources>
