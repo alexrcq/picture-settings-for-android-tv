@@ -1,8 +1,7 @@
 package com.alexrcq.tvpicturesettings.manager
 
-import androidx.annotation.StringRes
-import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.manager.model.BlueLightFilterMode
+import com.alexrcq.tvpicturesettings.manager.model.DarkMode
 import com.alexrcq.tvpicturesettings.manager.model.DarkModeState
 import com.alexrcq.tvpicturesettings.manager.model.OverlayParams
 import com.alexrcq.tvpicturesettings.manager.model.OverlayState
@@ -15,27 +14,35 @@ import kotlinx.coroutines.flow.stateIn
 
 class DarkModeManager(private val preferences: DarkModePreferences, scope: CoroutineScope) {
 
-    val activeMode: Mode get() = state.value.activeMode
+    val activeMode: DarkMode get() = state.value.activeMode
 
     val state: StateFlow<DarkModeState> = with(preferences) {
+        val overlayParamsFlow = combine(
+            screenDimmingEnabledFlow,
+            screenDimmingPowerFlow,
+            blueLightFilterModeFlow,
+            blueLightFilterTempFlow,
+            blueLightFilterPowerFlow,
+            ::OverlayParams
+        )
         combine(
             currentModeFlow, nightBacklightFlow, dayBacklightFlow, overlayParamsFlow
-        ) { mode: Mode, nightBacklight: Int, dayBacklight: Int, overlayParams: OverlayParams ->
+        ) { mode: DarkMode, nightBacklight: Int, dayBacklight: Int, overlayParams: OverlayParams ->
             calculateState(mode, nightBacklight, dayBacklight, overlayParams)
         }.stateIn(scope, SharingStarted.Eagerly, calculateInitialState())
     }
 
     private fun calculateState(
-        mode: Mode, nightBacklight: Int, dayBacklight: Int, overlayParams: OverlayParams
+        mode: DarkMode, nightBacklight: Int, dayBacklight: Int, overlayParams: OverlayParams
     ): DarkModeState = DarkModeState(
         activeMode = mode,
-        targetBacklight = if (mode == Mode.OFF) dayBacklight else nightBacklight,
+        targetBacklight = if (mode == DarkMode.OFF) dayBacklight else nightBacklight,
         overlayState = OverlayState(
             shouldShowDimmer = overlayParams.isDimmingEnabled,
             dimmingPower = overlayParams.dimmingPower,
             shouldShowBlueLightFilter = when (overlayParams.blueLightFilterMode) {
                 BlueLightFilterMode.ALWAYS -> true
-                BlueLightFilterMode.NIGHT_ONLY -> mode != Mode.OFF
+                BlueLightFilterMode.NIGHT_ONLY -> mode != DarkMode.OFF
                 BlueLightFilterMode.OFF -> false
             },
             blueLightFilterTemp = overlayParams.blueLightFilterTemp,
@@ -58,29 +65,29 @@ class DarkModeManager(private val preferences: DarkModePreferences, scope: Corou
     }
 
     fun enableDarkMode() {
-        val mode = if (preferences.isAdditionalDimmingEnabled) Mode.FULL else Mode.ONLY_BACKLIGHT
+        val mode = if (preferences.isAdditionalDimmingEnabled) DarkMode.FULL else DarkMode.ONLY_BACKLIGHT
         applyMode(mode)
     }
 
     fun disableDarkMode() {
-        applyMode(Mode.OFF)
+        applyMode(DarkMode.OFF)
     }
 
     fun toggleMode() {
         val nextMode = when (activeMode) {
-            Mode.OFF -> if (preferences.threeStepsDarkModeEnabled || !preferences.isAdditionalDimmingEnabled) {
-                Mode.ONLY_BACKLIGHT
+            DarkMode.OFF -> if (preferences.isThreeStepsDarkModeEnabled || !preferences.isAdditionalDimmingEnabled) {
+                DarkMode.ONLY_BACKLIGHT
             } else {
-                Mode.FULL
+                DarkMode.FULL
             }
-            Mode.ONLY_BACKLIGHT -> if (preferences.threeStepsDarkModeEnabled) Mode.FULL else Mode.OFF
-            Mode.FULL -> Mode.OFF
+            DarkMode.ONLY_BACKLIGHT -> if (preferences.isThreeStepsDarkModeEnabled) DarkMode.FULL else DarkMode.OFF
+            DarkMode.FULL -> DarkMode.OFF
         }
         applyMode(nextMode)
     }
 
     fun toggleFullDarkMode() {
-        val mode = if (activeMode != Mode.FULL) Mode.FULL else Mode.ONLY_BACKLIGHT
+        val mode = if (activeMode != DarkMode.FULL) DarkMode.FULL else DarkMode.ONLY_BACKLIGHT
         applyMode(mode)
     }
 
@@ -93,7 +100,7 @@ class DarkModeManager(private val preferences: DarkModePreferences, scope: Corou
     }
 
     fun setScreenDimmingPower(power: Int) {
-        preferences.screenDimmingPower = power
+        preferences.screenDimmingPower = power.coerceIn(0, 100)
     }
 
     fun toggleBlueLightFilter() {
@@ -105,12 +112,8 @@ class DarkModeManager(private val preferences: DarkModePreferences, scope: Corou
         preferences.blueLightFilterMode = newMode
     }
 
-    private fun applyMode(mode: Mode) {
+    private fun applyMode(mode: DarkMode) {
         preferences.currentMode = mode
-        preferences.isScreenDimmingEnabled = (mode == Mode.FULL)
-    }
-
-    enum class Mode(@StringRes val message: Int) {
-        OFF(R.string.dark_mode_off), ONLY_BACKLIGHT(R.string.dark_mode_only_backlight), FULL(R.string.dark_mode_max)
+        preferences.isScreenDimmingEnabled = (mode == DarkMode.FULL)
     }
 }
