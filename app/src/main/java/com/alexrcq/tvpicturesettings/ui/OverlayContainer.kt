@@ -10,7 +10,7 @@ import android.widget.FrameLayout
 
 class OverlayContainer(private val context: Context) {
 
-    private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    private val windowManager = context.getSystemService(WindowManager::class.java)
     private val frameLayout = FrameLayout(context)
 
     fun addView(view: View) {

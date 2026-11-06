@@ -20,16 +20,14 @@ class MtkWhiteBalanceFragment : GlobalSettingsFragment(R.xml.white_balance_prefs
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferences(savedInstanceState, rootKey)
-        val app = (requireActivity().application as App)
+        val app = requireActivity().application as App
         videoSettings = app.videoSettings
         videoPreferences = app.videoPreferences
         setupPreferences()
     }
 
     private fun setupPreferences() {
-        findPreference<Preference>(PreferencesKeys.RESET_VALUES)?.onClick {
-            videoSettings.resetWhiteBalance()
-        }
+        findPreference<Preference>(PreferencesKeys.RESET_VALUES)?.onClick(videoSettings::resetWhiteBalance)
         if (videoPreferences.isWhiteBalanceLocked) {
             setControlsEnabled(false)
             scrollToPreference(PreferencesKeys.WHITE_BALANCE_LOCKED)

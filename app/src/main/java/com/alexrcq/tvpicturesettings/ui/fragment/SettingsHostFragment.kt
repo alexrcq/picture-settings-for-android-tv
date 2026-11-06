@@ -4,7 +4,9 @@ import androidx.leanback.preference.LeanbackSettingsFragmentCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
+import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.storage.PreferencesKeys
+import com.alexrcq.tvpicturesettings.ui.fragment.base.BasePreferenceFragment
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.TimePickerDialog
 import com.alexrcq.tvpicturesettings.ui.preference.TimePickerPreference
 
@@ -31,8 +33,9 @@ class SettingsHostFragment : LeanbackSettingsFragmentCompat() {
             PreferencesKeys.SCREEN_CONTROL -> ScreenControlFragment()
             PreferencesKeys.SCREEN_SCHEDULE_PREFERENCES -> ScreenScheduleFragment()
             PreferencesKeys.DARK_MODE_PREFERENCES -> DarkModePreferencesFragment()
-            PreferencesKeys.DARK_MODE_SCHEDULE -> DarkModeScheduleFragment()
-            PreferencesKeys.ADVANCED_DARK_MODE_PREFERENCES -> AdvancedDarkModePreferencesFragment()
+            PreferencesKeys.DARK_MODE_SCHEDULE -> BasePreferenceFragment.newInstance(R.xml.dark_mode_schedule_prefs)
+            PreferencesKeys.ADVANCED_DARK_MODE_PREFERENCES ->
+                BasePreferenceFragment.newInstance(R.xml.advanced_dark_mode_prefs)
             PreferencesKeys.BLUE_LIGHT_FILTER -> BlueLightFilterFragment()
             else -> {
                 if (pref.key?.startsWith("screen_schedule_day_") == true) {

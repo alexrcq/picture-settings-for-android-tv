@@ -14,7 +14,7 @@ import androidx.preference.SeekBarPreference
 import androidx.preference.TwoStatePreference
 import com.alexrcq.tvpicturesettings.storage.GlobalSettingsStore
 
-abstract class GlobalSettingsFragment(@XmlRes prefsResId: Int) : BasePreferenceFragment(prefsResId) {
+abstract class GlobalSettingsFragment(@XmlRes prefsResId: Int = 0) : BasePreferenceFragment(prefsResId) {
 
     protected lateinit var globalSettings: GlobalSettingsStore
 

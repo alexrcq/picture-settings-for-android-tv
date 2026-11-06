@@ -25,7 +25,7 @@ class MtkWhiteBalanceLocker : Service() {
 
     private val colorGainObserver = object : ContentObserver(Handler(Looper.getMainLooper())) {
         override fun onChange(selfChange: Boolean, uri: Uri?) {
-            uri?.lastPathSegment?.let { key -> enforceLockedValue(key) }
+            uri?.lastPathSegment?.let(::enforceLockedValue)
         }
     }
 

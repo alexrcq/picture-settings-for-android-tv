@@ -30,7 +30,8 @@ class MsspVideoPreferencesFragment : GlobalSettingsFragment(R.xml.mssp_video_pre
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferences(savedInstanceState, rootKey)
-        videoSettings = (requireActivity().application as App).videoSettings
+        val app = requireActivity().application as App
+        videoSettings = app.videoSettings
         setupPreferences()
         handleLocaleSpecifics()
     }
@@ -41,27 +42,24 @@ class MsspVideoPreferencesFragment : GlobalSettingsFragment(R.xml.mssp_video_pre
     }
 
     private fun setupPreferences() {
-        findPreference<Preference>(PreferencesKeys.RESET_TO_DEFAULT)?.onClick {
-            showResetToDefaultDialog()
-        }
+        findPreference<Preference>(PreferencesKeys.RESET_TO_DEFAULT)?.onClick(::showResetToDefaultDialog)
         findPreference<ListPreference>(MtkGlobalKeys.PICTURE_MODE)?.setOnPreferenceChangeListener { _, newValue ->
             userModeSnapshot.clear()
             videoSettings.applyPictureMode((newValue as String).toInt())
             false
         }
         userModeSnapshotKeys.forEach { key ->
-            findPreference<Preference>(key)?.apply {
-                setOnPreferenceChangeListener { preference, newValue ->
-                    snapshotUserModeValues(preference.key, newValue as Int)
-                    videoSettings.applyPictureMode(MtkVideoSettings.PICTURE_MODE_USER)
-                    true
-                }
+            findPreference<Preference>(key)?.setOnPreferenceChangeListener { preference, newValue ->
+                snapshotUserModeValues(preference.key, newValue as Int)
+                videoSettings.applyPictureMode(MtkVideoSettings.PICTURE_MODE_USER)
+                true
             }
         }
     }
 
     private fun updateTemperaturePreference() {
-        val isWhiteBalanceLocked = (requireActivity().application as App).videoPreferences.isWhiteBalanceLocked
+        val app = requireActivity().application as App
+        val isWhiteBalanceLocked = app.videoPreferences.isWhiteBalanceLocked
         findPreference<ListPreference>(MtkGlobalKeys.PICTURE_TEMPERATURE)?.apply {
             isEnabled = !isWhiteBalanceLocked
             summaryProvider = SummaryProvider<ListPreference> { preference ->
@@ -101,7 +99,8 @@ class MsspVideoPreferencesFragment : GlobalSettingsFragment(R.xml.mssp_video_pre
     private fun handleLocaleSpecifics() {
         when (resources.configuration.locales[0].toLanguageTag()) {
             "ru-RU" -> {
-                val preferences = (requireActivity().application as App).videoPreferences
+                val app = requireActivity().application as App
+                val preferences = app.videoPreferences
                 if (preferences.showAboutVideoPrefsRuLocalization) {
                     showAboutRuLocalizationFix()
                     preferences.showAboutVideoPrefsRuLocalization = false

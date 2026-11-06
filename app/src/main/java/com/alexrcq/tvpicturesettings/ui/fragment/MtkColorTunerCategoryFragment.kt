@@ -5,12 +5,13 @@ import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.preference.Preference
 import androidx.preference.PreferenceScreen
+import androidx.preference.forEach
 import com.alexrcq.tvpicturesettings.R
-import com.alexrcq.tvpicturesettings.ui.fragment.base.BaseMtkColorTunerFragment
+import com.alexrcq.tvpicturesettings.ui.fragment.base.GlobalSettingsFragment
 import com.alexrcq.tvpicturesettings.ui.preference.ColorTunerSeekBarPreference
 import com.alexrcq.tvpicturesettings.util.onClick
 
-class MtkColorTunerCategoryFragment : BaseMtkColorTunerFragment() {
+class MtkColorTunerCategoryFragment : GlobalSettingsFragment() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferences(savedInstanceState, rootKey)
@@ -53,6 +54,10 @@ class MtkColorTunerCategoryFragment : BaseMtkColorTunerFragment() {
             onClick(::resetTunerValues)
         }
         addPreference(resetPreference)
+    }
+
+    private fun resetTunerValues() {
+        preferenceScreen.forEach { (it as? ColorTunerSeekBarPreference)?.reset() }
     }
 
     enum class TunerCategory(

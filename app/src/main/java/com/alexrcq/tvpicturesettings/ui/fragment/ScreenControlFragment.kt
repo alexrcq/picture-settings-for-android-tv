@@ -25,6 +25,7 @@ import com.alexrcq.tvpicturesettings.util.showToast
 import kotlinx.coroutines.launch
 
 class ScreenControlFragment : BasePreferenceFragment(R.xml.screen_control_prefs) {
+
     private var takeScreenshotPref: Preference? = null
 
     private val viewModel: ScreenCaptureViewModel by viewModels {
@@ -36,7 +37,7 @@ class ScreenControlFragment : BasePreferenceFragment(R.xml.screen_control_prefs)
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         super.onCreatePreferences(savedInstanceState, rootKey)
         takeScreenshotPref = findPreference<Preference>(TAKE_SCREENSHOT)?.apply {
-            onClick { viewModel.captureScreen() }
+            onClick(viewModel::captureScreen)
         }
         if (!Device.hasInactivityDetection()) {
             findPreference<Preference>(PreferencesKeys.SCREEN_OFF_TIMEOUT)?.apply {
@@ -55,7 +56,7 @@ class ScreenControlFragment : BasePreferenceFragment(R.xml.screen_control_prefs)
                 launch { viewModel.state.collect(::renderScreenCaptureState) }
                 launch { viewModel.sideEffects.collect(::handleScreenCaptureSideEffect) }
                 launch {
-                    viewModel.isScreenCaptureAvailable.collect {
+                    viewModel.screenCaptureAvailableFlow.collect {
                         takeScreenshotPref?.isEnabled = it
                     }
                 }
@@ -98,7 +99,7 @@ class ScreenControlFragment : BasePreferenceFragment(R.xml.screen_control_prefs)
                 startActivity(Intent(Settings.ACTION_SETTINGS))
                 requireActivity().finish()
             }
-            .setNegativeButton(android.R.string.cancel, null)
+            .setNegativeButton(android.R.string.cancel) { _, _ -> requireActivity().finish() }
             .setOnCancelListener { requireActivity().finish() }
             .create()
         dialog.show()

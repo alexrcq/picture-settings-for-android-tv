@@ -3,15 +3,21 @@ package com.alexrcq.tvpicturesettings.ui.fragment.base
 import android.os.Bundle
 import androidx.annotation.CallSuper
 import androidx.annotation.XmlRes
+import androidx.core.os.bundleOf
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.preference.Preference
 
-abstract class BasePreferenceFragment(@XmlRes private val preferencesResId: Int) : LeanbackPreferenceFragmentCompat() {
+open class BasePreferenceFragment protected constructor(
+    @XmlRes private val preferencesResId: Int
+) : LeanbackPreferenceFragmentCompat() {
+
+    constructor() : this(0)
 
     @CallSuper
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        if (preferencesResId != 0) {
-            setPreferencesFromResource(preferencesResId, rootKey)
+        val resId = arguments?.getInt(ARG_PREFS_RES_ID, preferencesResId) ?: preferencesResId
+        if (resId != 0) {
+            setPreferencesFromResource(resId, rootKey)
         }
     }
 
@@ -23,5 +29,13 @@ abstract class BasePreferenceFragment(@XmlRes private val preferencesResId: Int)
             }
         }
         return super.onPreferenceTreeClick(preference)
+    }
+
+    companion object {
+        private const val ARG_PREFS_RES_ID = "prefs_res_id"
+
+        fun newInstance(@XmlRes preferencesResId: Int) = BasePreferenceFragment().apply {
+            arguments = bundleOf(ARG_PREFS_RES_ID to preferencesResId)
+        }
     }
 }
