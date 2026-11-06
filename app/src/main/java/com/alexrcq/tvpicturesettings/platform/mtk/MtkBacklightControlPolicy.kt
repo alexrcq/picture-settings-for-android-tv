@@ -4,14 +4,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.database.ContentObserver
-import android.net.Uri
-import android.os.Handler
-import android.os.Looper
-import android.provider.Settings
 import android.util.Xml
 import com.alexrcq.tvpicturesettings.platform.BacklightControlPolicy
-import com.alexrcq.tvpicturesettings.platform.ScreenSettings
+import com.alexrcq.tvpicturesettings.storage.GlobalSettingsStore
 import com.alexrcq.tvpicturesettings.storage.MtkGlobalKeys
 import com.alexrcq.tvpicturesettings.util.registerReceiverCompat
 import kotlinx.coroutines.CoroutineScope
@@ -29,7 +24,9 @@ import org.xmlpull.v1.XmlPullParser
 import java.io.File
 
 class MtkBacklightControlPolicy(
-    private val context: Context, private val screenSettings: ScreenSettings, scope: CoroutineScope
+    context: Context,
+    globalSettings: GlobalSettingsStore,
+    scope: CoroutineScope
 ) : BacklightControlPolicy {
 
     private val isOled: Boolean = context.packageManager.hasSystemFeature("mitv.hardware.panel.oled")
@@ -38,7 +35,7 @@ class MtkBacklightControlPolicy(
         queryTvConfigByKey("support_local_dimming") == "YES"
     }
 
-    private val isDolbyVisionActive: Flow<Boolean> = callbackFlow {
+    private val dolbyVisionActiveFlow: Flow<Boolean> = callbackFlow {
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (intent.action == ACTION_NOTIFY_DOLBY_VISION) {
@@ -53,26 +50,18 @@ class MtkBacklightControlPolicy(
         }
     }
 
-    private val isAutoBacklightEnabled: Flow<Boolean> = callbackFlow {
-        val observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
-            override fun onChange(selfChange: Boolean, uri: Uri?) {
-                if (uri?.lastPathSegment == MtkGlobalKeys.PICTURE_AUTO_BACKLIGHT) {
-                    trySend(screenSettings.isAutoBacklightEnabled)
-                }
-            }
-        }
-        send(screenSettings.isAutoBacklightEnabled)
-        context.contentResolver.registerContentObserver(Settings.Global.CONTENT_URI, true, observer)
-        awaitClose {
-            context.contentResolver.unregisterContentObserver(observer)
-        }
-    }
+    private val autoBacklightEnabledFlow: Flow<Boolean> =
+        globalSettings.getBooleanFlow(MtkGlobalKeys.PICTURE_AUTO_BACKLIGHT, false)
 
-    override val isAdjustmentAllowed: StateFlow<Boolean> = combine(
-        isAutoBacklightEnabled, isDolbyVisionActive
+    override val adjustmentAllowedFlow: StateFlow<Boolean> = combine(
+        autoBacklightEnabledFlow, dolbyVisionActiveFlow
     ) { isAutoBacklightEnabled, isDolbyVisionActive ->
         !(isAutoBacklightEnabled || (isDolbyVisionActive && !isLocalDimmingSupported.await() && !isOled))
-    }.stateIn(scope, SharingStarted.Eagerly, !screenSettings.isAutoBacklightEnabled)
+    }.stateIn(
+        scope,
+        SharingStarted.Eagerly,
+        !globalSettings.getBoolean(MtkGlobalKeys.PICTURE_AUTO_BACKLIGHT, false)
+    )
 
     companion object {
         private const val ACTION_NOTIFY_DOLBY_VISION =

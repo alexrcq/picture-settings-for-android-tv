@@ -6,9 +6,6 @@ import com.alexrcq.tvpicturesettings.storage.MtkGlobalKeys
 
 class MtkScreenSettings(private val globalSettings: GlobalSettingsStore) : ScreenSettings {
 
-    override val isAutoBacklightEnabled: Boolean
-        get() = globalSettings.getBoolean(MtkGlobalKeys.PICTURE_AUTO_BACKLIGHT, false)
-
     override val maxBacklight: Int = 100
 
     override var backlight: Int
@@ -18,7 +15,7 @@ class MtkScreenSettings(private val globalSettings: GlobalSettingsStore) : Scree
         }
 
     override var isScreenOn: Boolean
-        get() = globalSettings.getBoolean(MtkGlobalKeys.POWER_PICTURE_OFF, false)
+        get() = globalSettings.getBoolean(MtkGlobalKeys.POWER_PICTURE_OFF, true)
         set(value) {
             globalSettings.putBoolean(MtkGlobalKeys.POWER_PICTURE_OFF, value)
         }

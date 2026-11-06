@@ -19,7 +19,7 @@ class DarkModePreferencesFragment : BasePreferenceFragment(R.xml.dark_mode_prefs
         val backlightControlPolicy = (requireActivity().application as App).backlightControlPolicy
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                backlightControlPolicy.isAdjustmentAllowed.collect { isAdjustmentAllowed ->
+                backlightControlPolicy.adjustmentAllowedFlow.collect { isAdjustmentAllowed ->
                     findPreference<Preference>(PreferencesKeys.NIGHT_BACKLIGHT)?.isEnabled = isAdjustmentAllowed
                 }
             }

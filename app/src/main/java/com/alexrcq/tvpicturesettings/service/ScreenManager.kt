@@ -29,7 +29,10 @@ import com.alexrcq.tvpicturesettings.util.ColorUtils
 import com.alexrcq.tvpicturesettings.util.registerReceiverCompat
 import com.alexrcq.tvpicturesettings.util.showToast
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -92,6 +95,7 @@ class ScreenManager : LifecycleService() {
         super.onDestroy()
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun setupObservers() {
         darkModeManager.state
             .map { it.overlayState }
@@ -102,10 +106,11 @@ class ScreenManager : LifecycleService() {
         darkModeManager.state
             .map { it.targetBacklight }
             .distinctUntilChanged()
-            .onEach { targetBacklight ->
-                val canAdjustBacklight = backlightControlPolicy.isAdjustmentAllowed.value
-                if (canAdjustBacklight) screenSettings.backlight = targetBacklight
+            .mapLatest { targetBacklight ->
+                backlightControlPolicy.adjustmentAllowedFlow.first { it }
+                targetBacklight
             }
+            .onEach { screenSettings.backlight = it }
             .launchIn(lifecycleScope)
 
         darkModeManager.state

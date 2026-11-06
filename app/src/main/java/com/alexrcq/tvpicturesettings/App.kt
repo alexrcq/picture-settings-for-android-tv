@@ -65,7 +65,7 @@ class App : Application() {
         screenSettings = MtkScreenSettings(globalSettings)
         videoSettings = MtkVideoSettings(globalSettings)
         developerSettings = DeveloperSettings(globalSettings)
-        backlightControlPolicy = MtkBacklightControlPolicy(this, screenSettings, applicationScope)
+        backlightControlPolicy = MtkBacklightControlPolicy(this, globalSettings, applicationScope)
         tvInputMonitor = MtkTvInputMonitor(contentResolver)
         inactivityMonitor = MtkInactivityMonitor()
 
