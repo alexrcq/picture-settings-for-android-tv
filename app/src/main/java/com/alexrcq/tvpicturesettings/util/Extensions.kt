@@ -1,10 +1,13 @@
 package com.alexrcq.tvpicturesettings.util
 
+import android.Manifest
 import android.app.AppOpsManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
+import android.content.pm.PermissionInfo
 import android.os.Build
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -16,9 +19,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 
 fun Context.registerReceiverCompat(
-    receiver: BroadcastReceiver,
-    filter: IntentFilter,
-    isExported: Boolean = true
+    receiver: BroadcastReceiver, filter: IntentFilter, isExported: Boolean = true
 ): Intent? {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         val flags = if (isExported) Context.RECEIVER_EXPORTED else Context.RECEIVER_NOT_EXPORTED
@@ -70,7 +71,7 @@ fun LocalTime.nextOccurrence(from: LocalDateTime, dayOfWeek: Int? = null): Local
 
 suspend fun AppOpsManager.waitUntilAllowed(opName: String, packageName: String) = callbackFlow {
     val listener = AppOpsManager.OnOpChangedListener { _, _ ->
-        if (isOpAllowed(opName, packageName)) {
+        if (checkOpMode(opName, packageName) == AppOpsManager.MODE_ALLOWED) {
             trySend(Unit)
         }
     }
@@ -81,11 +82,33 @@ suspend fun AppOpsManager.waitUntilAllowed(opName: String, packageName: String) 
     }
 }.first()
 
-private fun AppOpsManager.isOpAllowed(op: String, packageName: String): Boolean {
-    val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+fun AppOpsManager.checkOpMode(op: String, packageName: String): Int {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         unsafeCheckOpNoThrow(op, android.os.Process.myUid(), packageName)
     } else {
         @Suppress("DEPRECATION") checkOpNoThrow(op, android.os.Process.myUid(), packageName)
     }
-    return mode == AppOpsManager.MODE_ALLOWED
+}
+
+fun permissionToOp(permission: String): String? =
+    AppOpsManager.permissionToOp(permission) ?: when (permission) {
+        Manifest.permission.PACKAGE_USAGE_STATS -> AppOpsManager.OPSTR_GET_USAGE_STATS
+        else -> null
+    }
+
+fun Context.hasPermission(permission: String): Boolean {
+    val op = permissionToOp(permission)
+        ?: return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+
+    val mode = getSystemService(AppOpsManager::class.java).checkOpMode(op, packageName)
+    return mode == AppOpsManager.MODE_ALLOWED ||
+        (mode == AppOpsManager.MODE_DEFAULT &&
+            checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED)
+}
+
+fun PermissionInfo.isDangerous(): Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+    protection == PermissionInfo.PROTECTION_DANGEROUS
+} else {
+    @Suppress("DEPRECATION")
+    (protectionLevel and PermissionInfo.PROTECTION_MASK_BASE) == PermissionInfo.PROTECTION_DANGEROUS
 }

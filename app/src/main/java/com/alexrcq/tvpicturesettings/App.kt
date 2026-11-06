@@ -13,9 +13,7 @@ import com.alexrcq.tvpicturesettings.platform.ScreenSettings
 import com.alexrcq.tvpicturesettings.platform.TvInputMonitor
 import com.alexrcq.tvpicturesettings.platform.VideoSettings
 import com.alexrcq.tvpicturesettings.platform.adb.AdbShell
-import com.alexrcq.tvpicturesettings.platform.adb.LocalAdbShell
 import com.alexrcq.tvpicturesettings.platform.android.DeveloperSettings
-import com.alexrcq.tvpicturesettings.platform.android.SystemDeveloperSettings
 import com.alexrcq.tvpicturesettings.platform.mtk.MtkBacklightControlPolicy
 import com.alexrcq.tvpicturesettings.platform.mtk.MtkInactivityMonitor
 import com.alexrcq.tvpicturesettings.platform.mtk.MtkScreenSettings
@@ -61,12 +59,12 @@ class App : Application() {
         videoPreferences = VideoPreferences(sharedPreferences, resources)
         screenControlPreferences = ScreenControlPreferences(sharedPreferences, resources)
 
-        adbShell = LocalAdbShell(this)
+        adbShell = AdbShell(this)
 
         val globalSettings = MtkGlobalSettingsStore(contentResolver)
         screenSettings = MtkScreenSettings(globalSettings)
         videoSettings = MtkVideoSettings(globalSettings)
-        developerSettings = SystemDeveloperSettings(globalSettings)
+        developerSettings = DeveloperSettings(globalSettings)
         backlightControlPolicy = MtkBacklightControlPolicy(this, screenSettings, applicationScope)
         tvInputMonitor = MtkTvInputMonitor(contentResolver)
         inactivityMonitor = MtkInactivityMonitor()
@@ -78,11 +76,7 @@ class App : Application() {
 
         if (Device.isSupported(this)) {
             AppStateInitializer(
-                darkModePreferences,
-                darkModeManager,
-                darkModeScheduler,
-                screenScheduler,
-                screenSettings
+                darkModePreferences, darkModeManager, darkModeScheduler, screenScheduler, screenSettings
             ).init()
         }
     }

@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.alexrcq.tvpicturesettings.platform.TvInputMonitor
 import com.alexrcq.tvpicturesettings.platform.adb.AdbShell
+import com.alexrcq.tvpicturesettings.platform.adb.captureScreen
 import com.alexrcq.tvpicturesettings.platform.android.DeveloperSettings
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,9 +40,9 @@ class ScreenCaptureViewModel(
     val state: StateFlow<ScreenCaptureState> = _state.asStateFlow()
 
     private val _sideEffects = Channel<ScreenCaptureSideEffect>()
-    val sideEffects = _sideEffects.receiveAsFlow()
+    val sideEffects: Flow<ScreenCaptureSideEffect> = _sideEffects.receiveAsFlow()
 
-    val isScreenCaptureAvailable: SharedFlow<Boolean> = tvInputMonitor.activeInput.map { it == null }
+    val screenCaptureAvailableFlow: SharedFlow<Boolean> = tvInputMonitor.activeInput.map { it == null }
         .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
 
     fun captureScreen() {

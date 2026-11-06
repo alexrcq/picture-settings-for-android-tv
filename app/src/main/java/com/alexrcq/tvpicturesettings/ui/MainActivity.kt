@@ -3,7 +3,6 @@ package com.alexrcq.tvpicturesettings.ui
 import android.Manifest
 import android.app.AlertDialog
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -18,12 +17,14 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.alexrcq.tvpicturesettings.App
 import com.alexrcq.tvpicturesettings.R
 import com.alexrcq.tvpicturesettings.platform.Device
+import com.alexrcq.tvpicturesettings.platform.android.PermissionGranter
 import com.alexrcq.tvpicturesettings.service.MtkWhiteBalanceLocker
 import com.alexrcq.tvpicturesettings.service.ScreenManager
 import com.alexrcq.tvpicturesettings.ui.fragment.dialog.LoadingDialog
 import com.alexrcq.tvpicturesettings.ui.viewmodel.SetupSideEffect
 import com.alexrcq.tvpicturesettings.ui.viewmodel.SetupState
 import com.alexrcq.tvpicturesettings.ui.viewmodel.SetupViewModel
+import com.alexrcq.tvpicturesettings.util.hasPermission
 import com.alexrcq.tvpicturesettings.util.showToast
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -32,7 +33,9 @@ class MainActivity : FragmentActivity() {
 
     private val viewModel: SetupViewModel by viewModels {
         val app = application as App
-        SetupViewModel.Factory(app.adbShell, app.developerSettings)
+        SetupViewModel.provideFactory(
+            PermissionGranter(applicationContext, app.adbShell), app.developerSettings
+        )
     }
 
     private val requiredPermissions = listOfNotNull(
@@ -104,8 +107,7 @@ class MainActivity : FragmentActivity() {
         }
     }
 
-    private fun getMissingPermissions(): List<String> =
-        requiredPermissions.filter { checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }
+    private fun getMissingPermissions(): List<String> = requiredPermissions.filter { !hasPermission(it) }
 
     private fun startServices() {
         ScreenManager.startForeground(this)

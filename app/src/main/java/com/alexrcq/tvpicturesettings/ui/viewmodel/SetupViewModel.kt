@@ -3,8 +3,8 @@ package com.alexrcq.tvpicturesettings.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.alexrcq.tvpicturesettings.platform.adb.AdbShell
 import com.alexrcq.tvpicturesettings.platform.android.DeveloperSettings
+import com.alexrcq.tvpicturesettings.platform.android.PermissionGranter
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -28,7 +28,9 @@ sealed interface SetupSideEffect {
     class Error(val message: String) : SetupSideEffect
 }
 
-class SetupViewModel(private val adbShell: AdbShell, private val developerSettings: DeveloperSettings) : ViewModel() {
+class SetupViewModel(
+    private val permissionGranter: PermissionGranter, private val developerSettings: DeveloperSettings
+) : ViewModel() {
 
     private val _state = MutableStateFlow<SetupState>(SetupState.Idle)
     val state: StateFlow<SetupState> = _state.asStateFlow()
@@ -50,7 +52,7 @@ class SetupViewModel(private val adbShell: AdbShell, private val developerSettin
             _state.value = SetupState.Processing
 
             try {
-                adbShell.grantPermissions(permissions)
+                permissionGranter.grantPermissions(permissions)
                 _sideEffects.send(SetupSideEffect.PermissionsGranted)
             } catch (e: CancellationException) {
                 throw e
@@ -66,14 +68,13 @@ class SetupViewModel(private val adbShell: AdbShell, private val developerSettin
         }
     }
 
-    override fun onCleared() {
-        adbShell.disconnect()
-    }
-
-    class Factory(private val adbShell: AdbShell, private val developerSettings: DeveloperSettings) :
-        ViewModelProvider.Factory {
-
+    companion object {
         @Suppress("UNCHECKED_CAST")
-        override fun <T : ViewModel> create(modelClass: Class<T>): T = SetupViewModel(adbShell, developerSettings) as T
+        fun provideFactory(
+            permissionGranter: PermissionGranter, developerSettings: DeveloperSettings
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T =
+                SetupViewModel(permissionGranter, developerSettings) as T
+        }
     }
 }
