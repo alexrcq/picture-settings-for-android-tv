@@ -18,7 +18,7 @@
 
     <string-array name="picture_temperature">
         <item>Warm</item>
-        <item>Cold</item>
+        <item>Cool</item>
         <item>Default</item>
     </string-array>
 
@@ -30,7 +30,7 @@
 
     <string-array name="picture_advanced_video_noise_reduction_entries">
         <item>Off</item>
-        <item>Minimum</item>
+        <item>Low</item>
         <item>Medium</item>
         <item>Strong</item>
     </string-array>
@@ -68,7 +68,7 @@
 
     <string-array name="blue_light_filter_mode_entries">
         <item>Off</item>
-        <item>Night Mode only</item>
+        <item>Dark Mode only</item>
         <item>Always</item>
     </string-array>
 

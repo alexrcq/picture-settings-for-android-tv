@@ -52,7 +52,7 @@
     <string name="picture_settings">Picture Settings</string>
     <string name="white_balance">White Balance</string>
     <string name="app_description">Version: %1$s</string>
-    <string name="color_gain_warning">The color gain settings may not work properly. The best way to adjust white balance is to use the corresponding settings in "Video Preferences"</string>
+    <string name="color_gain_warning">The color gain settings may not work properly. The best way to adjust white balance is to use the corresponding settings in \"Video Preferences\".</string>
     <string name="reset_values">Reset to Default</string>
     <string name="hold_to_toggle_extra_dimm_hint">Press and hold to toggle Extra Dimming</string>
     <string name="lock_values">Lock Values</string>
