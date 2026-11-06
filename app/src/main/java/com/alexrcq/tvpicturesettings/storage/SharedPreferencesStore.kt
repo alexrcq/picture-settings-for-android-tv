@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.core.content.edit
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import timber.log.Timber
 import kotlin.properties.ReadWriteProperty
@@ -39,17 +40,30 @@ open class SharedPreferencesStore(private val sharedPreferences: SharedPreferenc
         }
     }
 
-    fun <T : Any> preference(key: String, defValue: T): ReadWriteProperty<Any?, T> =
+    protected fun <T : Any> preference(key: String, defValue: T): ReadWriteProperty<Any?, T> =
         object : ReadWriteProperty<Any?, T> {
             override fun getValue(thisRef: Any?, property: KProperty<*>): T = get(key, defValue)
 
             override fun setValue(thisRef: Any?, property: KProperty<*>, value: T): Unit = put(key, value)
         }
 
-    fun <T: Any> preferenceFlow(key: String, defValue: T) = callbackFlow {
+    protected fun <T : Any> preferenceFlow(key: String, defValue: T) = callbackFlow {
         val listener = OnSharedPreferenceChangeListener { _, changedPrefKey ->
             if (key == changedPrefKey) {
                 trySend(get(changedPrefKey, defValue))
+            }
+        }
+        registerOnSharedPreferenceChangeListener(listener)
+        trySend(get(key, defValue))
+        awaitClose {
+            unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }
+
+    protected fun changesFlow(keyFilter: (String) -> Boolean): Flow<Unit> = callbackFlow {
+        val listener = OnSharedPreferenceChangeListener { _, changedKey ->
+            if (changedKey != null && keyFilter(changedKey)) {
+                trySend(Unit)
             }
         }
         registerOnSharedPreferenceChangeListener(listener)
@@ -58,11 +72,11 @@ open class SharedPreferencesStore(private val sharedPreferences: SharedPreferenc
         }
     }
 
-    fun registerOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener) {
+    private fun registerOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener) {
         sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
     }
 
-    fun unregisterOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener) {
+    private fun unregisterOnSharedPreferenceChangeListener(listener: OnSharedPreferenceChangeListener) {
         sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener)
     }
 }

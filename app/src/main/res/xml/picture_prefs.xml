@@ -1,36 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
     app:title="@string/picture">
-    <com.alexrcq.tvpicturesettings.ui.preference.LongPressGlobalSeekbarPreference
+    <com.alexrcq.tvpicturesettings.ui.preference.LongPressGlobalSeekBarPreference
         app:key="picture_backlight"
         app:title="@string/backlight" />
     <Preference
         app:key="toggle_screen_power"
         app:title="@string/power_picture_off" />
     <Preference
-        app:key="take_screenshot"
-        app:title="@string/take_screenshot" />
-    <Preference
-        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.VideoPreferencesFragment"
-        app:key="video_preferences"
+        app:key="mssp_video_preferences"
         app:title="@string/video_preferences" />
+    <PreferenceCategory app:title="@string/advanced" />
     <Preference
-        app:key="open_picture_settings"
-        app:title="@string/open_picture_settings"
-        tools:isPreferenceVisible="false"/>
-    <PreferenceCategory app:title="@string/advanced"/>
+        app:key="screen_control"
+        app:title="@string/advanced_screen_control_title" />
     <Preference
-        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.BlueLightFilterFragment"
-        app:key="blue_light_filter"
-        app:title="@string/blue_light_filter"/>
-    <Preference
-        app:fragment="com.alexrcq.tvpicturesettings.ui.fragment.DarkModePreferencesFragment"
         app:key="dark_mode_preferences"
-        app:title="@string/dark_mode_preferences"/>
+        app:title="@string/dark_mode_preferences" />
     <Preference
         app:key="app_description"
         app:selectable="false"
-        app:summary="@string/app_description"/>
+        app:summary="@string/app_description" />
 </PreferenceScreen>

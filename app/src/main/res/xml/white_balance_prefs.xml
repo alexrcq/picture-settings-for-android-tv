@@ -1,27 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    android:title="@string/white_balance">
-    <com.alexrcq.tvpicturesettings.ui.preference.PersistentGlobalSeekbarPreference
-        android:key="picture_red_gain"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="@string/white_balance">
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekBarPreference
         android:max="2047"
-        android:title="@string/red" />
-    <com.alexrcq.tvpicturesettings.ui.preference.PersistentGlobalSeekbarPreference
-        android:key="picture_green_gain"
+        app:key="picture_red_gain"
+        app:title="@string/red" />
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekBarPreference
         android:max="2047"
-        android:title="@string/green" />
-    <com.alexrcq.tvpicturesettings.ui.preference.PersistentGlobalSeekbarPreference
-        android:key="picture_blue_gain"
+        app:key="picture_green_gain"
+        app:title="@string/green" />
+    <com.alexrcq.tvpicturesettings.ui.preference.GlobalSeekBarPreference
         android:max="2047"
-        android:title="@string/blue" />
+        app:key="picture_blue_gain"
+        app:title="@string/blue" />
     <SwitchPreference
-        android:defaultValue="@bool/is_white_balance_locked"
-        android:key="fix_wb_values"
-        android:title="@string/fix_values"
-        android:summary="@string/fix_values_summary"/>
+        app:defaultValue="@bool/def_white_balance_locked"
+        app:key="fix_wb_values"
+        app:summary="@string/lock_values_summary"
+        app:title="@string/lock_values" />
     <Preference
-        android:key="reset_values"
-        android:title="@string/reset_to_default_1024"/>
-    <Preference
-        android:selectable="false"
-        android:summary="@string/white_balance_hint"/>
+        app:key="reset_values"
+        app:title="@string/reset_values" />
 </PreferenceScreen>

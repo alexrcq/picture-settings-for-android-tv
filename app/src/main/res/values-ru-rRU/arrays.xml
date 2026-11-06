@@ -18,4 +18,46 @@
         <item>Средне</item>
         <item>Сильно</item>
     </array>
+    <string-array name="screen_off_timeout_entries">
+        <item>Не выключать экран</item>
+        <item>После 5 минут бездействия</item>
+        <item>После 15 минут бездействия</item>
+        <item>После 30 минут бездействия</item>
+        <item>После часа бездействия</item>
+        <item>После 2 часов бездействия</item>
+        <item>После 4 часов бездействия</item>
+        <item>После 8 часов бездействия</item>
+        <item>После 12 часов бездействия</item>
+    </string-array>
+    <string-array name="blue_light_filter_mode_entries">
+        <item>Выключено</item>
+        <item>Только в ночном режиме</item>
+        <item>Всегда</item>
+    </string-array>
+    <string-array name="screen_schedule_mode_entries">
+        <item>Расписание выключено</item>
+        <item>Ежедневный</item>
+        <item>По дням недели</item>
+    </string-array>
+    <string-array name="days_of_week_entries">
+        <item>Понедельник</item>
+        <item>Вторник</item>
+        <item>Среда</item>
+        <item>Четверг</item>
+        <item>Пятница</item>
+        <item>Суббота</item>
+        <item>Воскресенье</item>
+    </string-array>
+
+    <string-array name="launcher_screen_off_timeout_entries">
+        <item>Не выключать экран</item>
+        <item>Выключать экран через 1 минуту</item>
+        <item>Выключать экран через 2 минуты</item>
+        <item>Выключать экран через 3 минуты</item>
+        <item>Выключать экран через 5 минут</item>
+        <item>Выключать экран через 10 минут</item>
+        <item>Выключать экран через 15 минут</item>
+        <item>Выключать экран через 30 минут</item>
+        <item>Выключать экран через 1 час</item>
+    </string-array>
 </resources>

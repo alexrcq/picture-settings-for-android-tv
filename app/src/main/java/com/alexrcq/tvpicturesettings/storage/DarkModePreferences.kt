@@ -2,78 +2,95 @@ package com.alexrcq.tvpicturesettings.storage
 
 import android.content.SharedPreferences
 import android.content.res.Resources
-import com.alexrcq.tvpicturesettings.domain.DarkModeManager
 import com.alexrcq.tvpicturesettings.R
+import com.alexrcq.tvpicturesettings.manager.model.BlueLightFilterMode
+import com.alexrcq.tvpicturesettings.manager.model.DarkMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.LocalTime
 
-class DarkModePreferences(sharedPreferences: SharedPreferences, resources: Resources) :
+class DarkModePreferences(sharedPreferences: SharedPreferences, private val resources: Resources) :
     SharedPreferencesStore(sharedPreferences) {
 
-    var isAutoDarkModeEnabled: Boolean by preference(
-        PreferencesKeys.IS_AUTO_DARK_MODE_ENABLED,
-        resources.getBoolean(R.bool.is_auto_dark_mode_enabled)
+    var isDarkModeScheduleEnabled: Boolean by preference(
+        PreferencesKeys.DARK_MODE_SCHEDULE_ENABLED, resources.getBoolean(R.bool.def_dark_mode_schedule_enabled)
     )
-    var darkModeTime: String by preference(PreferencesKeys.DARK_MODE_TIME, resources.getString(R.string.dark_mode_time))
-    var dayModeTime: String by preference(PreferencesKeys.DAY_MODE_TIME, resources.getString(R.string.day_mode_time))
+    var darkModeTime: LocalTime
+        get() = LocalTime.parse(get(PreferencesKeys.DARK_MODE_TIME, resources.getString(R.string.def_dark_mode_time)))
+        set(value) {
+            put(PreferencesKeys.DARK_MODE_TIME, value.toString())
+        }
+    var dayModeTime: LocalTime
+        get() = LocalTime.parse(get(PreferencesKeys.DAY_MODE_TIME, resources.getString(R.string.def_day_mode_time)))
+        set(value) {
+            put(PreferencesKeys.DAY_MODE_TIME, value.toString())
+        }
     var nightBacklight: Int by preference(
-        PreferencesKeys.NIGHT_BACKLIGHT,
-        resources.getInteger(R.integer.night_backlight)
+        PreferencesKeys.NIGHT_BACKLIGHT, resources.getInteger(R.integer.def_night_backlight)
     )
     var dayBacklight: Int by preference(
-        PreferencesKeys.DAY_BACKLIGHT,
-        resources.getInteger(R.integer.day_backlight)
+        PreferencesKeys.DAY_BACKLIGHT, resources.getInteger(R.integer.def_day_backlight)
     )
-    var turnOffDarkModeOnPowerOn: Boolean by preference(
-        PreferencesKeys.TURN_OFF_DARK_MODE_ON_POWER_ON,
-        resources.getBoolean(R.bool.turn_off_dark_mode_on_power_on)
+    var disableDarkModeOnPowerOn: Boolean by preference(
+        PreferencesKeys.DISABLE_DARK_MODE_ON_POWER_ON, resources.getBoolean(R.bool.def_disable_dark_mode_on_power_on)
     )
     var isAdditionalDimmingEnabled: Boolean by preference(
-        PreferencesKeys.IS_ADDITIONAL_DIMMING_ENABLED,
-        resources.getBoolean(R.bool.is_additional_dimming_enabled)
+        PreferencesKeys.ADDITIONAL_DIMMING_ENABLED, resources.getBoolean(R.bool.def_additional_dimming_enabled)
     )
     var isScreenDimmingEnabled: Boolean by preference(
-        PreferencesKeys.IS_SCREEN_DIMMING_ENABLED,
-        resources.getBoolean(R.bool.is_screen_dimming_enabled)
+        PreferencesKeys.SCREEN_DIMMING_ENABLED, resources.getBoolean(R.bool.def_screen_dimming_enabled)
     )
     var screenDimmingPower: Int by preference(
-        PreferencesKeys.SCREEN_DIMMING_POWER,
-        resources.getInteger(R.integer.screen_dimming_power)
+        PreferencesKeys.SCREEN_DIMMING_POWER, resources.getInteger(R.integer.def_screen_dimming_power)
     )
-    var threeStepsDarkModeEnabled: Boolean by preference(
-        PreferencesKeys.STEP_BY_STEP_DARK_MODE_ENABLED,
-        resources.getBoolean(R.bool.three_steps_dark_mode_enabled)
+    var isThreeStepsDarkModeEnabled: Boolean by preference(
+        PreferencesKeys.STEP_BY_STEP_DARK_MODE_ENABLED, resources.getBoolean(R.bool.def_three_steps_dark_mode_enabled)
     )
     var showModeChanged: Boolean by preference(
-        PreferencesKeys.SHOW_MODE_CHANGED,
-        resources.getBoolean(R.bool.show_mode_changed)
-    )
-    var isBlueLightFilterEnabled: Boolean by preference(
-        PreferencesKeys.IS_BLUE_LIGHT_FILTER_ENABLED,
-        resources.getBoolean(R.bool.is_blue_light_filter_enabled)
+        PreferencesKeys.SHOW_MODE_CHANGED, resources.getBoolean(R.bool.def_show_mode_changed)
     )
     var blueLightFilterPower: Int by preference(
-        PreferencesKeys.BLUE_LIGHT_FILTER_POWER,
-        resources.getInteger(R.integer.blue_light_filter_power)
+        PreferencesKeys.BLUE_LIGHT_FILTER_POWER, resources.getInteger(R.integer.def_blue_light_filter_power)
     )
     var blueLightFilterTemp: Int by preference(
-        PreferencesKeys.BLUE_LIGHT_FILTER_TEMPERATURE,
-        resources.getInteger(R.integer.blue_filter_temperature)
+        PreferencesKeys.BLUE_LIGHT_FILTER_TEMPERATURE, resources.getInteger(R.integer.def_blue_light_filter_temperature)
     )
-    var isNightBlueFilterEnabled: Boolean by preference(
-        PreferencesKeys.IS_NIGHT_BLUE_FILTER_ENABLED,
-        resources.getBoolean(R.bool.is_night_blue_filter_enabled)
-    )
-    var isAlwaysBlueFilterEnabled: Boolean by preference(
-        PreferencesKeys.IS_ALWAYS_BLUE_FILTER_ENABLED,
-        resources.getBoolean(R.bool.is_always_blue_filter_enabled)
-    )
-    var currentMode: DarkModeManager.Mode
-        get() = DarkModeManager.Mode.valueOf(get(PreferencesKeys.CURRENT_MODE_NAME, DarkModeManager.Mode.OFF.name))
+    var blueLightFilterMode: BlueLightFilterMode
+        get() = BlueLightFilterMode.of(get(PreferencesKeys.BLUE_LIGHT_FILTER_MODE, BlueLightFilterMode.OFF.value))
+        set(value) {
+            put(PreferencesKeys.BLUE_LIGHT_FILTER_MODE, value.value)
+        }
+    var currentMode: DarkMode
+        get() = DarkMode.valueOf(get(PreferencesKeys.CURRENT_MODE_NAME, DarkMode.OFF.name))
         set(value) {
             put(PreferencesKeys.CURRENT_MODE_NAME, value.name)
         }
-    val modeFlow: Flow<DarkModeManager.Mode> = preferenceFlow(
-        PreferencesKeys.CURRENT_MODE_NAME, DarkModeManager.Mode.OFF.name
-    ).map { modeName -> DarkModeManager.Mode.valueOf(modeName) }
+    val currentModeFlow: Flow<DarkMode> = preferenceFlow(
+        PreferencesKeys.CURRENT_MODE_NAME, DarkMode.OFF.name
+    ).map { modeName -> DarkMode.valueOf(modeName) }
+    val screenDimmingEnabledFlow: Flow<Boolean> = preferenceFlow(
+        PreferencesKeys.SCREEN_DIMMING_ENABLED, resources.getBoolean(R.bool.def_screen_dimming_enabled)
+    )
+    val screenDimmingPowerFlow: Flow<Int> = preferenceFlow(
+        PreferencesKeys.SCREEN_DIMMING_POWER, resources.getInteger(R.integer.def_screen_dimming_power)
+    )
+    val blueLightFilterModeFlow: Flow<BlueLightFilterMode> = preferenceFlow(
+        PreferencesKeys.BLUE_LIGHT_FILTER_MODE, BlueLightFilterMode.OFF.value
+    ).map { BlueLightFilterMode.of(it) }
+    val blueLightFilterTempFlow: Flow<Int> = preferenceFlow(
+        PreferencesKeys.BLUE_LIGHT_FILTER_TEMPERATURE, resources.getInteger(R.integer.def_blue_light_filter_temperature)
+    )
+    val blueLightFilterPowerFlow: Flow<Int> = preferenceFlow(
+        PreferencesKeys.BLUE_LIGHT_FILTER_POWER, resources.getInteger(R.integer.def_blue_light_filter_power)
+    )
+    val nightBacklightFlow: Flow<Int> =
+        preferenceFlow(PreferencesKeys.NIGHT_BACKLIGHT, resources.getInteger(R.integer.def_night_backlight))
+    val dayBacklightFlow: Flow<Int> =
+        preferenceFlow(PreferencesKeys.DAY_BACKLIGHT, resources.getInteger(R.integer.def_day_backlight))
+
+    val scheduleChangesFlow: Flow<Unit> = changesFlow { key ->
+        key == PreferencesKeys.DARK_MODE_SCHEDULE_ENABLED ||
+            key == PreferencesKeys.DARK_MODE_TIME ||
+            key == PreferencesKeys.DAY_MODE_TIME
+    }
 }

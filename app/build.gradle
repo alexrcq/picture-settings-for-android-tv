@@ -9,10 +9,11 @@ android {
     defaultConfig {
         applicationId "com.alexrcq.tvpicturesettings"
         minSdkVersion 26
-        compileSdk 32
+        compileSdk 33
         targetSdkVersion 33
-        versionCode 48
-        versionName "1.0.82"
+        versionCode 52
+        versionName "1.0.84"
+        resConfigs "en", "ru-rRU", "tr", "xhdpi"
     }
 
     compileOptions {
@@ -63,6 +64,7 @@ android {
 
 dependencies {
     def leanback_version = '1.2.0-alpha02'
+    def lifecycle_version = "2.4.0"
     implementation("androidx.leanback:leanback:$leanback_version")
     implementation("androidx.leanback:leanback-preference:$leanback_version")
 
@@ -72,5 +74,6 @@ dependencies {
 
     implementation 'com.jakewharton.timber:timber:5.0.1'
 
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-service:$lifecycle_version"
 }

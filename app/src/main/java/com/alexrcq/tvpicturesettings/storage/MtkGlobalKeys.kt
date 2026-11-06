@@ -11,7 +11,6 @@ object MtkGlobalKeys {
     const val PICTURE_SATURATION = "picture_saturation"
     const val PICTURE_HUE = "picture_hue"
     const val PICTURE_SHARPNESS = "picture_sharpness"
-    const val PICTURE_LIST_HDR = "picture_list_hdr"
     const val PICTURE_RESET_TO_DEFAULT = "picture_reset_to_default"
     const val PICTURE_AUTO_BACKLIGHT = "picture_auto_backlight"
     const val POWER_PICTURE_OFF = "power_picture_off"
