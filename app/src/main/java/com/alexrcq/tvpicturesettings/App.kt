@@ -70,9 +70,9 @@ class App : Application() {
         inactivityMonitor = MtkInactivityMonitor()
 
         darkModeManager = DarkModeManager(darkModePreferences, applicationScope)
-        darkModeScheduler = DarkModeScheduler(this, darkModePreferences)
+        darkModeScheduler = DarkModeScheduler(this, darkModePreferences, applicationScope)
 
-        screenScheduler = ScreenScheduler(this, screenControlPreferences)
+        screenScheduler = ScreenScheduler(this, screenControlPreferences, applicationScope)
 
         if (Device.isSupported(this)) {
             AppStateInitializer(

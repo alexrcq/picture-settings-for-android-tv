@@ -88,4 +88,9 @@ class DarkModePreferences(sharedPreferences: SharedPreferences, private val reso
     val dayBacklightFlow: Flow<Int> =
         preferenceFlow(PreferencesKeys.DAY_BACKLIGHT, resources.getInteger(R.integer.def_day_backlight))
 
+    val scheduleChangesFlow: Flow<Unit> = changesFlow { key ->
+        key == PreferencesKeys.DARK_MODE_SCHEDULE_ENABLED ||
+            key == PreferencesKeys.DARK_MODE_TIME ||
+            key == PreferencesKeys.DAY_MODE_TIME
+    }
 }

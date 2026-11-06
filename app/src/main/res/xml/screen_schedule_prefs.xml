@@ -11,11 +11,11 @@
         app:useSimpleSummaryProvider="true" />
 
     <com.alexrcq.tvpicturesettings.ui.preference.TimePickerPreference
-        app:defaultValue="08:00"
+        app:defaultValue="@string/def_screen_on_time"
         app:key="screen_on_time"
         app:title="@string/screen_on_time" />
     <com.alexrcq.tvpicturesettings.ui.preference.TimePickerPreference
-        app:defaultValue="23:00"
+        app:defaultValue="@string/def_screen_off_time"
         app:key="screen_off_time"
         app:title="@string/screen_off_time" />
 

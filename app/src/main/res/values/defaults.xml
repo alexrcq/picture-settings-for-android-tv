@@ -17,5 +17,7 @@
 
     <string name="def_dark_mode_time" translatable="false">22:45</string>
     <string name="def_day_mode_time" translatable="false">07:30</string>
+    <string name="def_screen_on_time" translatable="false">08:00</string>
+    <string name="def_screen_off_time" translatable="false">23:00</string>
     <string name="def_screen_off_timeout" translatable="false">0</string>
 </resources>
